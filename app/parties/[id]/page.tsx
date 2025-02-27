@@ -13,6 +13,8 @@ import {
   PartyParticipant,
   ParticipantDishContribution,
 } from '@prisma/client'
+import { DeletePartyDialog } from '@/components/delete-party-dialog'
+import { RemoveParticipantButton } from '@/components/remove-participant-button'
 
 interface PartyWithDetails extends Party {
   createdBy: {
@@ -128,7 +130,12 @@ export default async function PartyPage({
         </div>
         <div className='flex items-center gap-4 self-start'>
           <ShareParty partyId={party.id} partyName={party.name} />
-          {isAdmin && <EditPartyDialog party={party} />}
+          {isAdmin && (
+            <>
+              <EditPartyDialog party={party} />
+              <DeletePartyDialog partyId={party.id} partyName={party.name} />
+            </>
+          )}
           <PartyActions
             partyId={party.id}
             isParticipant={isParticipant}
@@ -192,17 +199,50 @@ export default async function PartyPage({
                     className='flex items-center justify-between gap-4 p-3 bg-muted/50 rounded-lg'
                   >
                     <span className='font-medium'>{participant.user.name}</span>
-                    {participant.numGuests > 0 && (
-                      <Badge variant='secondary'>
-                        +{participant.numGuests} guest
-                        {participant.numGuests !== 1 && 's'}
-                      </Badge>
-                    )}
+                    <div className='flex items-center gap-2'>
+                      {participant.numGuests > 0 && (
+                        <Badge variant='secondary'>
+                          +{participant.numGuests} guest
+                          {participant.numGuests !== 1 && 's'}
+                        </Badge>
+                      )}
+                      {isAdmin && (
+                        <RemoveParticipantButton
+                          partyId={party.id}
+                          participantId={participant.id}
+                          participantName={participant.user.name}
+                        />
+                      )}
+                    </div>
                   </div>
                 ))
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Per Person Amounts Card */}
+      <div className='card p-6 space-y-4'>
+        <h2 className='text-lg font-medium'>Amount Per Person</h2>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+          {party.dishes.map((partyDish) => (
+            <div
+              key={partyDish.dishId}
+              className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'
+            >
+              <div className='flex items-center gap-2'>
+                <span className='font-medium'>{partyDish.dish.name}</span>
+                <Badge variant='outline' className='shrink-0'>
+                  {partyDish.dish.unit}
+                </Badge>
+              </div>
+              <span className='text-sm'>
+                {partyDish.amountPerPerson.toFixed(1)}{' '}
+                {partyDish.dish.unit.toLowerCase()}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -212,6 +252,7 @@ export default async function PartyPage({
         participants={party.participants}
         isParticipant={isParticipant}
         totalParticipants={totalParticipants}
+        isAdmin={isAdmin}
       />
     </div>
   )

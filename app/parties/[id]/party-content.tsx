@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { ViewToggle } from '@/components/ui/view-toggle'
 import { DishContributionForm } from '@/components/dish-contribution-form'
+import { AddPartyDishDialog } from '@/components/add-party-dish-dialog'
 import {
   PartyDish,
   PartyParticipant,
@@ -33,6 +34,7 @@ interface DishesContentProps {
   })[]
   isParticipant: boolean
   totalParticipants: number
+  isAdmin: boolean
 }
 
 export function DishesContent({
@@ -40,6 +42,7 @@ export function DishesContent({
   participants,
   isParticipant,
   totalParticipants,
+  isAdmin,
 }: DishesContentProps) {
   const [view, setView] = useState<'grid' | 'list'>('grid')
   const params = useParams()
@@ -49,7 +52,10 @@ export function DishesContent({
     <div className='card p-6 space-y-4'>
       <div className='flex items-center justify-between'>
         <h2 className='text-lg font-medium'>Dishes</h2>
-        <ViewToggle view={view} onViewChange={setView} />
+        <div className='flex items-center gap-4'>
+          {isAdmin && <AddPartyDishDialog partyId={partyId} />}
+          <ViewToggle view={view} onViewChange={setView} />
+        </div>
       </div>
       <div
         className={
