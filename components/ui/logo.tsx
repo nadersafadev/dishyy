@@ -27,7 +27,7 @@ export function Logo({ variant = 'dark', size = 'default' }: LogoProps) {
           variant === 'light' ? 'text-white' : 'text-foreground'
         )}
       >
-        Dishy
+        Dishyy
       </span>
     </div>
   )
