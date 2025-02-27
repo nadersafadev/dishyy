@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  clerkId   String     @unique
+  name      String
+  email     String     @unique
+  role      Role       @default(INDIVIDUAL)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  parties   Party[]    @relation("CreatedParties")
+  attending PartyParticipant[]
+
+  @@map("users")
+}
+
+model Party {
+  id              String     @id @default(cuid())
+  name            String
+  description     String?
+  date            DateTime
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  createdById     String
+  createdBy       User       @relation("CreatedParties", fields: [createdById], references: [id])
+  dishes          PartyDish[]
+  participants    PartyParticipant[]
+  maxParticipants Int?      // Optional maximum number of total participants (including guests)
+  status          PartyStatus @default(OPEN)
+
+  @@map("parties")
+}
+
+model Dish {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  imageUrl    String?    // URL of the uploaded image
+  imageId     String?    // Cloudinary public ID for the image
+  unit        Unit       @default(QUANTITY)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  parties     PartyDish[]
+
+  @@map("dishes")
+}
+
+model PartyDish {
+  id              String   @id @default(cuid())
+  partyId         String
+  dishId          String
+  amountPerPerson Float    // Amount per person in the dish's unit
+  party           Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  dish            Dish     @relation(fields: [dishId], references: [id])
+  createdAt       DateTime @default(now())
+
+  @@unique([partyId, dishId])
+  @@map("party_dishes")
+}
+
+model PartyParticipant {
+  id          String     @id @default(cuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  partyId     String
+  party       Party      @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  numGuests   Int        @default(0)  // Number of additional guests the participant is bringing
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([userId, partyId])  // A user can only participate once in a party
+  @@map("party_participants")
+}
+
+enum Role {
+  ADMIN
+  INDIVIDUAL
+}
+
+enum PartyStatus {
+  OPEN       // Accepting new participants
+  FULL       // Maximum participants reached
+  CLOSED     // No longer accepting participants
+  CANCELLED  // Party cancelled
+}
+
+enum Unit {
+  GRAMS
+  KILOS
+  QUANTITY
+  MILLILITERS
+  LITERS
+  PIECES
+}
+
