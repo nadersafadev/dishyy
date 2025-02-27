@@ -1,14 +1,14 @@
-import { SignUp } from '@clerk/nextjs'
-import { Background } from '@/components/ui/background'
-import { Logo } from '@/components/ui/logo'
+import { SignUp } from '@clerk/nextjs';
+import { Background } from '@/components/ui/background';
+import { Logo } from '@/components/ui/logo';
 
 export default function SignUpPage() {
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center'>
+    <div className="min-h-screen flex flex-col items-center justify-center">
       <Background />
-      <div className='w-full max-w-[400px] space-y-4'>
-        <div className='flex justify-center'>
-          <Logo variant='light' size='large' />
+      <div className="w-full max-w-[400px] space-y-4">
+        <div className="flex justify-center">
+          <Logo variant="light" size="large" />
         </div>
         <SignUp
           appearance={{
@@ -25,12 +25,12 @@ export default function SignUpPage() {
               footerActionLink: 'text-primary hover:text-primary/90',
             },
           }}
-          path='/sign-up'
-          forceRedirectUrl='/dashboard'
-          signInUrl='/sign-in'
-          routing='path'
+          path="/sign-up"
+          forceRedirectUrl="/dashboard"
+          signInUrl="/sign-in"
+          routing="path"
         />
       </div>
     </div>
-  )
+  );
 }

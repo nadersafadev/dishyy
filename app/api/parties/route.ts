@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
 
 const partySchema = z.object({
   name: z.string().min(1, 'Party name is required'),
   description: z.string().optional(),
-  date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+  date: z.string().refine(val => !isNaN(Date.parse(val)), {
     message: 'Invalid date',
   }),
   maxParticipants: z.number().min(1).optional(),
@@ -18,7 +18,7 @@ const partySchema = z.object({
       })
     )
     .min(1, 'At least one dish is required'),
-})
+});
 
 // GET all parties
 export async function GET() {
@@ -40,52 +40,52 @@ export async function GET() {
       orderBy: {
         createdAt: 'desc',
       },
-    })
+    });
 
-    return NextResponse.json(parties)
+    return NextResponse.json(parties);
   } catch (error) {
-    console.error('Error fetching parties:', error)
+    console.error('Error fetching parties:', error);
     return NextResponse.json(
       { error: 'Error fetching parties' },
       { status: 500 }
-    )
+    );
   }
 }
 
 // CREATE a new party
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
+    const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse('Unauthorized', { status: 401 })
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
-    })
+    });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const body = await req.json()
-    const validatedData = partySchema.parse(body)
+    const body = await req.json();
+    const validatedData = partySchema.parse(body);
 
     // Verify all dishes exist
     const dishes = await prisma.dish.findMany({
       where: {
         id: {
-          in: validatedData.dishes.map((d) => d.dishId),
+          in: validatedData.dishes.map(d => d.dishId),
         },
       },
-    })
+    });
 
     if (dishes.length !== validatedData.dishes.length) {
       return NextResponse.json(
         { error: 'One or more dishes not found' },
         { status: 400 }
-      )
+      );
     }
 
     const party = await prisma.party.create({
@@ -112,20 +112,20 @@ export async function POST(req: Request) {
           },
         },
       },
-    })
+    });
 
-    return NextResponse.json(party)
+    return NextResponse.json(party);
   } catch (error) {
-    console.error('Error creating party:', error)
+    console.error('Error creating party:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid data', details: error.errors },
         { status: 400 }
-      )
+      );
     }
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
-    )
+    );
   }
 }

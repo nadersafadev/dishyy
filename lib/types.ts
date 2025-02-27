@@ -14,16 +14,16 @@ export const unitLabels: Record<Unit, string> = {
   [Unit.MILLILITERS]: 'Milliliters',
   [Unit.LITERS]: 'Liters',
   [Unit.PIECES]: 'Pieces',
-}
+};
 
 export interface Dish {
-  id: string
-  name: string
-  description: string | null
-  imageUrl: string | null
-  imageId: string | null
-  unit: Unit
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  imageId: string | null;
+  unit: Unit;
   _count?: {
-    parties: number
-  }
+    parties: number;
+  };
 }

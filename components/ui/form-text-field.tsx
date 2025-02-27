@@ -1,22 +1,22 @@
-import { useFormContext } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form';
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 interface FormTextFieldProps {
-  name: string
-  label: string
-  placeholder?: string
-  type?: 'text' | 'number'
-  className?: string
-  min?: number
-  step?: string
-  optional?: boolean
+  name: string;
+  label: string;
+  placeholder?: string;
+  type?: 'text' | 'number';
+  className?: string;
+  min?: number;
+  step?: string;
+  optional?: boolean;
 }
 
 export function FormTextField({
@@ -29,7 +29,7 @@ export function FormTextField({
   step,
   optional = false,
 }: FormTextFieldProps) {
-  const form = useFormContext()
+  const form = useFormContext();
 
   return (
     <FormField
@@ -37,10 +37,10 @@ export function FormTextField({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className='text-sm font-medium'>
+          <FormLabel className="text-sm font-medium">
             {label}
             {optional && (
-              <span className='text-sm text-muted-foreground'> (Optional)</span>
+              <span className="text-sm text-muted-foreground"> (Optional)</span>
             )}
           </FormLabel>
           <FormControl>
@@ -56,19 +56,19 @@ export function FormTextField({
                   ? ''
                   : field.value
               }
-              onChange={(e) => {
-                const value = e.target.value
+              onChange={e => {
+                const value = e.target.value;
                 if (type === 'number') {
-                  field.onChange(value === '' ? undefined : Number(value))
+                  field.onChange(value === '' ? undefined : Number(value));
                 } else {
-                  field.onChange(value)
+                  field.onChange(value);
                 }
               }}
             />
           </FormControl>
-          <FormMessage className='text-xs' />
+          <FormMessage className="text-xs" />
         </FormItem>
       )}
     />
-  )
+  );
 }

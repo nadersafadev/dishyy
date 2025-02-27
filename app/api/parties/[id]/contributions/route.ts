@@ -1,30 +1,30 @@
-import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
 
 const contributionSchema = z.object({
   dishId: z.string().min(1, 'Dish ID is required'),
   amount: z.number().positive('Amount must be positive'),
-})
+});
 
 export async function POST(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = await auth()
+    const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse('Unauthorized', { status: 401 })
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
-    })
+    });
 
     if (!user) {
-      return new NextResponse('User not found', { status: 404 })
+      return new NextResponse('User not found', { status: 404 });
     }
 
     // Check if user is a participant in the party
@@ -35,7 +35,7 @@ export async function POST(
           partyId: params.id,
         },
       },
-    })
+    });
 
     if (!participant) {
       return new NextResponse(
@@ -43,11 +43,11 @@ export async function POST(
         {
           status: 403,
         }
-      )
+      );
     }
 
-    const body = await req.json()
-    const validatedData = contributionSchema.parse(body)
+    const body = await req.json();
+    const validatedData = contributionSchema.parse(body);
 
     // Get the party dish and all current contributions
     const [partyDish, allContributions] = await Promise.all([
@@ -74,37 +74,37 @@ export async function POST(
           },
         },
       }),
-    ])
+    ]);
 
     if (!partyDish) {
       return NextResponse.json(
         { error: 'Dish not found in party' },
         { status: 404 }
-      )
+      );
     }
 
     // Calculate total needed and current contributions
     const totalParticipants = partyDish.party.participants.reduce(
       (sum, p) => sum + 1 + p.numGuests,
       0
-    )
-    const totalNeeded = partyDish.amountPerPerson * totalParticipants
+    );
+    const totalNeeded = partyDish.amountPerPerson * totalParticipants;
     const currentContributions = allContributions.reduce(
       (sum, c) => sum + c.amount,
       0
-    )
+    );
 
     // Get the user's current contribution if it exists
     const existingContribution = allContributions.find(
-      (c) => c.participantId === participant.id
-    )
-    const userCurrentAmount = existingContribution?.amount || 0
+      c => c.participantId === participant.id
+    );
+    const userCurrentAmount = existingContribution?.amount || 0;
 
     // Calculate how much more can be contributed
     const remainingNeeded = Math.max(
       0,
       totalNeeded - currentContributions + userCurrentAmount
-    )
+    );
 
     // Check if the new contribution would exceed the needed amount
     if (validatedData.amount > remainingNeeded) {
@@ -115,7 +115,7 @@ export async function POST(
           )}`,
         },
         { status: 400 }
-      )
+      );
     }
 
     // Create or update the contribution
@@ -142,21 +142,21 @@ export async function POST(
           },
         },
       },
-    })
+    });
 
-    return NextResponse.json(contribution)
+    return NextResponse.json(contribution);
   } catch (error) {
-    console.error('Error adding dish contribution:', error)
+    console.error('Error adding dish contribution:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid data', details: error.errors },
         { status: 400 }
-      )
+      );
     }
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -166,10 +166,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = await auth()
+    const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse('Unauthorized', { status: 401 })
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const contributions = await prisma.participantDishContribution.findMany({
@@ -195,14 +195,14 @@ export async function GET(
           },
         },
       },
-    })
+    });
 
-    return NextResponse.json(contributions)
+    return NextResponse.json(contributions);
   } catch (error) {
-    console.error('Error fetching contributions:', error)
+    console.error('Error fetching contributions:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
-    )
+    );
   }
 }

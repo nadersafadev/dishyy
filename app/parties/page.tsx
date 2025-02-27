@@ -1,16 +1,16 @@
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { PlusIcon } from 'lucide-react'
-import { PartyListWithViewToggle } from '@/components/party-list-with-view-toggle'
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { PlusIcon } from 'lucide-react';
+import { PartyListWithViewToggle } from '@/components/party-list-with-view-toggle';
 
 export default async function PartiesPage() {
-  const { userId } = await auth()
+  const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in')
+    redirect('/sign-in');
   }
 
   const [user, parties] = await Promise.all([
@@ -46,49 +46,49 @@ export default async function PartiesPage() {
         },
       },
     }),
-  ])
+  ]);
 
-  const isAdmin = user?.role === 'ADMIN'
+  const isAdmin = user?.role === 'ADMIN';
 
   return (
-    <div className='space-y-8'>
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
-        <div className='space-y-1'>
-          <h1 className='text-2xl font-semibold tracking-tight'>
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">
             All Dish Parties
           </h1>
-          <p className='text-muted-foreground'>
+          <p className="text-muted-foreground">
             Browse and join upcoming dish parties in your area.
           </p>
         </div>
         {isAdmin && (
-          <Link href='/parties/new' className='self-start sm:self-auto'>
-            <Button className='gap-2 w-full sm:w-auto'>
-              <PlusIcon className='h-4 w-4' />
+          <Link href="/parties/new" className="self-start sm:self-auto">
+            <Button className="gap-2 w-full sm:w-auto">
+              <PlusIcon className="h-4 w-4" />
               Create Party
             </Button>
           </Link>
         )}
       </div>
 
-      <div className='card p-6'>
+      <div className="card p-6">
         {parties.length === 0 ? (
-          <div className='text-center'>
-            <p className='text-muted-foreground'>No upcoming parties found.</p>
+          <div className="text-center">
+            <p className="text-muted-foreground">No upcoming parties found.</p>
             {isAdmin && (
-              <Button asChild className='mt-4 w-full sm:w-auto'>
-                <Link href='/parties/new'>Create Your First Party</Link>
+              <Button asChild className="mt-4 w-full sm:w-auto">
+                <Link href="/parties/new">Create Your First Party</Link>
               </Button>
             )}
           </div>
         ) : (
           <PartyListWithViewToggle
             parties={parties}
-            title='Upcoming Dish Parties'
-            description='Browse and join upcoming dish parties in your area.'
+            title="Upcoming Dish Parties"
+            description="Browse and join upcoming dish parties in your area."
           />
         )}
       </div>
     </div>
-  )
+  );
 }
