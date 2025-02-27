@@ -49,20 +49,72 @@ export async function POST(
     const body = await req.json()
     const validatedData = contributionSchema.parse(body)
 
-    // Check if the dish exists in the party
-    const partyDish = await prisma.partyDish.findUnique({
-      where: {
-        partyId_dishId: {
-          partyId: params.id,
-          dishId: validatedData.dishId,
+    // Get the party dish and all current contributions
+    const [partyDish, allContributions] = await Promise.all([
+      prisma.partyDish.findUnique({
+        where: {
+          partyId_dishId: {
+            partyId: params.id,
+            dishId: validatedData.dishId,
+          },
         },
-      },
-    })
+        include: {
+          party: {
+            include: {
+              participants: true,
+            },
+          },
+        },
+      }),
+      prisma.participantDishContribution.findMany({
+        where: {
+          dishId: validatedData.dishId,
+          participant: {
+            partyId: params.id,
+          },
+        },
+      }),
+    ])
 
     if (!partyDish) {
       return NextResponse.json(
         { error: 'Dish not found in party' },
         { status: 404 }
+      )
+    }
+
+    // Calculate total needed and current contributions
+    const totalParticipants = partyDish.party.participants.reduce(
+      (sum, p) => sum + 1 + p.numGuests,
+      0
+    )
+    const totalNeeded = partyDish.amountPerPerson * totalParticipants
+    const currentContributions = allContributions.reduce(
+      (sum, c) => sum + c.amount,
+      0
+    )
+
+    // Get the user's current contribution if it exists
+    const existingContribution = allContributions.find(
+      (c) => c.participantId === participant.id
+    )
+    const userCurrentAmount = existingContribution?.amount || 0
+
+    // Calculate how much more can be contributed
+    const remainingNeeded = Math.max(
+      0,
+      totalNeeded - currentContributions + userCurrentAmount
+    )
+
+    // Check if the new contribution would exceed the needed amount
+    if (validatedData.amount > remainingNeeded) {
+      return NextResponse.json(
+        {
+          error: `Cannot contribute more than needed. Maximum allowed: ${remainingNeeded.toFixed(
+            1
+          )}`,
+        },
+        { status: 400 }
       )
     }
 

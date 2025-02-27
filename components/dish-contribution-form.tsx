@@ -10,10 +10,6 @@ import * as z from 'zod'
 import { Form } from '@/components/ui/form'
 import { FormTextField } from '@/components/ui/form-text-field'
 
-const formSchema = z.object({
-  amount: z.number().positive('Amount must be positive'),
-})
-
 interface DishContributionFormProps {
   partyId: string
   dishId: string
@@ -31,6 +27,16 @@ export function DishContributionForm({
 }: DishContributionFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const formSchema = z.object({
+    amount: z
+      .number()
+      .positive('Amount must be positive')
+      .max(
+        remainingNeeded,
+        `Cannot exceed ${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`
+      ),
+  })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,9 +65,9 @@ export function DishContributionForm({
       }
 
       toast.success(
-        `Successfully contributed ${
-          values.amount
-        } ${unit.toLowerCase()} of ${dishName}`
+        `Successfully contributed ${values.amount.toFixed(
+          1
+        )} ${unit.toLowerCase()} of ${dishName}`
       )
       form.reset()
       router.refresh()
@@ -77,29 +83,31 @@ export function DishContributionForm({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className='flex items-stretch gap-2 mt-2'
-      >
-        <div className='flex-1'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='flex gap-2 mt-2'>
+        <div className='flex-1 min-h-[60px] flex flex-col'>
           <FormTextField
             name='amount'
             label=''
             type='number'
-            placeholder={`Amount in ${unit.toLowerCase()}`}
+            placeholder={`Amount in ${unit.toLowerCase()} (max: ${remainingNeeded.toFixed(
+              1
+            )})`}
             min={0.1}
             step='0.1'
-            className='w-full'
+            className='[&_input]:h-10 [&_input]:m-0'
           />
         </div>
-        <Button
-          type='submit'
-          variant='secondary'
-          disabled={isSubmitting}
-          className='shrink-0 h-10'
-        >
-          {isSubmitting ? 'Contributing...' : 'Contribute'}
-        </Button>
+        <div className='flex items-start pt-[6px]'>
+          <Button
+            type='submit'
+            variant='secondary'
+            disabled={isSubmitting}
+            size='default'
+            className='h-10 px-4'
+          >
+            {isSubmitting ? 'Contributing...' : 'Contribute'}
+          </Button>
+        </div>
       </form>
     </Form>
   )

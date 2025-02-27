@@ -9,6 +9,7 @@ import {
   PartyParticipant,
   ParticipantDishContribution,
 } from '@prisma/client'
+import { useParams } from 'next/navigation'
 
 interface DishesContentProps {
   dishes: (PartyDish & {
@@ -41,6 +42,8 @@ export function DishesContent({
   totalParticipants,
 }: DishesContentProps) {
   const [view, setView] = useState<'grid' | 'list'>('grid')
+  const params = useParams()
+  const partyId = params.id as string
 
   return (
     <div className='card p-6 space-y-4'>
@@ -173,7 +176,7 @@ export function DishesContent({
                 {isParticipant && remainingNeeded > 0 && (
                   <div className='border-t pt-3 mt-2'>
                     <DishContributionForm
-                      partyId={partyDish.partyId}
+                      partyId={partyId}
                       dishId={partyDish.dishId}
                       dishName={partyDish.dish.name}
                       unit={partyDish.dish.unit}
