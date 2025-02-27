@@ -6,6 +6,38 @@ import { UsersIcon, CalendarIcon, MapPinIcon } from 'lucide-react'
 import { PartyActions } from '@/components/party-actions'
 import { EditPartyDialog } from '@/components/edit-party-dialog'
 import { ShareParty } from '@/components/share-party'
+import { DishesContent } from './party-content'
+import {
+  Party,
+  PartyDish,
+  PartyParticipant,
+  ParticipantDishContribution,
+} from '@prisma/client'
+
+interface PartyWithDetails extends Party {
+  createdBy: {
+    name: string
+  }
+  dishes: (PartyDish & {
+    dish: {
+      name: string
+      unit: string
+      description: string | null
+      imageUrl: string | null
+    }
+  })[]
+  participants: (PartyParticipant & {
+    user: {
+      name: string
+    }
+    contributions: (ParticipantDishContribution & {
+      dish: {
+        name: string
+        unit: string
+      }
+    })[]
+  })[]
+}
 
 export default async function PartyPage({
   params,
@@ -26,15 +58,40 @@ export default async function PartyPage({
     prisma.party.findUnique({
       where: { id: params.id },
       include: {
-        createdBy: true,
+        createdBy: {
+          select: {
+            name: true,
+          },
+        },
         dishes: {
           include: {
-            dish: true,
+            dish: {
+              select: {
+                name: true,
+                unit: true,
+                description: true,
+                imageUrl: true,
+              },
+            },
           },
         },
         participants: {
           include: {
-            user: true,
+            user: {
+              select: {
+                name: true,
+              },
+            },
+            contributions: {
+              include: {
+                dish: {
+                  select: {
+                    name: true,
+                    unit: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -117,37 +174,6 @@ export default async function PartyPage({
               </div>
             </div>
           </div>
-
-          <div className='card p-6 space-y-4'>
-            <h2 className='text-lg font-medium'>Dishes</h2>
-            <div className='space-y-3'>
-              {party.dishes.map((partyDish) => (
-                <div
-                  key={partyDish.dishId}
-                  className='flex items-center justify-between gap-4 p-3 bg-muted/50 rounded-lg'
-                >
-                  <div className='min-w-0 space-y-1'>
-                    <div className='flex items-center gap-2'>
-                      <span className='font-medium truncate'>
-                        {partyDish.dish.name}
-                      </span>
-                      <Badge variant='outline' className='shrink-0'>
-                        {partyDish.dish.unit}
-                      </Badge>
-                    </div>
-                    {partyDish.dish.description && (
-                      <p className='text-sm text-muted-foreground truncate'>
-                        {partyDish.dish.description}
-                      </p>
-                    )}
-                  </div>
-                  <span className='text-sm text-muted-foreground whitespace-nowrap'>
-                    {partyDish.amountPerPerson} per person
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Right Column */}
@@ -179,6 +205,14 @@ export default async function PartyPage({
           </div>
         </div>
       </div>
+
+      {/* Dishes Section - Full Width */}
+      <DishesContent
+        dishes={party.dishes}
+        participants={party.participants}
+        isParticipant={isParticipant}
+        totalParticipants={totalParticipants}
+      />
     </div>
   )
 }

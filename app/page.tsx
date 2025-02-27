@@ -38,7 +38,7 @@ export default async function Home() {
               <h1 className='text-4xl sm:text-5xl font-bold tracking-tight'>
                 {isAuthenticated
                   ? `Welcome back, ${user?.firstName || 'there'}!`
-                  : 'Welcome to Dishy'}
+                  : 'Welcome to Dishyy'}
               </h1>
               <p className='text-xl text-muted-foreground'>
                 Where Flavors Unite and Friendships Simmer
@@ -94,7 +94,7 @@ export default async function Home() {
       <footer className='py-6 border-t border-border/40'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <p className='text-sm text-muted-foreground text-center'>
-            © {new Date().getFullYear()} Dishy. All rights reserved.
+            © {new Date().getFullYear()} Dishyy. All rights reserved.
           </p>
         </div>
       </footer>
