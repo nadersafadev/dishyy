@@ -1,6 +1,6 @@
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
 import Header from '@/components/Header';
-
+import Footer from '@/components/Footer';
 export default function DashboardLayout({
   children,
 }: {
@@ -16,13 +16,7 @@ export default function DashboardLayout({
               {children}
             </div>
           </main>
-          <footer className="border-t border-border/40 py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <p className="text-sm text-muted-foreground text-center">
-                © {new Date().getFullYear()} Dishyy. All rights reserved.
-              </p>
-            </div>
-          </footer>
+          <Footer />
         </div>
       </SignedIn>
       <SignedOut>
