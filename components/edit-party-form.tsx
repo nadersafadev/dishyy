@@ -29,7 +29,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { FormTextField } from '@/components/ui/forms/form-text-field';
 import { FormNumberField } from '@/components/ui/forms/form-number-field';
-import { FormDateField } from '@/components/ui/form-date-field';
+import { FormDateField } from '@/components/ui/forms/form-date-field';
 
 const formSchema = z
   .object({

@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/forms/input';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from '@/components/ui/forms/calendar';
 import {
   Popover,
   PopoverContent,
@@ -57,7 +57,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { FormTextField } from '@/components/ui/forms/form-text-field';
-import { FormDateField } from '@/components/ui/form-date-field';
+import { FormDateField } from '@/components/ui/forms/form-date-field';
 import { FormNumberField } from '@/components/ui/forms/form-number-field';
 
 type SortOption = 'name-asc' | 'name-desc' | 'popular' | 'least-popular';

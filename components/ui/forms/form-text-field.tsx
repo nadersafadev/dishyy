@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/forms/input';
 
-// Use standard HTML input types, excluding number since it has its own component
+// Use only text-based HTML input types
 type InputType =
   | 'text'
   | 'email'
@@ -16,11 +16,6 @@ type InputType =
   | 'tel'
   | 'url'
   | 'search'
-  | 'date'
-  | 'time'
-  | 'datetime-local'
-  | 'month'
-  | 'week'
   | 'color';
 
 interface FormTextFieldProps {
