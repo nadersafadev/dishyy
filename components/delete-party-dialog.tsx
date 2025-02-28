@@ -14,7 +14,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Trash2 } from 'lucide-react';
+import { DeleteButton } from '@/components/ui/delete-button';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
@@ -56,15 +56,12 @@ export function DeletePartyDialog({
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <Button
+        <DeleteButton
           variant="destructive"
-          size="icon"
           className="h-9 w-9"
           disabled={isDeleting}
-        >
-          <Trash2 className="h-4 w-4" />
-          <span className="sr-only">Delete party</span>
-        </Button>
+          label="Delete party"
+        />
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { ViewToggle } from '@/components/ui/view-toggle';
 import { DishContributionForm } from '@/components/dish-contribution-form';
 import { AddPartyDishDialog } from '@/components/add-party-dish-dialog';
+import { RemovePartyDish } from '@/components/remove-party-dish';
+import { UpdateDishQuantity } from '@/components/update-dish-quantity';
 import {
   PartyDish,
   PartyParticipant,
@@ -82,8 +84,28 @@ export function DishesContent({
           return (
             <div
               key={partyDish.dishId}
-              className="flex flex-col gap-4 p-4 bg-muted/50 rounded-lg"
+              className="flex flex-col gap-4 p-4 bg-muted/50 rounded-lg relative"
             >
+              {/* New dish management controls for admins */}
+              {isAdmin && (
+                <div className="absolute top-2 right-2 flex items-center gap-2">
+                  <UpdateDishQuantity
+                    partyId={partyId}
+                    dishId={partyDish.dishId}
+                    dishName={partyDish.dish.name}
+                    unit={partyDish.dish.unit}
+                    currentAmount={partyDish.amountPerPerson}
+                    isAdmin={isAdmin}
+                  />
+                  <RemovePartyDish
+                    partyId={partyId}
+                    dishId={partyDish.dishId}
+                    dishName={partyDish.dish.name}
+                    isAdmin={isAdmin}
+                  />
+                </div>
+              )}
+
               <div className="flex gap-4">
                 <div className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 bg-muted">
                   {partyDish.dish.imageUrl ? (

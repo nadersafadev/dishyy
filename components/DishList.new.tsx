@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import type { Dish } from '@prisma/client';
-import { Edit2Icon, Trash2Icon, ImageIcon } from 'lucide-react';
+import { ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EditButton } from '@/components/ui/edit-button';
+import { DeleteButton } from '@/components/ui/delete-button';
 import Image from 'next/image';
 import {
   Dialog,
@@ -15,6 +17,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 interface DishWithCount extends Dish {
@@ -53,15 +56,17 @@ export default function DishList({ dishes, view = 'grid' }: DishListProps) {
         throw new Error(data.error || 'Failed to delete dish');
       }
 
+      toast.success(`${dish.name} deleted successfully`);
+      setSelectedDish(null);
       router.refresh();
     } catch (error) {
       console.error('Error deleting dish:', error);
       setError(
         error instanceof Error ? error.message : 'Failed to delete dish'
       );
+      toast.error('Failed to delete dish');
     } finally {
       setIsDeleting(false);
-      setSelectedDish(null);
     }
   };
 
@@ -100,27 +105,20 @@ export default function DishList({ dishes, view = 'grid' }: DishListProps) {
             {/* Position actions absolutely in grid view */}
             {view === 'grid' && (
               <div className="absolute top-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button
+                <EditButton
                   variant="secondary"
-                  size="icon"
+                  className="bg-background/80 backdrop-blur-sm"
                   onClick={() => router.push(`/dishes/${dish.id}/edit`)}
-                  className="h-8 w-8 bg-background/80 backdrop-blur-sm"
-                >
-                  <Edit2Icon className="h-4 w-4" />
-                  <span className="sr-only">Edit dish</span>
-                </Button>
+                  label={`Edit ${dish.name}`}
+                />
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-destructive hover:text-destructive-foreground"
+                    <DeleteButton
+                      className="bg-background/80 backdrop-blur-sm"
                       onClick={() => setSelectedDish(dish)}
-                    >
-                      <Trash2Icon className="h-4 w-4" />
-                      <span className="sr-only">Delete dish</span>
-                    </Button>
+                      label={`Delete ${dish.name}`}
+                    />
                   </DialogTrigger>
                   {selectedDish?.id === dish.id && (
                     <DialogContent>
@@ -210,27 +208,17 @@ export default function DishList({ dishes, view = 'grid' }: DishListProps) {
             {/* Actions Section - List View Only */}
             {view === 'list' && (
               <div className="flex items-center gap-4 mt-4 sm:mt-0 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <EditButton
                   onClick={() => router.push(`/dishes/${dish.id}/edit`)}
-                  className="h-8 w-8"
-                >
-                  <Edit2Icon className="h-4 w-4" />
-                  <span className="sr-only">Edit dish</span>
-                </Button>
+                  label={`Edit ${dish.name}`}
+                />
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 hover:bg-destructive hover:text-destructive-foreground"
+                    <DeleteButton
                       onClick={() => setSelectedDish(dish)}
-                    >
-                      <Trash2Icon className="h-4 w-4" />
-                      <span className="sr-only">Delete dish</span>
-                    </Button>
+                      label={`Delete ${dish.name}`}
+                    />
                   </DialogTrigger>
                   {selectedDish?.id === dish.id && (
                     <DialogContent>
