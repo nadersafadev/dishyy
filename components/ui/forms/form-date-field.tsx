@@ -47,7 +47,7 @@ export function FormDateField({
             )}
           </FormLabel>
           <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger asChild className="hover:border-primary">
               <FormControl>
                 <Button
                   variant="outline"
