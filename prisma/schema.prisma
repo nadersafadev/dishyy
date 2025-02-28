@@ -38,6 +38,24 @@ model Party {
   @@map("parties")
 }
 
+model Category {
+  id           String     @id @default(cuid())
+  name         String     @unique
+  description  String?
+  parentId     String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  
+  // Self-relation for hierarchical structure
+  parent       Category?  @relation("CategoryParentChild", fields: [parentId], references: [id])
+  children     Category[] @relation("CategoryParentChild")
+  
+  // Relation to dishes
+  dishes       Dish[]
+
+  @@map("categories")
+}
+
 model Dish {
   id            String                        @id @default(cuid())
   name          String                        @unique
@@ -47,6 +65,11 @@ model Dish {
   imageId       String?
   imageUrl      String?
   unit          Unit                          @default(QUANTITY)
+  
+  // Add category relation
+  categoryId    String?
+  category      Category?                     @relation(fields: [categoryId], references: [id])
+  
   contributions ParticipantDishContribution[]
   parties       PartyDish[]
 

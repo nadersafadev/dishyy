@@ -3,48 +3,44 @@ import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
-const dishSchema = z.object({
-  name: z.string().min(1, 'Dish name is required'),
+const categorySchema = z.object({
+  name: z.string().min(1, 'Category name is required'),
   description: z.string().optional(),
-  imageUrl: z.string().optional(),
-  unit: z.enum([
-    'GRAMS',
-    'KILOS',
-    'QUANTITY',
-    'MILLILITERS',
-    'LITERS',
-    'PIECES',
-  ]),
-  categoryId: z.string().optional().nullable(),
+  parentId: z.string().optional().nullable(),
 });
 
-// GET all dishes
+// GET all categories
 export async function GET() {
   try {
-    const dishes = await prisma.dish.findMany({
+    // Get all categories with their parent relation and count of dishes
+    const categories = await prisma.category.findMany({
       include: {
-        category: {
+        parent: {
           select: {
             id: true,
             name: true,
           },
+        },
+        _count: {
+          select: { dishes: true },
         },
       },
       orderBy: {
         name: 'asc',
       },
     });
-    return NextResponse.json(dishes);
+
+    return NextResponse.json(categories);
   } catch (error) {
-    console.error('Error fetching dishes:', error);
+    console.error('Error fetching categories:', error);
     return NextResponse.json(
-      { error: 'Error fetching dishes' },
+      { error: 'Error fetching categories' },
       { status: 500 }
     );
   }
 }
 
-// CREATE a new dish
+// CREATE a new category
 export async function POST(req: Request) {
   try {
     const { userId } = await auth();
@@ -59,51 +55,51 @@ export async function POST(req: Request) {
     });
 
     if (!user || user.role !== 'ADMIN') {
-      return new NextResponse('Only admins can create dishes', { status: 403 });
+      return new NextResponse('Only admins can create categories', {
+        status: 403,
+      });
     }
 
     const body = await req.json();
-    const validatedData = dishSchema.parse(body);
+    const validatedData = categorySchema.parse(body);
 
-    // Check if dish already exists
-    const existingDish = await prisma.dish.findUnique({
+    // Check if category already exists
+    const existingCategory = await prisma.category.findUnique({
       where: { name: validatedData.name },
     });
 
-    if (existingDish) {
+    if (existingCategory) {
       return NextResponse.json(
-        { error: 'A dish with this name already exists' },
+        { error: 'A category with this name already exists' },
         { status: 400 }
       );
     }
 
-    // If categoryId is provided, check if the category exists
-    if (validatedData.categoryId) {
-      const category = await prisma.category.findUnique({
-        where: { id: validatedData.categoryId },
+    // If parentId is provided, check if parent category exists
+    if (validatedData.parentId) {
+      const parentCategory = await prisma.category.findUnique({
+        where: { id: validatedData.parentId },
       });
 
-      if (!category) {
+      if (!parentCategory) {
         return NextResponse.json(
-          { error: 'Category not found' },
+          { error: 'Parent category not found' },
           { status: 400 }
         );
       }
     }
 
-    const dish = await prisma.dish.create({
+    const category = await prisma.category.create({
       data: {
         name: validatedData.name,
         description: validatedData.description || '',
-        imageUrl: validatedData.imageUrl || null,
-        unit: validatedData.unit,
-        categoryId: validatedData.categoryId || null,
+        parentId: validatedData.parentId || null,
       },
     });
 
-    return NextResponse.json(dish);
+    return NextResponse.json(category);
   } catch (error) {
-    console.error('Error creating dish:', error);
+    console.error('Error creating category:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid data', details: error.errors },

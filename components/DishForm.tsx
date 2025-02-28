@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import type { Dish } from '@/lib/types';
+import type { Dish, Category } from '@/lib/types';
 import { Unit, unitLabels } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   imageUrl: z.string().optional(),
   unit: z.nativeEnum(Unit),
+  categoryId: z.string().optional().nullable(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -44,6 +45,24 @@ export function DishForm({ dish }: DishFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -52,13 +71,21 @@ export function DishForm({ dish }: DishFormProps) {
       description: dish?.description || '',
       imageUrl: dish?.imageUrl || '',
       unit: dish?.unit || Unit.QUANTITY,
+      categoryId: dish?.categoryId || null,
     },
   });
 
   const onSubmit = async (data: FormData) => {
     try {
+      setLoading(true);
       setError(null);
       setSuccess(false);
+
+      // Handle the special "none" value for categoryId
+      const submissionData = {
+        ...data,
+        categoryId: data.categoryId === 'none' ? null : data.categoryId,
+      };
 
       const response = await fetch(
         dish ? `/api/dishes/${dish.id}` : '/api/dishes',
@@ -67,7 +94,7 @@ export function DishForm({ dish }: DishFormProps) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(submissionData),
         }
       );
 
@@ -85,6 +112,8 @@ export function DishForm({ dish }: DishFormProps) {
     } catch (error) {
       console.error('Error saving dish:', error);
       setError('An unexpected error occurred');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -161,6 +190,36 @@ export function DishForm({ dish }: DishFormProps) {
 
           <FormField
             control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value === null ? 'none' : field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category (optional)" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="none">No Category</SelectItem>
+                    {categories.map(category => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                        {category.parent && ` (${category.parent.name})`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="unit"
             render={({ field }) => (
               <FormItem>
@@ -196,9 +255,9 @@ export function DishForm({ dish }: DishFormProps) {
             <Button
               type="submit"
               className="flex-1"
-              disabled={form.formState.isSubmitting}
+              disabled={form.formState.isSubmitting || loading}
             >
-              {form.formState.isSubmitting
+              {form.formState.isSubmitting || loading
                 ? dish
                   ? 'Updating...'
                   : 'Creating...'
