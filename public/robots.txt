@@ -1,0 +1,12 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/*
+Disallow: /dashboard/*
+
+# Host
+Host: https://dishyy.com
+
+# Sitemaps
+Sitemap: https://dishyy.com/sitemap.xml
+Sitemap: https://dishyy.com/server-sitemap.xml
