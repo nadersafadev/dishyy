@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/forms/calendar';
+import { Calendar } from '@/components/forms/calendar';
 import { cn } from '@/lib/utils';
 
 interface FormDateFieldProps {

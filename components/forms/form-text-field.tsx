@@ -6,33 +6,43 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/forms/input';
+import { Input } from '@/components/forms/input';
 
-interface FormNumberFieldProps {
+// Use only text-based HTML input types
+type InputType =
+  | 'text'
+  | 'email'
+  | 'password'
+  | 'tel'
+  | 'url'
+  | 'search'
+  | 'color';
+
+interface FormTextFieldProps {
   name: string;
   label: string;
   placeholder?: string;
+  type?: InputType;
   className?: string;
-  min?: number;
-  max?: number;
-  step?: string;
+  maxLength?: number;
   optional?: boolean;
   disabled?: boolean;
-  onChange?: (value: number | undefined) => void;
+  autoComplete?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export function FormNumberField({
+export function FormTextField({
   name,
   label,
   placeholder,
+  type = 'text',
   className,
-  min,
-  max,
-  step,
+  maxLength,
   optional = false,
   disabled = false,
+  autoComplete,
   onChange,
-}: FormNumberFieldProps) {
+}: FormTextFieldProps) {
   const form = useFormContext();
 
   return (
@@ -50,32 +60,19 @@ export function FormNumberField({
           <FormControl>
             <Input
               {...field}
-              type="number"
-              min={min}
-              max={max}
-              step={step}
+              type={type}
+              maxLength={maxLength}
               disabled={disabled}
               placeholder={placeholder}
+              autoComplete={autoComplete}
               className={className}
-              // Handle number conversion
-              value={
-                field.value === undefined || field.value === null
-                  ? ''
-                  : field.value
-              }
               onChange={e => {
-                const value = e.target.value;
-
-                if (value === '') {
-                  field.onChange(undefined);
-                  if (onChange) onChange(undefined);
-                } else {
-                  const numValue = Number(value);
-                  if (!isNaN(numValue)) {
-                    field.onChange(numValue);
-                    if (onChange) onChange(numValue);
-                  }
+                // Call custom onChange if provided
+                if (onChange) {
+                  onChange(e);
                 }
+                // Use default field onChange
+                field.onChange(e);
               }}
             />
           </FormControl>

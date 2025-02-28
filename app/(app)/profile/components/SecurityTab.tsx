@@ -18,7 +18,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/forms/input';
+import { Input } from '@/components/forms/input';
 import { Label } from '@/components/ui/label';
 import { Key, Shield } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';

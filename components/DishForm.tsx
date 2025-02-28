@@ -7,8 +7,8 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import type { Dish, Category } from '@/lib/types';
 import { Unit, unitLabels } from '@/lib/types';
-import { FormTextField } from '@/components/ui/forms/form-text-field';
-import { FormNumberField } from '@/components/ui/forms/form-number-field';
+import { FormTextField } from '@/components/forms/form-text-field';
+import { FormNumberField } from '@/components/forms/form-number-field';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -19,7 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/forms/input';
+import { Input } from '@/components/forms/input';
 import { ImageUpload } from '@/components/ui/image-upload';
 import {
   Select,

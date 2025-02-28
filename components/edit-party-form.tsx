@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/forms/input';
+import { Input } from '@/components/forms/input';
 import { toast } from 'sonner';
 import { Party, PartyDish, PartyParticipant, Dish } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
@@ -27,9 +27,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { FormTextField } from '@/components/ui/forms/form-text-field';
-import { FormNumberField } from '@/components/ui/forms/form-number-field';
-import { FormDateField } from '@/components/ui/forms/form-date-field';
+import { FormTextField } from '@/components/forms/form-text-field';
+import { FormNumberField } from '@/components/forms/form-number-field';
+import { FormDateField } from '@/components/forms/form-date-field';
 
 const formSchema = z
   .object({

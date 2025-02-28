@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/forms/input';
+import { Input } from '@/components/forms/input';
 import { Label } from '@/components/ui/label';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';

@@ -8,8 +8,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form } from '@/components/ui/form';
-import { FormTextField } from '@/components/ui/forms/form-text-field';
-import { FormNumberField } from '@/components/ui/forms/form-number-field';
+import { FormTextField } from '@/components/forms/form-text-field';
+import { FormNumberField } from '@/components/forms/form-number-field';
 
 interface DishContributionFormProps {
   partyId: string;

@@ -23,8 +23,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/forms/input';
-import { Calendar } from '@/components/ui/forms/calendar';
+import { Input } from '@/components/forms/input';
+import { Calendar } from '@/components/forms/calendar';
 import {
   Popover,
   PopoverContent,
@@ -56,9 +56,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { FormTextField } from '@/components/ui/forms/form-text-field';
-import { FormDateField } from '@/components/ui/forms/form-date-field';
-import { FormNumberField } from '@/components/ui/forms/form-number-field';
+import { FormTextField } from '@/components/forms/form-text-field';
+import { FormDateField } from '@/components/forms/form-date-field';
+import { FormNumberField } from '@/components/forms/form-number-field';
 
 type SortOption = 'name-asc' | 'name-desc' | 'popular' | 'least-popular';
 
