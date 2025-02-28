@@ -1,17 +1,17 @@
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
-import { DishForm } from '@/components/DishForm'
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import { DishForm } from '@/components/DishForm';
 
 export default async function EditDishPage({
   params,
 }: {
-  params: { id: string }
+  params: { id: string };
 }) {
-  const { userId } = await auth()
+  const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in')
+    redirect('/sign-in');
   }
 
   const [user, dish] = await Promise.all([
@@ -22,28 +22,28 @@ export default async function EditDishPage({
     prisma.dish.findUnique({
       where: { id: params.id },
     }),
-  ])
+  ]);
 
   if (!user || user.role !== 'ADMIN') {
-    redirect('/dashboard')
+    redirect('/dashboard');
   }
 
   if (!dish) {
-    redirect('/dishes')
+    redirect('/dishes');
   }
 
   return (
-    <div className='max-w-2xl mx-auto space-y-8'>
-      <div className='space-y-2'>
-        <h1 className='text-2xl font-semibold tracking-tight'>Edit Dish</h1>
-        <p className='text-muted-foreground'>
+    <div className="max-w-2xl mx-auto space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight">Edit Dish</h1>
+        <p className="text-muted-foreground">
           Update the details of &quot;{dish.name}&quot;.
         </p>
       </div>
 
-      <div className='card p-6'>
+      <div className="card p-6">
         <DishForm dish={dish} />
       </div>
     </div>
-  )
+  );
 }

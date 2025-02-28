@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,16 +12,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { UserX } from 'lucide-react'
-import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
+} from '@/components/ui/alert-dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { UserX } from 'lucide-react';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface RemoveParticipantButtonProps {
-  partyId: string
-  participantId: string
-  participantName: string
+  partyId: string;
+  participantId: string;
+  participantName: string;
 }
 
 export function RemoveParticipantButton({
@@ -29,46 +29,46 @@ export function RemoveParticipantButton({
   participantId,
   participantName,
 }: RemoveParticipantButtonProps) {
-  const router = useRouter()
-  const [isOpen, setIsOpen] = useState(false)
-  const [isRemoving, setIsRemoving] = useState(false)
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   const handleRemove = async () => {
     try {
-      setIsRemoving(true)
+      setIsRemoving(true);
       const response = await fetch(
         `/api/parties/${partyId}/participants/${participantId}`,
         {
           method: 'DELETE',
         }
-      )
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to remove participant')
+        throw new Error('Failed to remove participant');
       }
 
-      toast.success(`${participantName} has been removed from the party`)
-      router.refresh()
-      setIsOpen(false)
+      toast.success(`${participantName} has been removed from the party`);
+      router.refresh();
+      setIsOpen(false);
     } catch (error) {
-      console.error('Error removing participant:', error)
-      toast.error('Failed to remove participant')
+      console.error('Error removing participant:', error);
+      toast.error('Failed to remove participant');
     } finally {
-      setIsRemoving(false)
+      setIsRemoving(false);
     }
-  }
+  };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <Button
-          variant='ghost'
-          size='icon'
-          className='h-8 w-8 text-muted-foreground hover:text-white hover:bg-destructive'
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-white hover:bg-destructive"
           disabled={isRemoving}
         >
-          <UserX className='h-4 w-4' />
-          <span className='sr-only'>Remove participant</span>
+          <UserX className="h-4 w-4" />
+          <span className="sr-only">Remove participant</span>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -79,13 +79,13 @@ export function RemoveParticipantButton({
             Their contributions will also be removed.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <ScrollArea className='max-h-[80vh]'>
+        <ScrollArea className="max-h-[80vh]">
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isRemoving}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRemove}
               disabled={isRemoving}
-              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isRemoving ? 'Removing...' : 'Remove Participant'}
             </AlertDialogAction>
@@ -93,5 +93,5 @@ export function RemoveParticipantButton({
         </ScrollArea>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

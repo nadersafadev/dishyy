@@ -1,24 +1,24 @@
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs'
-import Header from '@/components/Header'
+import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
+import Header from '@/components/Header';
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <>
       <SignedIn>
-        <div className='min-h-screen flex flex-col bg-background'>
+        <div className="min-h-screen flex flex-col bg-background">
           <Header />
-          <main className='flex-1 py-8'>
-            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <main className="flex-1 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               {children}
             </div>
           </main>
-          <footer className='border-t border-border/40 py-6'>
-            <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-              <p className='text-sm text-muted-foreground text-center'>
+          <footer className="border-t border-border/40 py-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <p className="text-sm text-muted-foreground text-center">
                 © {new Date().getFullYear()} Dishyy. All rights reserved.
               </p>
             </div>
@@ -29,5 +29,5 @@ export default function DashboardLayout({
         <RedirectToSignIn />
       </SignedOut>
     </>
-  )
+  );
 }

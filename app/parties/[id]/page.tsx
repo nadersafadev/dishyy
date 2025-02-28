@@ -1,55 +1,55 @@
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
-import { Badge } from '@/components/ui/badge'
-import { UsersIcon, CalendarIcon, MapPinIcon } from 'lucide-react'
-import { PartyActions } from '@/components/party-actions'
-import { EditPartyDialog } from '@/components/edit-party-dialog'
-import { ShareParty } from '@/components/share-party'
-import { DishesContent } from './party-content'
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import { Badge } from '@/components/ui/badge';
+import { UsersIcon, CalendarIcon, MapPinIcon } from 'lucide-react';
+import { PartyActions } from '@/components/party-actions';
+import { EditPartyDialog } from '@/components/edit-party-dialog';
+import { ShareParty } from '@/components/share-party';
+import { DishesContent } from './party-content';
 import {
   Party,
   PartyDish,
   PartyParticipant,
   ParticipantDishContribution,
-} from '@prisma/client'
-import { DeletePartyDialog } from '@/components/delete-party-dialog'
-import { RemoveParticipantButton } from '@/components/remove-participant-button'
+} from '@prisma/client';
+import { DeletePartyDialog } from '@/components/delete-party-dialog';
+import { RemoveParticipantButton } from '@/components/remove-participant-button';
 
 interface PartyWithDetails extends Party {
   createdBy: {
-    name: string
-  }
+    name: string;
+  };
   dishes: (PartyDish & {
     dish: {
-      name: string
-      unit: string
-      description: string | null
-      imageUrl: string | null
-    }
-  })[]
+      name: string;
+      unit: string;
+      description: string | null;
+      imageUrl: string | null;
+    };
+  })[];
   participants: (PartyParticipant & {
     user: {
-      name: string
-    }
+      name: string;
+    };
     contributions: (ParticipantDishContribution & {
       dish: {
-        name: string
-        unit: string
-      }
-    })[]
-  })[]
+        name: string;
+        unit: string;
+      };
+    })[];
+  })[];
 }
 
 export default async function PartyPage({
   params,
 }: {
-  params: { id: string }
+  params: { id: string };
 }) {
-  const { userId } = await auth()
+  const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in')
+    redirect('/sign-in');
   }
 
   const [user, party] = await Promise.all([
@@ -98,37 +98,37 @@ export default async function PartyPage({
         },
       },
     }),
-  ])
+  ]);
 
   if (!party) {
-    redirect('/parties')
+    redirect('/parties');
   }
 
   if (!user) {
-    redirect('/sign-in')
+    redirect('/sign-in');
   }
 
-  const isAdmin = user.role === 'ADMIN'
-  const isParticipant = party.participants.some((p) => p.userId === user.id)
+  const isAdmin = user.role === 'ADMIN';
+  const isParticipant = party.participants.some(p => p.userId === user.id);
   const totalParticipants = party.participants.reduce(
     (sum, p) => sum + 1 + p.numGuests,
     0
-  )
-  const hasMaxParticipants = party.maxParticipants !== null
+  );
+  const hasMaxParticipants = party.maxParticipants !== null;
   const isFull =
-    hasMaxParticipants && totalParticipants >= (party.maxParticipants ?? 0)
+    hasMaxParticipants && totalParticipants >= (party.maxParticipants ?? 0);
 
   return (
-    <div className='max-w-4xl mx-auto space-y-8'>
+    <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
-      <div className='flex flex-col sm:flex-row sm:items-start justify-between gap-4'>
-        <div className='space-y-1'>
-          <h1 className='text-2xl font-semibold tracking-tight'>
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">
             {party.name}
           </h1>
-          <p className='text-muted-foreground'>{party.description}</p>
+          <p className="text-muted-foreground">{party.description}</p>
         </div>
-        <div className='flex items-center gap-4 self-start'>
+        <div className="flex items-center gap-4 self-start">
           <ShareParty partyId={party.id} partyName={party.name} />
           {isAdmin && (
             <>
@@ -145,14 +145,14 @@ export default async function PartyPage({
       </div>
 
       {/* Party Details */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Column */}
-        <div className='space-y-6'>
-          <div className='card p-6 space-y-4'>
-            <h2 className='text-lg font-medium'>Details</h2>
-            <div className='space-y-3'>
-              <div className='flex items-center gap-2 text-sm'>
-                <CalendarIcon className='h-4 w-4 text-muted-foreground' />
+        <div className="space-y-6">
+          <div className="card p-6 space-y-4">
+            <h2 className="text-lg font-medium">Details</h2>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm">
+                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                 <span>
                   {new Date(party.date).toLocaleDateString(undefined, {
                     weekday: 'long',
@@ -162,21 +162,21 @@ export default async function PartyPage({
                   })}
                 </span>
               </div>
-              <div className='flex items-center gap-2 text-sm'>
-                <UsersIcon className='h-4 w-4 text-muted-foreground' />
+              <div className="flex items-center gap-2 text-sm">
+                <UsersIcon className="h-4 w-4 text-muted-foreground" />
                 <span>
                   {totalParticipants} participant
                   {totalParticipants !== 1 && 's'}
                   {hasMaxParticipants && ` / ${party.maxParticipants}`}
                 </span>
                 {isFull && (
-                  <Badge variant='destructive' className='ml-2'>
+                  <Badge variant="destructive" className="ml-2">
                     Full
                   </Badge>
                 )}
               </div>
-              <div className='flex items-center gap-2 text-sm'>
-                <MapPinIcon className='h-4 w-4 text-muted-foreground' />
+              <div className="flex items-center gap-2 text-sm">
+                <MapPinIcon className="h-4 w-4 text-muted-foreground" />
                 <span>Hosted by {party.createdBy.name}</span>
               </div>
             </div>
@@ -184,24 +184,24 @@ export default async function PartyPage({
         </div>
 
         {/* Right Column */}
-        <div className='space-y-6'>
-          <div className='card p-6 space-y-4'>
-            <h2 className='text-lg font-medium'>Participants</h2>
-            <div className='space-y-3'>
+        <div className="space-y-6">
+          <div className="card p-6 space-y-4">
+            <h2 className="text-lg font-medium">Participants</h2>
+            <div className="space-y-3">
               {party.participants.length === 0 ? (
-                <p className='text-sm text-muted-foreground'>
+                <p className="text-sm text-muted-foreground">
                   No participants yet. Be the first to join!
                 </p>
               ) : (
-                party.participants.map((participant) => (
+                party.participants.map(participant => (
                   <div
                     key={participant.id}
-                    className='flex items-center justify-between gap-4 p-3 bg-muted/50 rounded-lg'
+                    className="flex items-center justify-between gap-4 p-3 bg-muted/50 rounded-lg"
                   >
-                    <span className='font-medium'>{participant.user.name}</span>
-                    <div className='flex items-center gap-2'>
+                    <span className="font-medium">{participant.user.name}</span>
+                    <div className="flex items-center gap-2">
                       {participant.numGuests > 0 && (
-                        <Badge variant='secondary'>
+                        <Badge variant="secondary">
                           +{participant.numGuests} guest
                           {participant.numGuests !== 1 && 's'}
                         </Badge>
@@ -223,21 +223,21 @@ export default async function PartyPage({
       </div>
 
       {/* Per Person Amounts Card */}
-      <div className='card p-6 space-y-4'>
-        <h2 className='text-lg font-medium'>Amount Per Person</h2>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-          {party.dishes.map((partyDish) => (
+      <div className="card p-6 space-y-4">
+        <h2 className="text-lg font-medium">Amount Per Person</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {party.dishes.map(partyDish => (
             <div
               key={partyDish.dishId}
-              className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'
+              className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
             >
-              <div className='flex items-center gap-2'>
-                <span className='font-medium'>{partyDish.dish.name}</span>
-                <Badge variant='outline' className='shrink-0'>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{partyDish.dish.name}</span>
+                <Badge variant="outline" className="shrink-0">
                   {partyDish.dish.unit}
                 </Badge>
               </div>
-              <span className='text-sm'>
+              <span className="text-sm">
                 {partyDish.amountPerPerson.toFixed(1)}{' '}
                 {partyDish.dish.unit.toLowerCase()}
               </span>
@@ -255,5 +255,5 @@ export default async function PartyPage({
         isAdmin={isAdmin}
       />
     </div>
-  )
+  );
 }
