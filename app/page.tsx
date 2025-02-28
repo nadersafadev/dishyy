@@ -86,8 +86,8 @@ export default async function Home() {
                 <div className='absolute inset-0 opacity-[0.03] bg-[url("/noise.png")] bg-repeat animate-grain' />
 
                 {/* Accent circles */}
-                <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] bg-primary/10 rounded-full blur-3xl opacity-0 animate-fade-in-delay-2 animate-float" />
-                <div className="absolute bottom-1/3 left-1/4 w-[250px] h-[250px] bg-primary/10 rounded-full blur-3xl opacity-0 animate-fade-in-delay-2 animate-float delay-1000" />
+                <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] bg-primary/10 rounded-full blur-3xl opacity-0 animate-fade-in-delay-2 motion-safe:animate-pulse" />
+                <div className="absolute bottom-1/3 left-1/4 w-[250px] h-[250px] bg-primary/10 rounded-full blur-3xl opacity-0 animate-fade-in-delay-2 motion-safe:animate-pulse motion-safe:delay-1000" />
               </div>
 
               {/* Content */}
