@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Users,
   UtensilsCrossed,
+  UserCircle,
 } from 'lucide-react';
 import {
   Sheet,
@@ -38,6 +39,11 @@ const navItems: NavItemType[] = [
     href: '/parties',
     label: 'All Parties',
     icon: Users,
+  },
+  {
+    href: '/profile',
+    label: 'My Profile',
+    icon: UserCircle,
   },
   {
     href: '/dishes',
