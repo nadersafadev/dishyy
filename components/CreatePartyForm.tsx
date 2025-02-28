@@ -58,6 +58,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { FormTextField } from '@/components/ui/forms/form-text-field';
 import { FormDateField } from '@/components/ui/form-date-field';
+import { FormNumberField } from '@/components/ui/forms/form-number-field';
 
 type SortOption = 'name-asc' | 'name-desc' | 'popular' | 'least-popular';
 
@@ -316,10 +317,9 @@ const CreatePartyForm: React.FC = () => {
             optional
           />
 
-          <FormTextField
+          <FormNumberField
             name="maxParticipants"
             label="Maximum Participants"
-            type="number"
             placeholder="Enter maximum number of participants"
             min={1}
             optional

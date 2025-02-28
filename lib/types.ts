@@ -42,6 +42,7 @@ export interface Dish {
   imageId: string | null;
   unit: Unit;
   categoryId: string | null;
+  defaultAmount?: number | null;
   category?: Category;
   _count?: {
     parties: number;

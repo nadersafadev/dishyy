@@ -8,6 +8,7 @@ import * as z from 'zod';
 import type { Dish, Category } from '@/lib/types';
 import { Unit, unitLabels } from '@/lib/types';
 import { FormTextField } from '@/components/ui/forms/form-text-field';
+import { FormNumberField } from '@/components/ui/forms/form-number-field';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -34,6 +35,7 @@ const formSchema = z.object({
   imageUrl: z.string().optional(),
   unit: z.nativeEnum(Unit),
   categoryId: z.string().optional().nullable(),
+  defaultAmount: z.number().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -73,6 +75,7 @@ export function DishForm({ dish }: DishFormProps) {
       imageUrl: dish?.imageUrl || '',
       unit: dish?.unit || Unit.QUANTITY,
       categoryId: dish?.categoryId || null,
+      defaultAmount: dish?.defaultAmount || 0,
     },
   });
 
@@ -144,6 +147,15 @@ export function DishForm({ dish }: DishFormProps) {
             name="description"
             label="Description"
             placeholder="Enter dish description"
+            optional={true}
+          />
+
+          <FormNumberField
+            name="defaultAmount"
+            label="Default Amount"
+            placeholder="Enter default amount"
+            min={0}
+            step="0.1"
             optional={true}
           />
 

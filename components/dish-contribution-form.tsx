@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form } from '@/components/ui/form';
 import { FormTextField } from '@/components/ui/forms/form-text-field';
+import { FormNumberField } from '@/components/ui/forms/form-number-field';
 
 interface DishContributionFormProps {
   partyId: string;
@@ -85,16 +86,15 @@ export function DishContributionForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2 mt-2">
         <div className="flex-1 min-h-[60px] flex flex-col">
-          <FormTextField
+          <FormNumberField
             name="amount"
             label=""
-            type="number"
             placeholder={`Amount in ${unit.toLowerCase()} (max: ${remainingNeeded.toFixed(
               1
             )})`}
             min={0.1}
             step="0.1"
-            className="[&_input]:h-10 [&_input]:m-0"
+            max={remainingNeeded}
           />
         </div>
         <div className="flex items-start pt-[6px]">
