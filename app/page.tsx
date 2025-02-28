@@ -11,7 +11,7 @@ import {
   ListChecks,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Footer from '@/components/Footer';
+import Footer from '@/components/layout/Footer';
 
 // Types for features and steps
 interface Feature {
