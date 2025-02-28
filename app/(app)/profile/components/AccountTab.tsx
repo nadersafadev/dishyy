@@ -11,7 +11,8 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useUser } from '@clerk/nextjs';
-import { Github } from 'lucide-react';
+import { Github, Twitter } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 interface AccountTabProps {
   dbUser?: { role: string } | null;
@@ -21,6 +22,17 @@ export function AccountTab({ dbUser }: AccountTabProps) {
   const { user } = useUser();
 
   if (!user) return null;
+
+  const handleConnectGithub = () => {
+    // In a real app, this would initiate OAuth with GitHub
+    // For now we just use the simulation in ConnectedAccount
+    console.log('Connecting to GitHub...');
+  };
+
+  const handleDisconnectGithub = () => {
+    // In a real app, this would remove the GitHub connection
+    console.log('Disconnecting from GitHub...');
+  };
 
   return (
     <div className="space-y-6">
@@ -81,10 +93,21 @@ export function AccountTab({ dbUser }: AccountTabProps) {
               icon={<Github className="h-5 w-5" />}
               name="GitHub"
               description="Connect your GitHub account"
-              onConnect={() => {}}
+              onConnect={handleConnectGithub}
+              onDisconnect={handleDisconnectGithub}
             />
             <Separator />
-            {/* Add more social connections as needed */}
+            <ConnectedAccount
+              icon={<Twitter className="h-5 w-5" />}
+              name="Twitter"
+              description="Connect your Twitter account"
+              onConnect={() =>
+                toast({
+                  title: 'Twitter integration',
+                  description: 'Twitter integration coming soon!',
+                })
+              }
+            />
           </div>
         </CardContent>
       </Card>

@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/forms/input';
 import { toast } from 'sonner';
 import { Party, PartyDish, PartyParticipant, Dish } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
