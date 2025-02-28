@@ -17,7 +17,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form } from '@/components/ui/form';
-import { FormTextField } from '@/components/ui/form-text-field';
+import { FormTextField } from '@/components/ui/forms/form-text-field';
 
 interface AddPartyDishDialogProps {
   partyId: string;

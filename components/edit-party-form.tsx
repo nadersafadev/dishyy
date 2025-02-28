@@ -27,7 +27,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { FormTextField } from '@/components/ui/form-text-field';
+import { FormTextField } from '@/components/ui/forms/form-text-field';
 import { FormDateField } from '@/components/ui/form-date-field';
 
 const formSchema = z

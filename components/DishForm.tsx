@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import type { Dish, Category } from '@/lib/types';
 import { Unit, unitLabels } from '@/lib/types';
+import { FormTextField } from '@/components/ui/forms/form-text-field';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -133,40 +134,17 @@ export function DishForm({ dish }: DishFormProps) {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
+          <FormTextField
             name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Dish Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter dish name"
-                    {...field}
-                    className="border-input bg-background focus-visible:ring-0"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Dish Name"
+            placeholder="Enter dish name"
           />
 
-          <FormField
-            control={form.control}
+          <FormTextField
             name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description (Optional)</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter dish description"
-                    {...field}
-                    className="border-input bg-background focus-visible:ring-0"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Description"
+            placeholder="Enter dish description"
+            optional={true}
           />
 
           <FormField

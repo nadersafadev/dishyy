@@ -8,15 +8,36 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/forms/input';
 
+// Use standard HTML input types
+type InputType =
+  | 'text'
+  | 'number'
+  | 'email'
+  | 'password'
+  | 'tel'
+  | 'url'
+  | 'search'
+  | 'date'
+  | 'time'
+  | 'datetime-local'
+  | 'month'
+  | 'week'
+  | 'color';
+
 interface FormTextFieldProps {
   name: string;
   label: string;
   placeholder?: string;
-  type?: 'text' | 'number';
+  type?: InputType;
   className?: string;
   min?: number;
+  max?: number;
+  maxLength?: number;
   step?: string;
   optional?: boolean;
+  disabled?: boolean;
+  autoComplete?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function FormTextField({
@@ -26,8 +47,13 @@ export function FormTextField({
   type = 'text',
   className,
   min,
+  max,
+  maxLength,
   step,
   optional = false,
+  disabled = false,
+  autoComplete,
+  onChange,
 }: FormTextFieldProps) {
   const form = useFormContext();
 
@@ -48,9 +74,13 @@ export function FormTextField({
               {...field}
               type={type}
               min={min}
+              max={max}
+              maxLength={maxLength}
               step={step}
+              disabled={disabled}
               placeholder={placeholder}
-              className={`border-input bg-background focus-visible:ring-0 ${className}`}
+              autoComplete={autoComplete}
+              className={className}
               value={
                 field.value === undefined || field.value === null
                   ? ''
@@ -58,8 +88,24 @@ export function FormTextField({
               }
               onChange={e => {
                 const value = e.target.value;
+
+                // Handle the onChange
+                if (onChange) {
+                  onChange(e);
+                }
+
+                // Type conversions
                 if (type === 'number') {
-                  field.onChange(value === '' ? undefined : Number(value));
+                  // Handle numeric conversions properly
+                  if (value === '') {
+                    field.onChange(undefined);
+                  } else {
+                    const numValue = Number(value);
+                    // Only update if it's a valid number
+                    if (!isNaN(numValue)) {
+                      field.onChange(numValue);
+                    }
+                  }
                 } else {
                   field.onChange(value);
                 }
