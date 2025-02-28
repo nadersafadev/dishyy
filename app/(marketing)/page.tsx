@@ -1,5 +1,4 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { SignOutButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { Logo } from '@/components/ui/logo';
 import {
@@ -12,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/layout/Footer';
+import AuthenticatedHome from '@/components/home/AuthenticatedHome';
 
 // Types for features and steps
 interface Feature {
@@ -31,39 +31,21 @@ export default async function Home() {
   const user = await currentUser();
   const isAuthenticated = !!userId;
 
+  // Extract only the necessary user data
+  const userData = user
+    ? {
+        firstName: user.firstName,
+        imageUrl: user.imageUrl,
+        email: user.emailAddresses[0]?.emailAddress,
+      }
+    : null;
+
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
         {isAuthenticated ? (
           // Authenticated view
-          <div className="container h-[calc(100vh-4rem)] flex items-center justify-center">
-            <div className="w-full max-w-2xl rounded-xl border border-border/50 bg-white/60 backdrop-blur-md shadow-lg p-8 sm:p-12 text-center space-y-8">
-              <div className="flex justify-center">
-                <Logo size="xl" variant="dark" />
-              </div>
-              <div className="space-y-4">
-                <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-                  Welcome back, {user?.firstName || 'there'}!
-                </h1>
-                <p className="text-xl text-muted-foreground">
-                  Ready to create or join a dish party?
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/parties"
-                  className="btn-primary px-6 py-3 rounded-lg font-medium w-full sm:w-auto"
-                >
-                  Go to Parties
-                </Link>
-                <SignOutButton>
-                  <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium border border-input hover:bg-accent hover:text-accent-foreground hover-transition w-full sm:w-auto">
-                    Sign Out
-                  </button>
-                </SignOutButton>
-              </div>
-            </div>
-          </div>
+          <AuthenticatedHome userData={userData} />
         ) : (
           // Landing page view
           <div>
