@@ -170,7 +170,6 @@ const CreatePartyForm: React.FC = () => {
           <FormDishSelect
             name="dishIds"
             label="Dishes"
-            placeholder="Select dishes..."
             selectedDishes={selectedDishes}
             onSelectDish={handleSelectDish}
             showCreateOption={true}

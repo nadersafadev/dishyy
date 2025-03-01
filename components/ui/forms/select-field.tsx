@@ -198,7 +198,7 @@ export function SelectField<T>({
             <Button
               variant="outline"
               role="combobox"
-              className="w-full justify-between border-input bg-background text-sm font-normal"
+              className="w-full justify-between border-input bg-background text-sm font-normal hover:border-primary hover:bg-background text-muted-foreground hover:text-foreground"
             >
               {selectedItems.length > 0
                 ? selectionDisplayText(selectedItems.length)
@@ -255,7 +255,9 @@ export function SelectField<T>({
                           handleDialogOpenChange(true);
                         }}
                       >
-                        <span className="h-4 w-4">+</span>
+                        <span className="flex items-center justify-center h-5 w-5">
+                          +
+                        </span>
                         {dialogTriggerButtonLabel}
                       </Button>
                     </div>
