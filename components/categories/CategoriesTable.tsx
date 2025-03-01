@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { DeleteCategoryDialog } from '@/components/categories/DeleteCategoryDialog';
 import type { Category } from '@/lib/types';
 
 interface CategoryWithRelations {
@@ -77,16 +78,22 @@ export function CategoriesTable({ categories }: CategoriesTableProps) {
                     <Edit2Icon className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href={`/categories/${category.id}/delete`}>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8 text-destructive hover:bg-destructive hover:text-white"
-                    title="Delete Category"
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-                  </Button>
-                </Link>
+                <DeleteCategoryDialog
+                  categoryId={category.id}
+                  categoryName={category.name}
+                  dishesCount={category._count?.dishes || 0}
+                  isParent={category.parentId === null}
+                  trigger={
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:bg-destructive hover:text-white"
+                      title="Delete Category"
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
+                  }
+                />
               </div>
             </TableCell>
           </TableRow>

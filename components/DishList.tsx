@@ -7,18 +7,10 @@ import { EditButton } from '@/components/ui/edit-button';
 import { DeleteButton } from '@/components/ui/delete-button';
 import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Dish } from '@prisma/client';
+import { DeleteDishDialog } from '@/components/dishes/DeleteDishDialog';
 
 interface DishWithCount extends Dish {
   _count: {
@@ -33,44 +25,7 @@ interface DishListProps {
 
 export default function DishList({ dishes, view = 'grid' }: DishListProps) {
   const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [selectedDish, setSelectedDish] = useState<DishWithCount | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const handleDelete = async (dish: DishWithCount) => {
-    if (dish._count.parties > 0) {
-      setError('Cannot delete a dish that is being used in parties');
-      return;
-    }
-
-    try {
-      setIsDeleting(true);
-      setError(null);
-
-      const response = await fetch(`/api/dishes/${dish.id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to delete dish');
-      }
-
-      toast.success(`${dish.name} deleted successfully`);
-      setSelectedDish(null);
-
-      // Refresh the page to update the dish list
-      router.refresh();
-    } catch (error) {
-      console.error('Error deleting dish:', error);
-      setError(
-        error instanceof Error ? error.message : 'Failed to delete dish'
-      );
-      toast.error('Failed to delete dish');
-    } finally {
-      setIsDeleting(false);
-    }
-  };
 
   if (dishes.length === 0) {
     return (
@@ -114,54 +69,21 @@ export default function DishList({ dishes, view = 'grid' }: DishListProps) {
                   label={`Edit ${dish.name}`}
                 />
 
-                <Dialog>
-                  <DialogTrigger asChild>
+                <DeleteDishDialog
+                  dishId={dish.id}
+                  dishName={dish.name}
+                  inMenuCount={dish._count.parties}
+                  trigger={
                     <DeleteButton
                       className="bg-background/80 backdrop-blur-sm"
-                      onClick={() => setSelectedDish(dish)}
                       label={`Delete ${dish.name}`}
                     />
-                  </DialogTrigger>
-                  {selectedDish?.id === dish.id && (
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Delete Dish</DialogTitle>
-                        <DialogDescription>
-                          Are you sure you want to delete &quot;
-                          {selectedDish.name}
-                          &quot;? This action cannot be undone.
-                          {selectedDish._count.parties > 0 && (
-                            <p className="mt-2 text-destructive">
-                              This dish cannot be deleted because it is being
-                              used in {selectedDish._count.parties}{' '}
-                              {selectedDish._count.parties === 1
-                                ? 'party'
-                                : 'parties'}
-                              .
-                            </p>
-                          )}
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <Button
-                          variant="outline"
-                          onClick={() => setSelectedDish(null)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleDelete(selectedDish)}
-                          disabled={
-                            isDeleting || selectedDish._count.parties > 0
-                          }
-                        >
-                          {isDeleting ? 'Deleting...' : 'Delete'}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  )}
-                </Dialog>
+                  }
+                  onSuccess={() => {
+                    toast.success(`${dish.name} deleted successfully`);
+                    router.refresh();
+                  }}
+                />
               </div>
             )}
 
@@ -215,53 +137,16 @@ export default function DishList({ dishes, view = 'grid' }: DishListProps) {
                   label={`Edit ${dish.name}`}
                 />
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DeleteButton
-                      onClick={() => setSelectedDish(dish)}
-                      label={`Delete ${dish.name}`}
-                    />
-                  </DialogTrigger>
-                  {selectedDish?.id === dish.id && (
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Delete Dish</DialogTitle>
-                        <DialogDescription>
-                          Are you sure you want to delete &quot;
-                          {selectedDish.name}
-                          &quot;? This action cannot be undone.
-                          {selectedDish._count.parties > 0 && (
-                            <p className="mt-2 text-destructive">
-                              This dish cannot be deleted because it is being
-                              used in {selectedDish._count.parties}{' '}
-                              {selectedDish._count.parties === 1
-                                ? 'party'
-                                : 'parties'}
-                              .
-                            </p>
-                          )}
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <Button
-                          variant="outline"
-                          onClick={() => setSelectedDish(null)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleDelete(selectedDish)}
-                          disabled={
-                            isDeleting || selectedDish._count.parties > 0
-                          }
-                        >
-                          {isDeleting ? 'Deleting...' : 'Delete'}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  )}
-                </Dialog>
+                <DeleteDishDialog
+                  dishId={dish.id}
+                  dishName={dish.name}
+                  inMenuCount={dish._count.parties}
+                  trigger={<DeleteButton label={`Delete ${dish.name}`} />}
+                  onSuccess={() => {
+                    toast.success(`${dish.name} deleted successfully`);
+                    router.refresh();
+                  }}
+                />
               </div>
             )}
           </div>

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Edit2Icon, Trash2Icon, ChevronLeftIcon } from 'lucide-react';
+import { DeleteCategoryDialog } from '@/components/categories/DeleteCategoryDialog';
 
 interface CategoryDetailHeaderProps {
   id: string;
@@ -34,17 +35,21 @@ export function CategoryDetailHeader({
             Edit
           </Link>
         </Button>
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="text-destructive hover:bg-destructive hover:text-white"
-        >
-          <Link href={`/categories/${id}/delete`}>
-            <Trash2Icon className="h-4 w-4 mr-2" />
-            Delete
-          </Link>
-        </Button>
+        <DeleteCategoryDialog
+          categoryId={id}
+          categoryName={name}
+          isParent={true}
+          trigger={
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-destructive hover:bg-destructive hover:text-white"
+            >
+              <Trash2Icon className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+          }
+        />
       </div>
     </div>
   );

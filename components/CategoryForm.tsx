@@ -3,28 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import * as z from 'zod';
 import type { Category } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
+import { FormTextField } from '@/components/forms/form-text-field';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/forms/input';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/forms/select';
+  FormSelectField,
+  SortOption,
+} from '@/components/forms/form-select-field';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Category name is required'),
@@ -137,73 +125,47 @@ export function CategoryForm({ category }: CategoryFormProps) {
         </div>
       )}
 
-      <Form {...form}>
+      <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
+          <FormTextField
             name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter category name"
-                    {...field}
-                    disabled={form.formState.isSubmitting}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Category Name"
+            placeholder="Enter category name"
+            disabled={form.formState.isSubmitting}
           />
 
-          <FormField
-            control={form.control}
+          <FormTextField
             name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description (Optional)</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Enter category description"
-                    {...field}
-                    disabled={form.formState.isSubmitting}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Description"
+            placeholder="Enter category description"
+            optional
+            disabled={form.formState.isSubmitting}
           />
 
-          <FormField
-            control={form.control}
-            name="parentId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Parent Category (Optional)</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value || 'none'}
-                  disabled={form.formState.isSubmitting}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a parent category (optional)" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="none">No parent category</SelectItem>
-                    {categories.map(category => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
+          <div className="space-y-2">
+            <label htmlFor="parentId" className="text-sm font-medium">
+              Parent Category{' '}
+              <span className="text-sm text-muted-foreground">(Optional)</span>
+            </label>
+            <select
+              id="parentId"
+              {...form.register('parentId')}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={form.formState.isSubmitting}
+            >
+              <option value="none">No parent category</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            {form.formState.errors.parentId && (
+              <p className="text-xs text-destructive">
+                {form.formState.errors.parentId.message}
+              </p>
             )}
-          />
+          </div>
 
           <div className="flex gap-4">
             <Button
@@ -211,6 +173,7 @@ export function CategoryForm({ category }: CategoryFormProps) {
               variant="outline"
               onClick={() => router.push('/categories')}
               className="flex-1"
+              disabled={form.formState.isSubmitting || loading}
             >
               Cancel
             </Button>
@@ -229,7 +192,7 @@ export function CategoryForm({ category }: CategoryFormProps) {
             </Button>
           </div>
         </form>
-      </Form>
+      </FormProvider>
     </div>
   );
 }
