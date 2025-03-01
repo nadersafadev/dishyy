@@ -26,7 +26,7 @@ export function PartyListWithViewToggle({
   title,
   description,
 }: PartyListWithViewToggleProps) {
-  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [view, setView] = useState<'grid' | 'list'>('list');
 
   return (
     <div className="space-y-4">

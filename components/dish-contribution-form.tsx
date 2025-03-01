@@ -92,7 +92,6 @@ export function DishContributionForm({
             placeholder={`Amount in ${unit.toLowerCase()} (max: ${remainingNeeded.toFixed(
               1
             )})`}
-            min={0.1}
             step="0.01"
             max={remainingNeeded}
           />

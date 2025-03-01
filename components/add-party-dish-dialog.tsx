@@ -26,7 +26,7 @@ interface AddPartyDishDialogProps {
 
 const formSchema = z.object({
   dishId: z.string().min(1, 'Please select a dish'),
-  amountPerPerson: z.number().min(0.1, 'Amount must be greater than 0'),
+  amountPerPerson: z.number().min(0.01, 'Amount must be greater than 0'),
 });
 
 export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
@@ -48,7 +48,7 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
   // Fetch available dishes when dialog opens
   const fetchDishes = async () => {
     try {
-      const response = await fetch('/api/dishes');
+      const response = await fetch('/api/dishes?page=1&limit=20');
       if (!response.ok) throw new Error('Failed to fetch dishes');
       const data = await response.json();
       setDishes(data.dishes || []); // Use data.dishes if available, otherwise empty array
@@ -129,7 +129,6 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
                 name="amountPerPerson"
                 label="Amount per person"
                 step="0.01"
-                min={0.1}
                 onChange={value => {
                   if (value !== undefined) {
                     const formattedValue = value.toFixed(1);
