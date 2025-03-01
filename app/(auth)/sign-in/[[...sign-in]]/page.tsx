@@ -6,7 +6,14 @@ export const metadata = generateMetadata(
   'Sign in to your Dishyy account'
 );
 
-export default function SignInPage() {
+export default function SignInPage({
+  searchParams,
+}: {
+  searchParams?: { redirect_url?: string };
+}) {
+  // Get the redirect URL from search params or use dashboard as default
+  const redirectUrl = searchParams?.redirect_url || '/dashboard';
+
   return (
     <SignIn
       appearance={{
@@ -25,7 +32,7 @@ export default function SignInPage() {
       }}
       path="/sign-in"
       signUpUrl="/sign-up"
-      forceRedirectUrl="/dashboard"
+      redirectUrl={redirectUrl}
       routing="path"
     />
   );
