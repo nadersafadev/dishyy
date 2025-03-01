@@ -106,14 +106,15 @@ export function PartyActions({
           <DialogHeader>
             <DialogTitle>Join Party</DialogTitle>
             <DialogDescription>
-              Enter the number of additional guests you&apos;ll be bringing (not
-              including yourself).
+              How many additional people are you bringing with you? You are
+              already counted as a participant, so only include others who will
+              join you.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="guests">Number of Guests</Label>
+              <Label htmlFor="guests">Number of Additional Guests</Label>
               <Input
                 id="guests"
                 type="number"
@@ -121,6 +122,10 @@ export function PartyActions({
                 value={numGuests}
                 onChange={e => setNumGuests(e.target.value)}
               />
+              <p className="text-sm text-muted-foreground mt-1">
+                Enter 0 if you're coming alone. This number does not include
+                you.
+              </p>
             </div>
           </div>
 
