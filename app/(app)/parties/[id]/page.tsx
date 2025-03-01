@@ -201,6 +201,7 @@ export default async function PartyPage({
             participants={party.participants}
             isAdmin={isAdmin}
             partyId={party.id}
+            currentUserId={user.id}
           />
         </div>
       </div>
