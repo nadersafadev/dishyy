@@ -1,9 +1,9 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { Metadata } from 'next';
-import { prisma } from '@/lib/prisma';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserCircle, Shield, Settings } from 'lucide-react';
+import { generateMetadata } from '@/lib/metadata';
+import { prisma } from '@/lib/prisma';
 
 // Import our custom components
 import { ProfileHeader } from './components/ProfileHeader';
@@ -12,10 +12,10 @@ import { AccountTab } from './components/AccountTab';
 import { SecurityTab } from './components/SecurityTab';
 import { PreferencesTab } from './components/PreferencesTab';
 
-export const metadata: Metadata = {
-  title: 'Profile | Dishyy',
-  description: 'Manage your profile and account settings',
-};
+export const metadata = generateMetadata(
+  'Profile',
+  'Manage your profile and account settings'
+);
 
 export default async function ProfilePage() {
   const { userId } = await auth();

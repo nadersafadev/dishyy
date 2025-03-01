@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { generateMetadata } from '@/lib/metadata';
 
-export const metadata = {
-  title: 'Privacy Policy | Dishyy',
-  description: 'Privacy Policy for Dishyy - Your party planning companion',
-};
+export const metadata = generateMetadata(
+  'Privacy Policy',
+  'Privacy Policy for Dishyy - Your party planning companion'
+);
 
 export default function PrivacyPolicyPage() {
   return (

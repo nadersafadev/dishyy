@@ -2,6 +2,8 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { DishForm } from '@/components/DishForm';
+import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
+import { Metadata } from 'next';
 
 export default async function EditDishPage({
   params,
@@ -46,4 +48,13 @@ export default async function EditDishPage({
       </div>
     </div>
   );
+}
+
+// Generate dynamic metadata for the edit dish page
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  return baseGenerateMetadata('Edit Dish', 'Update dish details');
 }

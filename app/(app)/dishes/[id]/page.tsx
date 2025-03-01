@@ -11,9 +11,46 @@ import {
   PencilIcon,
   TrashIcon,
   CalendarIcon,
+  Share2Icon,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DeleteDishDialog } from '@/components/dishes/DeleteDishDialog';
+import { Metadata } from 'next';
+import { Suspense } from 'react';
+import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
+import { ShareButton } from '@/components/share-button';
+import { CategoryPill } from '@/components/category-pill';
+import { ImageCarousel } from '@/components/image-carousel';
+import { DishIngredients } from '@/components/dish-ingredients';
+import { DishNutrition } from '@/components/dish-nutrition';
+import { DishProperties } from '@/components/dish-properties';
+
+// Generate dynamic metadata for the dish page
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  // Fetch dish data for the metadata
+  const dish = await prisma.dish.findUnique({
+    where: { id: params.id },
+    select: { name: true, description: true },
+  });
+
+  // If dish not found, use default metadata
+  if (!dish) {
+    return baseGenerateMetadata(
+      'Dish Not Found',
+      'The requested dish could not be found'
+    );
+  }
+
+  // Return customized metadata with the dish name
+  return baseGenerateMetadata(
+    dish.name,
+    dish.description || `Details about ${dish.name}`
+  );
+}
 
 export default async function DishPage({ params }: { params: { id: string } }) {
   const { userId } = await auth();

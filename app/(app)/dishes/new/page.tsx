@@ -2,6 +2,12 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { DishForm } from '@/components/DishForm';
+import { generateMetadata } from '@/lib/metadata';
+
+export const metadata = generateMetadata(
+  'Create Dish',
+  'Add a new dish to your collection'
+);
 
 export default async function NewDishPage() {
   const { userId } = await auth();

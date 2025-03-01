@@ -6,6 +6,12 @@ import { CategoriesTable } from '@/components/categories/CategoriesTable';
 import { CategoryHierarchy } from '@/components/categories/CategoryHierarchy';
 import { CategoryCard } from '@/components/categories/CategoryCard';
 import { CategoriesFilters } from '@/components/categories/CategoriesFilters';
+import { generateMetadata } from '@/lib/metadata';
+
+export const metadata = generateMetadata(
+  'Categories',
+  'Create and manage categories for organizing dishes'
+);
 
 // Define types for the page props
 interface PageProps {

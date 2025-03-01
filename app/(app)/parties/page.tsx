@@ -1,10 +1,17 @@
-import { auth } from '@clerk/nextjs/server';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { auth } from '@clerk/nextjs';
 import { prisma } from '@/lib/prisma';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { PlusIcon } from 'lucide-react';
 import { PartyListWithViewToggle } from '@/components/party-list-with-view-toggle';
+import { generateMetadata } from '@/lib/metadata';
+import { PartiesGrid } from '@/components/parties-grid';
+
+export const metadata = generateMetadata(
+  'Parties',
+  'Browse and manage your parties'
+);
 
 export default async function PartiesPage() {
   const { userId } = await auth();

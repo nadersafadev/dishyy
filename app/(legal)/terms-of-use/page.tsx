@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { generateMetadata } from '@/lib/metadata';
 
-export const metadata = {
-  title: 'Terms of Use | Dishyy',
-  description: 'Terms of Use for Dishyy - Your party planning companion',
-};
+export const metadata = generateMetadata(
+  'Terms of Use',
+  'Terms of Use for Dishyy - Your party planning companion'
+);
 
 export default function TermsOfUsePage() {
   return (

@@ -1,6 +1,12 @@
 import { SignIn } from '@clerk/nextjs';
 import { Background } from '@/components/ui/background';
 import { Logo } from '@/components/ui/logo';
+import { generateMetadata } from '@/lib/metadata';
+
+export const metadata = generateMetadata(
+  'Reset Password',
+  'Reset your Dishyy account password'
+);
 
 export default function ResetPasswordPage() {
   return (

@@ -1,6 +1,12 @@
 import { SignUp } from '@clerk/nextjs';
 import { Background } from '@/components/ui/background';
 import { Logo } from '@/components/ui/logo';
+import { generateMetadata } from '@/lib/metadata';
+
+export const metadata = generateMetadata(
+  'Sign Up',
+  'Create your Dishyy account'
+);
 
 export default function SignUpPage() {
   return (

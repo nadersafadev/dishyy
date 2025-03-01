@@ -8,6 +8,7 @@ import { DishesTable } from '@/components/dishes/DishesTable';
 import { DishesFilters } from '@/components/dishes/DishesFilters';
 import { DishesGrid } from '@/components/dishes/DishesGrid';
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher';
+import { generateMetadata } from '@/lib/metadata';
 
 // Define the interface for dish data
 interface DishWithRelations {
@@ -30,6 +31,11 @@ interface PaginationMeta {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 }
+
+export const metadata = generateMetadata(
+  'Dishes',
+  'Browse and manage your dishes collection'
+);
 
 export default async function DishesPage({
   searchParams,

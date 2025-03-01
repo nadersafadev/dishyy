@@ -2,6 +2,12 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import CreatePartyForm from '@/components/CreatePartyForm';
+import { generateMetadata } from '@/lib/metadata';
+
+export const metadata = generateMetadata(
+  'Create Party',
+  'Create a new dish party'
+);
 
 export default async function NewPartyPage() {
   const { userId } = await auth();

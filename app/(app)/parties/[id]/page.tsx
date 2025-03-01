@@ -16,6 +16,8 @@ import {
 } from '@prisma/client';
 import { DeletePartyDialog } from '@/components/delete-party-dialog';
 import { RemoveParticipantButton } from '@/components/remove-participant-button';
+import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
+import { Metadata } from 'next';
 
 interface PartyWithDetails extends Party {
   createdBy: {
@@ -294,5 +296,32 @@ export default async function PartyPage({
         isAdmin={isAdmin}
       />
     </div>
+  );
+}
+
+// Generate dynamic metadata for the party page
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  // Fetch party data for the metadata
+  const party = await prisma.party.findUnique({
+    where: { id: params.id },
+    select: { name: true, description: true },
+  });
+
+  // If party not found, use default metadata
+  if (!party) {
+    return baseGenerateMetadata(
+      'Party Not Found',
+      'The requested party could not be found'
+    );
+  }
+
+  // Return customized metadata with the party name
+  return baseGenerateMetadata(
+    party.name,
+    party.description || `Details about ${party.name}`
   );
 }
