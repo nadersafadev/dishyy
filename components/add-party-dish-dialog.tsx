@@ -51,10 +51,11 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
       const response = await fetch('/api/dishes');
       if (!response.ok) throw new Error('Failed to fetch dishes');
       const data = await response.json();
-      setDishes(data);
+      setDishes(data.dishes || []); // Use data.dishes if available, otherwise empty array
     } catch (error) {
       console.error('Error fetching dishes:', error);
       toast.error('Failed to load dishes');
+      setDishes([]); // Set empty array on error
     }
   };
 
@@ -117,11 +118,12 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
                 className="w-full p-2 border rounded-md"
               >
                 <option value="">Select a dish...</option>
-                {dishes.map(dish => (
-                  <option key={dish.id} value={dish.id}>
-                    {dish.name}
-                  </option>
-                ))}
+                {Array.isArray(dishes) &&
+                  dishes.map(dish => (
+                    <option key={dish.id} value={dish.id}>
+                      {dish.name}
+                    </option>
+                  ))}
               </select>
               <FormNumberField
                 name="amountPerPerson"

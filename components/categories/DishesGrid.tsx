@@ -1,8 +1,7 @@
-interface Dish {
-  id: string;
-  name: string;
-  unit: string;
-}
+import { UtensilsCrossedIcon } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Dish } from '@prisma/client';
 
 interface DishesGridProps {
   dishes: Dish[];
@@ -11,24 +10,39 @@ interface DishesGridProps {
 export function DishesGrid({ dishes }: DishesGridProps) {
   if (dishes.length === 0) {
     return (
-      <p className="text-muted-foreground">
+      <div className="text-center p-8 text-muted-foreground">
         No dishes associated with this category.
-      </p>
+      </div>
     );
   }
 
   return (
-    <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       {dishes.map(dish => (
-        <div
+        <Link
+          href={`/dishes/${dish.id}`}
           key={dish.id}
-          className="border rounded-md p-3 hover:bg-muted/50 transition-colors"
+          className="flex flex-col items-center p-3 rounded-md border bg-card hover:bg-accent/10 transition-colors"
         >
-          <div className="font-medium">{dish.name}</div>
-          <div className="text-xs text-muted-foreground mt-1">
-            Unit: {dish.unit}
+          <div className="relative aspect-square w-full rounded-md overflow-hidden bg-muted mb-2">
+            {dish.imageUrl ? (
+              <Image
+                src={dish.imageUrl}
+                alt={dish.name}
+                fill
+                sizes="(max-width: 768px) 100vw, 25vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <UtensilsCrossedIcon className="h-12 w-12 text-muted-foreground/40" />
+              </div>
+            )}
           </div>
-        </div>
+          <span className="text-sm font-medium text-center truncate w-full">
+            {dish.name}
+          </span>
+        </Link>
       ))}
     </div>
   );
