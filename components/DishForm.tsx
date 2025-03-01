@@ -27,7 +27,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/forms/select';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Dish name is required'),
