@@ -74,9 +74,18 @@ export function PartyDishItem({
       }))
   );
 
+  // Check if current user already has a contribution for this dish
+  const userContribution = currentUserId
+    ? contributions.find(c => c.participant.userId === currentUserId)
+    : null;
+
   const totalContributed = contributions.reduce((sum, c) => sum + c.amount, 0);
   const totalNeeded = partyDish.amountPerPerson * totalParticipants;
   const remainingNeeded = Math.max(0, totalNeeded - totalContributed);
+  // If the user is editing, they can contribute up to their current amount + remaining needed
+  const maxEditAmount = userContribution
+    ? userContribution.amount + remainingNeeded
+    : remainingNeeded;
   const progressPercentage = Math.min(
     (totalContributed / totalNeeded) * 100,
     100
@@ -128,15 +137,31 @@ export function PartyDishItem({
                   partyId={partyId}
                 />
 
-                {isParticipant && remainingNeeded > 0 && (
+                {isParticipant && (
                   <div className="border-t pt-4 mt-2">
-                    <DishContributionForm
-                      partyId={partyId}
-                      dishId={partyDish.dishId}
-                      dishName={partyDish.dish.name}
-                      unit={partyDish.dish.unit}
-                      remainingNeeded={remainingNeeded}
-                    />
+                    {userContribution ? (
+                      <DishContributionForm
+                        partyId={partyId}
+                        dishId={partyDish.dishId}
+                        dishName={partyDish.dish.name}
+                        unit={partyDish.dish.unit}
+                        remainingNeeded={maxEditAmount}
+                        isEdit={true}
+                        contributionId={userContribution.id}
+                        initialAmount={userContribution.amount}
+                      />
+                    ) : (
+                      remainingNeeded > 0 && (
+                        <DishContributionForm
+                          partyId={partyId}
+                          dishId={partyDish.dishId}
+                          dishName={partyDish.dish.name}
+                          unit={partyDish.dish.unit}
+                          remainingNeeded={remainingNeeded}
+                          isEdit={false}
+                        />
+                      )
+                    )}
                   </div>
                 )}
               </div>
