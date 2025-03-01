@@ -6,6 +6,8 @@ module.exports = {
   changefreq: 'weekly',
   priority: 0.7,
   exclude: ['/api/*', '/dashboard/*'], // Exclude private routes from the sitemap
+  generateIndexSitemap: false,
+  outDir: 'public',
   robotsTxtOptions: {
     policies: [
       {
