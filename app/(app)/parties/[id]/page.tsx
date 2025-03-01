@@ -294,6 +294,7 @@ export default async function PartyPage({
         isParticipant={isParticipant}
         totalParticipants={totalParticipants}
         isAdmin={isAdmin}
+        currentUserId={user.id}
       />
     </div>
   );
