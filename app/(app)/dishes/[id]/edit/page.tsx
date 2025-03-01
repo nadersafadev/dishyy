@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { DishForm } from '@/components/DishForm';
 import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
 import { Metadata } from 'next';
+import { Dish, Unit } from '@/lib/types';
 
 export default async function EditDishPage({
   params,
@@ -16,7 +17,7 @@ export default async function EditDishPage({
     redirect('/sign-in');
   }
 
-  const [user, dish] = await Promise.all([
+  const [user, dbDish] = await Promise.all([
     prisma.user.findUnique({
       where: { clerkId: userId },
       select: { role: true },
@@ -30,9 +31,15 @@ export default async function EditDishPage({
     redirect('/dashboard');
   }
 
-  if (!dish) {
+  if (!dbDish) {
     redirect('/dishes');
   }
+
+  // Convert Prisma dish to app Dish type
+  const dish: Dish = {
+    ...dbDish,
+    unit: dbDish.unit as unknown as Unit, // Type conversion
+  };
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">

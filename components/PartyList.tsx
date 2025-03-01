@@ -44,7 +44,8 @@ const PartyList: React.FC<PartyListProps> = ({ parties, view = 'grid' }) => {
         );
         const hasMaxParticipants = party.maxParticipants !== null;
         const isFull =
-          hasMaxParticipants && totalParticipants >= party.maxParticipants;
+          hasMaxParticipants &&
+          totalParticipants >= (party.maxParticipants || 0);
 
         return (
           <Link
