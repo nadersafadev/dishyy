@@ -9,12 +9,12 @@ type FooterLink = {
 
 const legalLinks: FooterLink[] = [
   {
-    href: '/privacy',
+    href: '/privacy-policy',
     label: 'Privacy Policy',
   },
   {
-    href: '/terms',
-    label: 'Terms of Service',
+    href: '/terms-of-use',
+    label: 'Terms of Use',
   },
 ];
 

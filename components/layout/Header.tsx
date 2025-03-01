@@ -10,6 +10,7 @@ import {
   Users,
   UtensilsCrossed,
   UserCircle,
+  ListTree,
 } from 'lucide-react';
 import {
   Sheet,
@@ -51,6 +52,12 @@ const navItems: NavItemType[] = [
     icon: UtensilsCrossed,
     adminOnly: true,
   },
+  {
+    href: '/categories',
+    label: 'Categories',
+    icon: ListTree,
+    adminOnly: true,
+  },
 ];
 
 export default async function Header() {
@@ -70,26 +77,30 @@ export default async function Header() {
   return (
     <header className="bg-background border-b border-border/40" role="banner">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <Link
-            href="/dashboard"
-            className="flex items-center hover:opacity-90 transition-opacity"
-            aria-label="Go to dashboard"
-          >
-            <Logo />
-          </Link>
+        <div className="flex h-16 items-center">
+          <div className="flex-shrink-0">
+            <Link
+              href="/dashboard"
+              className="flex items-center hover:opacity-90 transition-opacity"
+              aria-label="Go to dashboard"
+            >
+              <Logo />
+            </Link>
+          </div>
 
-          <div className="flex items-center gap-4">
-            {/* Desktop Navigation */}
+          {/* Desktop Navigation - Centered */}
+          <div className="flex-grow flex justify-center">
             <nav
-              className="hidden md:flex items-center gap-6"
+              className="hidden md:flex items-center gap-8"
               aria-label="Main navigation"
             >
               {filteredNavItems.map(item => (
                 <NavItem key={item.href} href={item.href} label={item.label} />
               ))}
             </nav>
+          </div>
 
+          <div className="flex items-center gap-4">
             {/* Mobile Navigation */}
             <div className="md:hidden">
               <Sheet>
