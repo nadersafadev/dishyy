@@ -88,11 +88,19 @@ export function FormDishSelect({
         if (!response.ok) {
           throw new Error('Failed to fetch dishes');
         }
+
         const data = await response.json();
-        setDishes(data);
+
+        // Check if the response contains a dishes array or is an array itself
+        const dishesArray = data.dishes || data;
+
+        // Make sure we always set an array, even if the API returns something unexpected
+        setDishes(Array.isArray(dishesArray) ? dishesArray : []);
       } catch (error) {
         console.error('Error fetching dishes:', error);
         setError('Failed to load dishes');
+        // Make sure dishes is initialized as an empty array on error
+        setDishes([]);
       } finally {
         setIsLoading(false);
       }

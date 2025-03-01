@@ -128,8 +128,11 @@ export function SelectField<T>({
     }
   };
 
+  // Ensure items is an array
+  const itemsArray = Array.isArray(items) ? items : [];
+
   // Filter and sort items based on search query and sort option
-  const filteredAndSortedItems = items
+  const filteredAndSortedItems = itemsArray
     .filter(item => {
       if (!showSearch || !searchQuery) return true;
 
