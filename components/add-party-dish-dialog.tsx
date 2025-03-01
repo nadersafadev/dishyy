@@ -17,7 +17,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form } from '@/components/ui/form';
-import { FormTextField } from '@/components/ui/form-text-field';
+import { FormTextField } from '@/components/forms/form-text-field';
+import { FormNumberField } from '@/components/forms/form-number-field';
 
 interface AddPartyDishDialogProps {
   partyId: string;
@@ -33,6 +34,8 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dishes, setDishes] = useState<{ id: string; name: string }[]>([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [numberOfParticipants, setNumberOfParticipants] = useState(0);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,10 +51,11 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
       const response = await fetch('/api/dishes');
       if (!response.ok) throw new Error('Failed to fetch dishes');
       const data = await response.json();
-      setDishes(data);
+      setDishes(data.dishes || []); // Use data.dishes if available, otherwise empty array
     } catch (error) {
       console.error('Error fetching dishes:', error);
       toast.error('Failed to load dishes');
+      setDishes([]); // Set empty array on error
     }
   };
 
@@ -114,22 +118,26 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
                 className="w-full p-2 border rounded-md"
               >
                 <option value="">Select a dish...</option>
-                {dishes.map(dish => (
-                  <option key={dish.id} value={dish.id}>
-                    {dish.name}
-                  </option>
-                ))}
+                {Array.isArray(dishes) &&
+                  dishes.map(dish => (
+                    <option key={dish.id} value={dish.id}>
+                      {dish.name}
+                    </option>
+                  ))}
               </select>
-              <FormTextField
+              <FormNumberField
                 name="amountPerPerson"
                 label="Amount per person"
-                type="number"
                 step="0.1"
-                min="0.1"
-                onChange={e => {
-                  const value = parseFloat(e.target.value);
-                  if (!isNaN(value)) {
-                    form.setValue('amountPerPerson', value);
+                min={0.1}
+                onChange={value => {
+                  if (value !== undefined) {
+                    const formattedValue = value.toFixed(1);
+                    const newTotal =
+                      Number(formattedValue) * numberOfParticipants;
+                    setTotalAmount(newTotal);
+                  } else {
+                    setTotalAmount(0);
                   }
                 }}
               />

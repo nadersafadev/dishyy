@@ -13,7 +13,7 @@ export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
         variant="ghost"
         size="sm"
         className={`p-2 h-8 ${
-          view === 'grid' ? 'bg-background shadow-sm' : 'hover:bg-background/50'
+          view === 'grid' ? 'bg-background shadow-sm' : 'hover:bg-primary'
         }`}
         onClick={() => onViewChange('grid')}
       >
@@ -24,7 +24,7 @@ export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
         variant="ghost"
         size="sm"
         className={`p-2 h-8 ${
-          view === 'list' ? 'bg-background shadow-sm' : 'hover:bg-background/50'
+          view === 'list' ? 'bg-background shadow-sm' : 'hover:bg-primary'
         }`}
         onClick={() => onViewChange('list')}
       >

@@ -15,6 +15,7 @@ const dishSchema = z.object({
     'LITERS',
     'PIECES',
   ]),
+  categoryId: z.string().optional().nullable(),
 });
 
 // GET a single dish
@@ -25,6 +26,21 @@ export async function GET(
   try {
     const dish = await prisma.dish.findUnique({
       where: { id: params.id },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            parentId: true,
+            parent: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!dish) {
@@ -80,6 +96,20 @@ export async function PATCH(
       }
     }
 
+    // If categoryId is provided, check if the category exists
+    if (validatedData.categoryId) {
+      const category = await prisma.category.findUnique({
+        where: { id: validatedData.categoryId },
+      });
+
+      if (!category) {
+        return NextResponse.json(
+          { error: 'Category not found' },
+          { status: 400 }
+        );
+      }
+    }
+
     const updatedDish = await prisma.dish.update({
       where: { id: params.id },
       data: {
@@ -87,6 +117,7 @@ export async function PATCH(
         description: validatedData.description || '',
         imageUrl: validatedData.imageUrl || null,
         unit: validatedData.unit,
+        categoryId: validatedData.categoryId ?? null,
       },
     });
 
