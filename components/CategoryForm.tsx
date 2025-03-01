@@ -40,16 +40,19 @@ export function CategoryForm({ category }: CategoryFormProps) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories');
+        const response = await fetch('/api/categories?limit=100');
         if (response.ok) {
           const data = await response.json();
+          const categoriesData = data.categories || [];
+
           // Filter out the current category (if editing) and its children to prevent circular references
           const filteredData = category
-            ? data.filter(
+            ? categoriesData.filter(
                 (c: Category) =>
                   c.id !== category.id && c.parentId !== category.id
               )
-            : data;
+            : categoriesData;
+
           setCategories(filteredData);
         }
       } catch (error) {

@@ -54,10 +54,10 @@ export function DishForm({ dish }: DishFormProps) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories');
+        const response = await fetch('/api/categories?limit=100');
         if (response.ok) {
           const data = await response.json();
-          setCategories(data);
+          setCategories(data.categories || []);
         }
       } catch (error) {
         console.error('Error fetching categories:', error);
