@@ -1,39 +1,47 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { AlertTriangle } from 'lucide-react';
 import { DeleteEntityDialog } from '@/components/ui/delete-entity-dialog';
-import type { Dish } from '@/lib/types';
 
 interface DeleteDishDialogProps {
   dishId: string;
   dishName: string;
-  inMenuCount?: number;
-  trigger?: React.ReactNode;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  inMenuCount: number;
+  trigger: React.ReactNode;
   onSuccess?: () => void;
 }
 
 export function DeleteDishDialog({
   dishId,
   dishName,
-  inMenuCount = 0,
+  inMenuCount,
   trigger,
-  open,
-  onOpenChange,
   onSuccess,
 }: DeleteDishDialogProps) {
-  // Prepare warnings based on available data
-  const warnings = [];
-
-  if (inMenuCount > 0) {
-    warnings.push({
-      type: 'warning' as const,
-      title: 'Warning',
-      message: `This dish is used in ${inMenuCount} ${inMenuCount === 1 ? 'menu' : 'menus'}. Deleting this dish will remove it from these menus.`,
-    });
-  }
+  // Use the reusable DeleteEntityDialog component
+  const warnings =
+    inMenuCount > 0
+      ? [
+          {
+            type: 'warning' as const,
+            title: 'This dish is used in parties',
+            message: `This dish is currently used in ${inMenuCount} ${inMenuCount === 1 ? 'party' : 'parties'}. Deleting it will remove it from those parties.`,
+          },
+        ]
+      : [];
 
   return (
     <DeleteEntityDialog
@@ -42,11 +50,13 @@ export function DeleteDishDialog({
       entityType="Dish"
       deleteEndpoint={`/api/dishes/${dishId}`}
       warnings={warnings}
-      confirmText="Delete Dish"
       trigger={trigger}
-      open={open}
-      onOpenChange={onOpenChange}
-      onSuccess={onSuccess}
+      onSuccess={() => {
+        toast.success(`"${dishName}" has been deleted`);
+        if (onSuccess) {
+          onSuccess();
+        }
+      }}
     />
   );
 }
