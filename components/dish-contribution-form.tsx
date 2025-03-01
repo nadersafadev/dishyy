@@ -93,7 +93,7 @@ export function DishContributionForm({
               1
             )})`}
             min={0.1}
-            step="0.1"
+            step="0.01"
             max={remainingNeeded}
           />
         </div>

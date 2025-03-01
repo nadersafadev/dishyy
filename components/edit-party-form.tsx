@@ -309,7 +309,7 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
                     <Label>Amount Per Person</Label>
                     <Input
                       type="number"
-                      step="0.1"
+                      step="0.01"
                       min="0"
                       value={amountPerPerson}
                       onChange={e => setAmountPerPerson(e.target.value)}
@@ -357,7 +357,7 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
                 <div className="flex items-center gap-4">
                   <Input
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     min="0"
                     className="w-24"
                     value={partyDish.amountPerPerson}
