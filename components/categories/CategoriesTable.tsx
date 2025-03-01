@@ -1,20 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { DeleteCategoryDialog } from '@/components/categories/DeleteCategoryDialog';
 import { Badge } from '@/components/ui/badge';
-import {
-  Edit2Icon,
-  Trash2Icon,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DataPagination } from '@/components/ui/DataPagination';
 import {
   Table,
   TableBody,
@@ -23,8 +12,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { DeleteCategoryDialog } from '@/components/categories/DeleteCategoryDialog';
-import type { Category } from '@/lib/types';
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Edit2Icon,
+  Trash2Icon,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 interface CategoryWithRelations {
   id: string;
@@ -187,99 +183,11 @@ export function CategoriesTable({
       </div>
 
       {/* Pagination UI */}
-      {pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            Showing{' '}
-            <span className="font-medium">
-              {(pagination.page - 1) * pagination.limit + 1}
-            </span>{' '}
-            to{' '}
-            <span className="font-medium">
-              {Math.min(
-                pagination.page * pagination.limit,
-                pagination.totalCount
-              )}
-            </span>{' '}
-            of <span className="font-medium">{pagination.totalCount}</span>{' '}
-            categories
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!pagination.hasPreviousPage}
-              asChild={pagination.hasPreviousPage}
-            >
-              {pagination.hasPreviousPage ? (
-                <Link href={createPageURL(1)}>
-                  <ChevronsLeft className="h-4 w-4" />
-                  <span className="sr-only">First page</span>
-                </Link>
-              ) : (
-                <span>
-                  <ChevronsLeft className="h-4 w-4" />
-                  <span className="sr-only">First page</span>
-                </span>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!pagination.hasPreviousPage}
-              asChild={pagination.hasPreviousPage}
-            >
-              {pagination.hasPreviousPage ? (
-                <Link href={createPageURL(pagination.page - 1)}>
-                  <ChevronLeft className="h-4 w-4" />
-                  <span className="sr-only">Previous page</span>
-                </Link>
-              ) : (
-                <span>
-                  <ChevronLeft className="h-4 w-4" />
-                  <span className="sr-only">Previous page</span>
-                </span>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!pagination.hasNextPage}
-              asChild={pagination.hasNextPage}
-            >
-              {pagination.hasNextPage ? (
-                <Link href={createPageURL(pagination.page + 1)}>
-                  <ChevronRight className="h-4 w-4" />
-                  <span className="sr-only">Next page</span>
-                </Link>
-              ) : (
-                <span>
-                  <ChevronRight className="h-4 w-4" />
-                  <span className="sr-only">Next page</span>
-                </span>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!pagination.hasNextPage}
-              asChild={pagination.hasNextPage}
-            >
-              {pagination.hasNextPage ? (
-                <Link href={createPageURL(pagination.totalPages)}>
-                  <ChevronsRight className="h-4 w-4" />
-                  <span className="sr-only">Last page</span>
-                </Link>
-              ) : (
-                <span>
-                  <ChevronsRight className="h-4 w-4" />
-                  <span className="sr-only">Last page</span>
-                </span>
-              )}
-            </Button>
-          </div>
-        </div>
-      )}
+      <DataPagination
+        pagination={pagination}
+        itemName="categories"
+        baseUrl="/categories"
+      />
     </div>
   );
 }

@@ -61,7 +61,7 @@ export default async function CategoriesPage({ searchParams }: PageProps) {
 
   // Get query parameters with defaults
   const page = parseInt(searchParams.page || '1');
-  const limit = parseInt(searchParams.limit || '20');
+  const limit = parseInt(searchParams.limit || '10');
   const sortBy = searchParams.sortBy || 'name';
   const sortOrder = searchParams.sortOrder || 'asc';
   const search = searchParams.search || '';
