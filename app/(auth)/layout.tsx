@@ -1,6 +1,5 @@
 import React from 'react';
 import { Background } from '@/components/ui/background';
-import { Logo } from '@/components/ui/logo';
 
 export default function AuthLayout({
   children,
@@ -8,9 +7,11 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
+    <div className="relative min-h-screen w-full overflow-hidden">
       <Background />
-      <div className="w-full max-w-[400px] space-y-4">{children}</div>
+      <div className="relative z-10 flex min-h-screen w-full items-center justify-center p-4">
+        <div className="w-full max-w-[400px] mx-auto">{children}</div>
+      </div>
     </div>
   );
 }
