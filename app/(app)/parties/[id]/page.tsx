@@ -229,6 +229,7 @@ export default async function PartyPage({
           )}
           <PartyActions
             partyId={party.id}
+            partyName={party.name}
             isParticipant={isParticipant}
             isFull={isFull}
           />
