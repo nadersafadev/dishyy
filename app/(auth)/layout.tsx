@@ -1,6 +1,5 @@
 import React from 'react';
 import { Background } from '@/components/ui/background';
-import { Logo } from '@/components/ui/logo';
 
 export default function AuthLayout({
   children,

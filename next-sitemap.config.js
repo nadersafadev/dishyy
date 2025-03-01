@@ -7,9 +7,6 @@ module.exports = {
   priority: 0.7,
   exclude: ['/api/*', '/dashboard/*'], // Exclude private routes from the sitemap
   robotsTxtOptions: {
-    additionalSitemaps: [
-      'https://dishyy.com/server-sitemap.xml', // If you have a server-side sitemap
-    ],
     policies: [
       {
         userAgent: '*',
