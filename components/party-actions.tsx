@@ -14,17 +14,20 @@ import {
 import { Input } from '@/components/forms/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { LeavePartyDialog } from '@/components/leave-party-dialog';
 
 interface PartyActionsProps {
   partyId: string;
   isParticipant: boolean;
   isFull: boolean;
+  partyName?: string;
 }
 
 export function PartyActions({
   partyId,
   isParticipant,
   isFull,
+  partyName = 'this party',
 }: PartyActionsProps) {
   const router = useRouter();
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
@@ -63,30 +66,6 @@ export function PartyActions({
     }
   };
 
-  const handleLeave = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/parties/${partyId}/leave`, {
-        method: 'POST',
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to leave party');
-      }
-
-      toast.success('Successfully left the party');
-      setIsLeaveDialogOpen(false);
-      router.refresh();
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to leave party'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   if (isParticipant) {
     return (
       <>
@@ -98,33 +77,12 @@ export function PartyActions({
           Leave Party
         </Button>
 
-        <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Leave Party</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to leave this party? You can always join
-                again later if there&apos;s still space.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsLeaveDialogOpen(false)}
-                disabled={isLoading}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleLeave}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Leaving...' : 'Leave Party'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <LeavePartyDialog
+          partyId={partyId}
+          partyName={partyName}
+          open={isLeaveDialogOpen}
+          onOpenChange={setIsLeaveDialogOpen}
+        />
       </>
     );
   }
@@ -148,14 +106,15 @@ export function PartyActions({
           <DialogHeader>
             <DialogTitle>Join Party</DialogTitle>
             <DialogDescription>
-              Enter the number of additional guests you&apos;ll be bringing (not
-              including yourself).
+              How many additional people are you bringing with you? You are
+              already counted as a participant, so only include others who will
+              join you.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="guests">Number of Guests</Label>
+              <Label htmlFor="guests">Number of Additional Guests</Label>
               <Input
                 id="guests"
                 type="number"
@@ -163,6 +122,10 @@ export function PartyActions({
                 value={numGuests}
                 onChange={e => setNumGuests(e.target.value)}
               />
+              <p className="text-sm text-muted-foreground mt-1">
+                Enter 0 if you're coming alone. This number does not include
+                you.
+              </p>
             </div>
           </div>
 

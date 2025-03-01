@@ -47,6 +47,7 @@ interface DishesContentProps {
   isParticipant: boolean;
   totalParticipants: number;
   isAdmin: boolean;
+  currentUserId?: string;
 }
 
 export function DishesContent({
@@ -55,6 +56,7 @@ export function DishesContent({
   isParticipant,
   totalParticipants,
   isAdmin,
+  currentUserId,
 }: DishesContentProps) {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const params = useParams();
@@ -189,6 +191,7 @@ export function DishesContent({
                   isAdmin={isAdmin}
                   isParticipant={isParticipant}
                   partyId={partyId}
+                  currentUserId={currentUserId}
                 />
               )
             )}
