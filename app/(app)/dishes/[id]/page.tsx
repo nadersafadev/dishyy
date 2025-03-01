@@ -16,14 +16,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { DeleteDishDialog } from '@/components/dishes/DeleteDishDialog';
 import { Metadata } from 'next';
-import { Suspense } from 'react';
 import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
-import { ShareButton } from '@/components/share-button';
-import { CategoryPill } from '@/components/category-pill';
-import { ImageCarousel } from '@/components/image-carousel';
-import { DishIngredients } from '@/components/dish-ingredients';
-import { DishNutrition } from '@/components/dish-nutrition';
-import { DishProperties } from '@/components/dish-properties';
 
 // Generate dynamic metadata for the dish page
 export async function generateMetadata({

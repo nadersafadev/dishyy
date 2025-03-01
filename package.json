@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "type-check": "tsc --noEmit",
+    "prebuild": "npm run type-check",
     "build": "prisma generate && next build",
     "postbuild": "next-sitemap",
     "start": "next start",

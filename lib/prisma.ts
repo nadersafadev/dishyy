@@ -28,11 +28,6 @@ process.on('beforeExit', async () => {
   await prisma.$disconnect();
 });
 
-// Handle errors
-prisma.$on('error', e => {
-  console.error('Prisma Client error:', e);
-});
-
 // Handle queries
 prisma.$use(async (params, next) => {
   const before = Date.now();
