@@ -128,7 +128,7 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
               <FormNumberField
                 name="amountPerPerson"
                 label="Amount per person"
-                step="0.1"
+                step="0.01"
                 min={0.1}
                 onChange={value => {
                   if (value !== undefined) {

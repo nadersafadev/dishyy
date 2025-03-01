@@ -155,7 +155,7 @@ export function DishForm({ dish }: DishFormProps) {
             label="Default Amount"
             placeholder="Enter default amount"
             min={0}
-            step="0.1"
+            step="0.01"
             optional={true}
           />
 
