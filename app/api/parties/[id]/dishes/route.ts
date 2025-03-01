@@ -7,7 +7,7 @@ const addDishSchema = z.object({
   dishId: z.string().min(1, 'Dish ID is required'),
   amountPerPerson: z
     .number()
-    .min(0.1, 'Amount per person must be greater than 0'),
+    .min(0.01, 'Amount per person must be greater than 0'),
 });
 
 export async function POST(
