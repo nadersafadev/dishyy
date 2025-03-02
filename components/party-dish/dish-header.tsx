@@ -47,14 +47,16 @@ export function DishHeader({
           <div className="flex items-center gap-2">
             <span className="font-medium text-base truncate">{name}</span>
             <Badge variant="outline" className="shrink-0">
-              {unit}
+              {unit === 'QUANTITY' ? 'QTY' : unit}
             </Badge>
           </div>
           <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
             <span>{amountPerPerson} per person</span>
             <span className="mx-1">•</span>
             <span className="font-medium">
-              {totalContributed.toFixed(1)}/{totalNeeded.toFixed(1)}
+              {unit === 'QUANTITY'
+                ? `${totalContributed}/${Math.ceil(totalNeeded)}`
+                : `${totalContributed.toFixed(1)}/${totalNeeded.toFixed(1)}`}
             </span>
           </div>
         </div>

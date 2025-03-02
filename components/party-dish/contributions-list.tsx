@@ -72,7 +72,9 @@ export function ContributionsList({
                 </span>
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">
-                    {contribution.amount.toFixed(1)} {unit.toLowerCase()}
+                    {unit === 'QUANTITY'
+                      ? `${Math.ceil(contribution.amount)}`
+                      : `${contribution.amount.toFixed(1)} ${unit.toLowerCase()}`}
                   </span>
                   {isCurrentUserContribution && (
                     <DeleteDishContributionDialog
@@ -98,7 +100,9 @@ export function ContributionsList({
         <div className="text-sm font-medium flex items-center gap-2">
           <span className="text-muted-foreground">Still needed:</span>
           <Badge variant="outline" className="font-normal">
-            {remainingNeeded.toFixed(1)} {unit.toLowerCase()}
+            {unit === 'QUANTITY'
+              ? `${Math.ceil(remainingNeeded)}`
+              : `${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`}
           </Badge>
         </div>
       )}
