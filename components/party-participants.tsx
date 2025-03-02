@@ -64,6 +64,7 @@ export function PartyParticipants({
 
   // Determine which participants to display
   const MAX_VISIBLE_PARTICIPANTS = 5;
+  const totalParticipants = participants.length;
   const visibleParticipants = showAllParticipants
     ? [...currentUserEntry, ...sortedOtherParticipants]
     : [
@@ -74,8 +75,11 @@ export function PartyParticipants({
         ),
       ];
 
-  const hasMoreParticipants = participants.length > MAX_VISIBLE_PARTICIPANTS;
-  const remainingParticipants = participants.length - MAX_VISIBLE_PARTICIPANTS;
+  const hasMoreParticipants = totalParticipants > visibleParticipants.length;
+  const remainingParticipants = Math.max(
+    0,
+    totalParticipants - visibleParticipants.length
+  );
 
   const handleUpdateGuests = async () => {
     if (!currentUserParticipant || numGuests === null) return;
