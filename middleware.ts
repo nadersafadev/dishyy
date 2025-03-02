@@ -5,11 +5,7 @@ import {
 } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-const isProtectedRoute = createRouteMatcher([
-  '/dishes/(.*)',
-  '/categories/(.*)',
-  '/parties/(.*)/dishes/(.*)',
-]);
+const isProtectedRoute = createRouteMatcher(['(app)/(.*)']);
 
 export default clerkMiddleware(async (_, req) => {
   // Check if the route is protected
