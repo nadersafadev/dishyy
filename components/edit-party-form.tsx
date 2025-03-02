@@ -102,7 +102,7 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
     // Fetch available dishes
     fetch('/api/dishes')
       .then(res => res.json())
-      .then(data => setDishes(data))
+      .then(data => setDishes(data.dishes))
       .catch(error => console.error('Error fetching dishes:', error));
   }, []);
 

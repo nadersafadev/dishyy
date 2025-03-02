@@ -1,22 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useRouter } from 'next/navigation';
 import { DeleteButton } from '@/components/ui/delete-button';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+import { DeleteEntityDialog } from '@/components/ui/delete-entity-dialog';
 
 interface DeletePartyDialogProps {
   partyId: string;
@@ -28,63 +15,46 @@ export function DeletePartyDialog({
   partyName,
 }: DeletePartyDialogProps) {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
-    try {
-      setIsDeleting(true);
-      const response = await fetch(`/api/parties/${partyId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete party');
-      }
-
-      toast.success('Party deleted successfully');
-      router.push('/parties');
-    } catch (error) {
-      console.error('Error deleting party:', error);
-      toast.error('Failed to delete party');
-      setIsOpen(false);
-    } finally {
-      setIsDeleting(false);
-    }
+  const handleSuccess = () => {
+    toast.success('Party deleted successfully');
+    router.push('/parties');
   };
 
+  const warnings = [
+    {
+      type: 'warning' as const,
+      title: 'This action is permanent',
+      message:
+        'Once deleted, you cannot recover this party or any of its data.',
+    },
+    {
+      type: 'warning' as const,
+      title: 'All party data will be removed',
+      message:
+        'This includes participants, dishes, and all other associated data.',
+    },
+  ];
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger asChild>
+    <DeleteEntityDialog
+      entityId={partyId}
+      entityName={partyName}
+      entityType="Party"
+      deleteEndpoint={`/api/parties/${partyId}`}
+      title="Delete Party"
+      confirmText="Delete Party"
+      cancelText="Cancel"
+      requireConfirmation={true}
+      warnings={warnings}
+      onSuccess={handleSuccess}
+      trigger={
         <DeleteButton
           variant="destructive"
           className="h-9 w-9"
-          disabled={isDeleting}
           label="Delete party"
         />
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete Party</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete &quot;{partyName}&quot;? This action
-            cannot be undone and will remove all associated data including
-            participants and contributions.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <ScrollArea className="max-h-[80vh]">
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isDeleting ? 'Deleting...' : 'Delete Party'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </ScrollArea>
-      </AlertDialogContent>
-    </AlertDialog>
+      }
+    />
   );
 }

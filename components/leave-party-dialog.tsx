@@ -28,8 +28,13 @@ export function LeavePartyDialog({
     router.refresh();
   };
 
-  // Custom warning message
+  // Custom warning messages
   const warnings = [
+    {
+      type: 'warning' as const,
+      title: 'You will lose access to party features',
+      message: 'You will no longer be able to see or contribute to this party.',
+    },
     {
       type: 'info' as const,
       title: 'You can rejoin later',
@@ -46,6 +51,7 @@ export function LeavePartyDialog({
       title="Leave Party"
       confirmText="Leave Party"
       cancelText="Cancel"
+      requireConfirmation={true}
       warnings={warnings}
       onSuccess={handleSuccess}
       open={open}
