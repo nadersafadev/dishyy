@@ -76,6 +76,7 @@ export default async function Home() {
         firstName: user.firstName,
         imageUrl: user.imageUrl,
         email: user.emailAddresses[0]?.emailAddress,
+        createdAt: user.createdAt ? new Date(user.createdAt) : null,
       }
     : null;
 
