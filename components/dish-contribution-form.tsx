@@ -40,7 +40,9 @@ export function DishContributionForm({
       .positive('Amount must be positive')
       .max(
         remainingNeeded,
-        `Cannot exceed ${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`
+        unit === 'QUANTITY'
+          ? `Cannot exceed ${Math.ceil(remainingNeeded)}`
+          : `Cannot exceed ${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`
       ),
   });
 
@@ -78,9 +80,11 @@ export function DishContributionForm({
         }
 
         toast.success(
-          `Successfully updated contribution to ${values.amount.toFixed(
-            1
-          )} ${unit.toLowerCase()} of ${dishName}`
+          `Successfully updated contribution to ${
+            unit === 'QUANTITY'
+              ? `${Math.ceil(values.amount)}`
+              : `${values.amount.toFixed(1)} ${unit.toLowerCase()}`
+          } of ${dishName}`
         );
       } else {
         // Add new contribution
@@ -101,9 +105,11 @@ export function DishContributionForm({
         }
 
         toast.success(
-          `Successfully contributed ${values.amount.toFixed(
-            1
-          )} ${unit.toLowerCase()} of ${dishName}`
+          `Successfully contributed ${
+            unit === 'QUANTITY'
+              ? `${Math.ceil(values.amount)}`
+              : `${values.amount.toFixed(1)} ${unit.toLowerCase()}`
+          } of ${dishName}`
         );
       }
 
@@ -128,10 +134,16 @@ export function DishContributionForm({
           <FormNumberField
             name="amount"
             label=""
-            placeholder={`Amount in ${unit.toLowerCase()} (max: ${remainingNeeded.toFixed(
-              1
-            )})`}
-            step="0.01"
+            placeholder={`${
+              unit === 'QUANTITY'
+                ? 'Amount in QTY'
+                : `Amount in ${unit.toLowerCase()}`
+            } (max: ${
+              unit === 'QUANTITY'
+                ? `${Math.ceil(remainingNeeded)}`
+                : `${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`
+            })`}
+            step={unit === 'QUANTITY' ? '1' : '0.01'}
             max={remainingNeeded}
           />
         </div>

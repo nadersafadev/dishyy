@@ -3,6 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { DeleteDishContributionDialog } from '@/components/delete-dish-contribution-dialog';
 import { ParticipantDishContribution } from '@prisma/client';
+import { ContributionItem } from './contribution-item';
 
 interface ContributionsListProps {
   contributions: (ParticipantDishContribution & {
@@ -55,38 +56,16 @@ export function ContributionsList({
       </div>
       <div className="space-y-2">
         {contributions.length > 0 ? (
-          contributions.map(contribution => {
-            const isCurrentUserContribution =
-              contribution.participant?.userId === currentUserId;
-
-            return (
-              <div
-                key={contribution.id}
-                className={`flex items-center justify-between text-sm bg-background/80 p-2.5 rounded-md ${
-                  isCurrentUserContribution ? 'border border-primary' : ''
-                }`}
-              >
-                <span className="font-medium">
-                  {contribution.participant?.user.name}
-                  {isCurrentUserContribution && ' (You)'}
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">
-                    {contribution.amount.toFixed(1)} {unit.toLowerCase()}
-                  </span>
-                  {isCurrentUserContribution && (
-                    <DeleteDishContributionDialog
-                      contributionId={contribution.id}
-                      partyId={partyId}
-                      dishName={dishName}
-                      amount={contribution.amount}
-                      unit={unit}
-                    />
-                  )}
-                </div>
-              </div>
-            );
-          })
+          contributions.map(contribution => (
+            <ContributionItem
+              key={contribution.id}
+              contribution={contribution}
+              currentUserId={currentUserId}
+              partyId={partyId}
+              dishName={dishName}
+              unit={unit}
+            />
+          ))
         ) : (
           <div className="text-sm text-muted-foreground py-1">
             No contributions yet
@@ -98,7 +77,9 @@ export function ContributionsList({
         <div className="text-sm font-medium flex items-center gap-2">
           <span className="text-muted-foreground">Still needed:</span>
           <Badge variant="outline" className="font-normal">
-            {remainingNeeded.toFixed(1)} {unit.toLowerCase()}
+            {unit === 'QUANTITY'
+              ? `${Math.ceil(remainingNeeded)}`
+              : `${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`}
           </Badge>
         </div>
       )}
