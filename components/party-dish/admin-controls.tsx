@@ -2,13 +2,14 @@
 
 import { UpdateDishQuantity } from '@/components/update-dish-quantity';
 import { RemovePartyDish } from '@/components/remove-party-dish';
+import { Unit } from '@/lib/types';
 
 interface AdminControlsProps {
   isAdmin: boolean;
   partyId: string;
   dishId: string;
   dishName: string;
-  unit: string;
+  unit: Unit;
   amountPerPerson: number;
 }
 

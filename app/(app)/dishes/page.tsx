@@ -9,6 +9,7 @@ import { DishesFilters } from '@/components/dishes/DishesFilters';
 import { DishesGrid } from '@/components/dishes/DishesGrid';
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher';
 import { generateMetadata } from '@/lib/metadata';
+import { Unit } from '@/lib/types';
 
 // Define the interface for dish data
 interface DishWithRelations {
@@ -16,7 +17,7 @@ interface DishWithRelations {
   name: string;
   description: string | null;
   imageUrl: string | null;
-  unit: string;
+  unit: Unit;
   categoryId: string | null;
   category: { id: string; name: string } | null;
   _count: { parties: number };
@@ -92,7 +93,17 @@ export default async function DishesPage({
   // Fetch categories for the filter dropdown
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' },
-    select: { id: true, name: true },
+    select: {
+      id: true,
+      name: true,
+      // Include parent info to show hierarchy in the dropdown
+      parent: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
   });
 
   // Build URL to fetch dishes with filters
@@ -100,7 +111,11 @@ export default async function DishesPage({
   apiUrl.searchParams.set('page', page.toString());
   apiUrl.searchParams.set('limit', limit.toString());
   if (search) apiUrl.searchParams.set('search', search);
-  if (categoryId) apiUrl.searchParams.set('categoryId', categoryId);
+  if (categoryId) {
+    apiUrl.searchParams.set('categoryId', categoryId);
+    // Always include child categories when a category is selected
+    apiUrl.searchParams.set('includeChildCategories', 'true');
+  }
   if (hasCategory !== 'all')
     apiUrl.searchParams.set('hasCategory', hasCategory);
   if (hasImage !== 'all') apiUrl.searchParams.set('hasImage', hasImage);
@@ -139,7 +154,6 @@ export default async function DishesPage({
       <DishesFilters
         search={search}
         categoryId={categoryId}
-        hasCategory={hasCategory}
         hasImage={hasImage}
         sortBy={sortBy}
         sortOrder={sortOrder}

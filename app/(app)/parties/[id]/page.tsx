@@ -13,6 +13,7 @@ import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
 import { Metadata } from 'next';
 import { PartyParticipants } from '@/components/party-participants';
 import { PartyHeader } from '@/components/party-header';
+import { Unit } from '@/lib/types';
 
 interface PartyWithDetails extends Party {
   createdBy: {
@@ -22,7 +23,7 @@ interface PartyWithDetails extends Party {
     dish: {
       id: string;
       name: string;
-      unit: string;
+      unit: Unit;
       description: string | null;
       imageUrl: string | null;
       categoryId: string;
@@ -40,7 +41,7 @@ interface PartyWithDetails extends Party {
     contributions: (ParticipantDishContribution & {
       dish: {
         name: string;
-        unit: string;
+        unit: Unit;
       };
     })[];
   })[];
@@ -156,22 +157,33 @@ export default async function PartyPage({
   );
 
   // Enhance dishes with category information
-  const dishesWithCategories = party.dishes.map(partyDish => ({
-    ...partyDish,
+  const dishesWithCategories = party.dishes.map(dish => ({
+    ...dish,
     dish: {
-      ...partyDish.dish,
+      ...dish.dish,
+      unit: dish.dish.unit as Unit,
       // Ensure categoryId is always a string by filtering out null values
-      // This matches the expected type in the components
-      categoryId: partyDish.dish.categoryId || '',
+      categoryId: dish.dish.categoryId || '',
       category:
-        partyDish.dish.categoryId && categoryMap[partyDish.dish.categoryId]
+        dish.dish.categoryId && categoryMap[dish.dish.categoryId]
           ? {
-              id: categoryMap[partyDish.dish.categoryId].id,
-              name: categoryMap[partyDish.dish.categoryId].name,
-              parentId: categoryMap[partyDish.dish.categoryId].parentId,
+              id: categoryMap[dish.dish.categoryId].id,
+              name: categoryMap[dish.dish.categoryId].name,
+              parentId: categoryMap[dish.dish.categoryId].parentId,
             }
           : { id: 'uncategorized', name: 'Uncategorized', parentId: null },
     },
+  }));
+
+  const participantsWithContributions = party.participants.map(participant => ({
+    ...participant,
+    contributions: participant.contributions.map(contribution => ({
+      ...contribution,
+      dish: {
+        ...contribution.dish,
+        unit: contribution.dish.unit as Unit,
+      },
+    })),
   }));
 
   return (
@@ -198,7 +210,7 @@ export default async function PartyPage({
         <div className="md:col-span-3 space-y-8">
           {/* Participants Section */}
           <PartyParticipants
-            participants={party.participants}
+            participants={participantsWithContributions}
             isAdmin={isAdmin}
             partyId={party.id}
             currentUserId={user.id}
@@ -209,7 +221,7 @@ export default async function PartyPage({
       {/* Dishes Section - Full Width */}
       <DishesContent
         dishes={dishesWithCategories}
-        participants={party.participants}
+        participants={participantsWithContributions}
         isParticipant={isParticipant}
         totalParticipants={totalParticipants}
         isAdmin={isAdmin}

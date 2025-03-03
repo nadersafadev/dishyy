@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { UtensilsCrossedIcon, ChevronRightIcon } from 'lucide-react';
 import { UpdateDishQuantity } from '@/components/update-dish-quantity';
 import { useParams } from 'next/navigation';
+import { Unit } from '@/lib/types';
 import {
   Collapsible,
   CollapsibleContent,
@@ -21,7 +22,7 @@ interface PartyDishAmountsProps {
     dish: {
       id: string;
       name: string;
-      unit: string;
+      unit: Unit;
       description: string | null;
       imageUrl: string | null;
       categoryId: string;
@@ -154,7 +155,7 @@ export function PartyDishAmounts({
                   dish: {
                     id: string;
                     name: string;
-                    unit: string;
+                    unit: Unit;
                     description: string | null;
                     imageUrl: string | null;
                     categoryId: string;

@@ -106,9 +106,9 @@ export default async function DishPage({ params }: { params: { id: string } }) {
   });
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4">
+    <div className="max-w-5xl mx-auto py-4 sm:py-8 px-3 sm:px-4">
       {/* Back button */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <Button asChild variant="ghost" size="sm">
           <Link href="/dishes">
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
@@ -117,7 +117,7 @@ export default async function DishPage({ params }: { params: { id: string } }) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
         {/* Left column - Image */}
         <div className="md:col-span-1">
           <div className="aspect-square relative rounded-lg overflow-hidden border bg-muted">
@@ -130,18 +130,18 @@ export default async function DishPage({ params }: { params: { id: string } }) {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-muted">
-                <UtensilsCrossedIcon className="h-24 w-24 text-muted-foreground/40" />
+                <UtensilsCrossedIcon className="h-16 sm:h-24 w-16 sm:w-24 text-muted-foreground/40" />
               </div>
             )}
           </div>
         </div>
 
         {/* Right column - Dish details */}
-        <div className="md:col-span-2 space-y-6">
-          <div className="flex items-start justify-between">
+        <div className="md:col-span-2 space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-0">
             <div>
-              <h1 className="text-3xl font-bold">{dish.name}</h1>
-              <div className="flex items-center gap-3 mt-2">
+              <h1 className="text-2xl sm:text-3xl font-bold">{dish.name}</h1>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
                 <Badge variant="outline">{dish.unit}</Badge>
                 {dish.category && (
                   <Badge variant="secondary">{dish.category.name}</Badge>
@@ -150,8 +150,13 @@ export default async function DishPage({ params }: { params: { id: string } }) {
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center gap-2">
-              <Button asChild size="sm" variant="outline">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="flex-1 sm:flex-initial justify-center"
+              >
                 <Link href={`/dishes/${dish.id}/edit`}>
                   <PencilIcon className="h-4 w-4 mr-2" />
                   Edit
@@ -162,7 +167,11 @@ export default async function DishPage({ params }: { params: { id: string } }) {
                 dishName={dish.name}
                 inMenuCount={usageCount}
                 trigger={
-                  <Button size="sm" variant="destructive">
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="flex-1 sm:flex-initial justify-center"
+                  >
                     <TrashIcon className="h-4 w-4 mr-2" />
                     Delete
                   </Button>
@@ -173,16 +182,22 @@ export default async function DishPage({ params }: { params: { id: string } }) {
 
           {/* Description */}
           {dish.description && (
-            <div className="card p-4">
-              <h2 className="text-lg font-medium mb-2">Description</h2>
-              <p className="text-muted-foreground">{dish.description}</p>
+            <div className="card p-3 sm:p-4">
+              <h2 className="text-base sm:text-lg font-medium mb-2">
+                Description
+              </h2>
+              <p className="text-muted-foreground text-sm sm:text-base">
+                {dish.description}
+              </p>
             </div>
           )}
 
           {/* Usage stats */}
-          <div className="card p-4">
-            <h2 className="text-lg font-medium mb-2">Usage Statistics</h2>
-            <p className="text-muted-foreground">
+          <div className="card p-3 sm:p-4">
+            <h2 className="text-base sm:text-lg font-medium mb-2">
+              Usage Statistics
+            </h2>
+            <p className="text-muted-foreground text-sm sm:text-base">
               This dish is used in {usageCount}{' '}
               {usageCount === 1 ? 'party' : 'parties'}.
             </p>
@@ -190,22 +205,24 @@ export default async function DishPage({ params }: { params: { id: string } }) {
 
           {/* Parties using this dish */}
           {partiesUsingDish.length > 0 && (
-            <div className="card p-4">
-              <h2 className="text-lg font-medium mb-4">
+            <div className="card p-3 sm:p-4">
+              <h2 className="text-base sm:text-lg font-medium mb-3 sm:mb-4">
                 Used in{' '}
                 {partiesUsingDish.length === 5 ? '5+' : partiesUsingDish.length}{' '}
                 Parties
               </h2>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {partiesUsingDish.map(partyDish => (
                   <Link
                     key={partyDish.id}
                     href={`/parties/${partyDish.party.id}`}
-                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition"
+                    className="flex items-center justify-between p-2 sm:p-3 bg-muted/50 rounded-lg hover:bg-muted transition"
                   >
-                    <span className="font-medium">{partyDish.party.name}</span>
-                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                      <CalendarIcon className="h-4 w-4" />
+                    <span className="font-medium text-sm sm:text-base">
+                      {partyDish.party.name}
+                    </span>
+                    <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground text-xs sm:text-sm">
+                      <CalendarIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span>
                         {new Date(partyDish.party.date).toLocaleDateString()}
                       </span>
@@ -214,7 +231,7 @@ export default async function DishPage({ params }: { params: { id: string } }) {
                 ))}
               </div>
               {usageCount > 5 && (
-                <p className="text-sm text-muted-foreground mt-3">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2 sm:mt-3">
                   And {usageCount - 5} more{' '}
                   {usageCount - 5 === 1 ? 'party' : 'parties'}...
                 </p>

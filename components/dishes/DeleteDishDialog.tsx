@@ -1,19 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { AlertTriangle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { DeleteEntityDialog } from '@/components/ui/delete-entity-dialog';
 
 interface DeleteDishDialogProps {
@@ -21,7 +9,6 @@ interface DeleteDishDialogProps {
   dishName: string;
   inMenuCount: number;
   trigger: React.ReactNode;
-  onSuccess?: () => void;
 }
 
 export function DeleteDishDialog({
@@ -29,9 +16,10 @@ export function DeleteDishDialog({
   dishName,
   inMenuCount,
   trigger,
-  onSuccess,
 }: DeleteDishDialogProps) {
-  // Use the reusable DeleteEntityDialog component
+  const router = useRouter();
+  const { toast } = useToast();
+
   const warnings =
     inMenuCount > 0
       ? [
@@ -52,10 +40,11 @@ export function DeleteDishDialog({
       warnings={warnings}
       trigger={trigger}
       onSuccess={() => {
-        toast.success(`"${dishName}" has been deleted`);
-        if (onSuccess) {
-          onSuccess();
-        }
+        toast({
+          title: 'Dish Deleted',
+          description: `${dishName} has been successfully deleted.`,
+        });
+        router.refresh();
       }}
     />
   );

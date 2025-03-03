@@ -14,12 +14,13 @@ import { DishProgressBar } from '@/components/party-dish/dish-progress-bar';
 import { DishDescription } from '@/components/party-dish/dish-description';
 import { ContributionsList } from '@/components/party-dish/contributions-list';
 import { AdminControls } from '@/components/party-dish/admin-controls';
+import { Unit } from '@/lib/types';
 
 interface PartyDishItemProps {
   partyDish: PartyDish & {
     dish: {
       name: string;
-      unit: string;
+      unit: Unit;
       description: string | null;
       imageUrl: string | null;
       categoryId: string;
@@ -37,7 +38,7 @@ interface PartyDishItemProps {
     contributions: (ParticipantDishContribution & {
       dish: {
         name: string;
-        unit: string;
+        unit: Unit;
       };
     })[];
   })[];

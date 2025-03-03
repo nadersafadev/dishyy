@@ -5,8 +5,8 @@ import { z } from 'zod';
 
 const dishSchema = z.object({
   name: z.string().min(1, 'Dish name is required'),
-  description: z.string().optional(),
-  imageUrl: z.string().optional(),
+  description: z.string().nullable(),
+  imageUrl: z.string().nullable(),
   unit: z.enum([
     'GRAMS',
     'KILOS',
@@ -15,7 +15,7 @@ const dishSchema = z.object({
     'LITERS',
     'PIECES',
   ]),
-  categoryId: z.string().optional().nullable(),
+  categoryId: z.string().nullable(),
 });
 
 // GET a single dish
@@ -114,10 +114,10 @@ export async function PATCH(
       where: { id: params.id },
       data: {
         name: validatedData.name,
-        description: validatedData.description || '',
-        imageUrl: validatedData.imageUrl || null,
+        description: validatedData.description,
+        imageUrl: validatedData.imageUrl,
         unit: validatedData.unit,
-        categoryId: validatedData.categoryId ?? null,
+        categoryId: validatedData.categoryId,
       },
     });
 

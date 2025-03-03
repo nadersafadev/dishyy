@@ -33,8 +33,13 @@ interface DishCardProps {
 
 export function DishCard({ dish }: DishCardProps) {
   return (
-    <Card className="overflow-hidden flex flex-col">
-      <div className="aspect-square relative">
+    <Card className="overflow-hidden flex flex-col group relative">
+      <Link
+        href={`/dishes/${dish.id}`}
+        className="absolute inset-0 z-10 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+        aria-label={`View details for ${dish.name}`}
+      />
+      <div className="aspect-square relative group-hover:opacity-90 transition-opacity">
         {dish.imageUrl ? (
           <Image
             src={dish.imageUrl}
@@ -51,41 +56,47 @@ export function DishCard({ dish }: DishCardProps) {
       </div>
       <CardContent className="py-4 flex-grow">
         <div className="flex items-start justify-between">
-          <h3 className="font-medium text-lg truncate">{dish.name}</h3>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link
-                  href={`/dishes/${dish.id}`}
-                  className="flex w-full cursor-pointer"
+          <h3 className="font-medium text-lg truncate group-hover:text-primary transition-colors">
+            {dish.name}
+          </h3>
+          <div className="relative z-20">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={e => e.stopPropagation()}
                 >
-                  <Edit className="mr-2 h-4 w-4" /> Edit
-                </Link>
-              </DropdownMenuItem>
-              <DeleteDishDialog
-                dishId={dish.id}
-                dishName={dish.name}
-                inMenuCount={dish._count.parties}
-                trigger={
-                  <DropdownMenuItem
-                    onSelect={e => e.preventDefault()}
-                    className="text-destructive focus:text-destructive cursor-pointer"
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link
+                    href={`/dishes/${dish.id}`}
+                    className="flex w-full cursor-pointer"
+                    onClick={e => e.stopPropagation()}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" /> Delete
-                  </DropdownMenuItem>
-                }
-              />
-            </DropdownMenuContent>
-          </DropdownMenu>
+                    <Edit className="mr-2 h-4 w-4" /> Edit
+                  </Link>
+                </DropdownMenuItem>
+                <DeleteDishDialog
+                  dishId={dish.id}
+                  dishName={dish.name}
+                  inMenuCount={dish._count.parties}
+                  trigger={
+                    <DropdownMenuItem
+                      onSelect={e => e.preventDefault()}
+                      className="text-destructive focus:text-destructive cursor-pointer"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" /> Delete
+                    </DropdownMenuItem>
+                  }
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         {dish.description && (
           <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
@@ -97,11 +108,12 @@ export function DishCard({ dish }: DishCardProps) {
         {dish.category ? (
           <Badge
             variant="outline"
-            className="hover:bg-secondary transition-colors"
+            className="hover:bg-secondary transition-colors relative z-20"
           >
             <Link
               href={`/categories/${dish.category.id}`}
               className="hover:underline"
+              onClick={e => e.stopPropagation()}
             >
               {dish.category.name}
             </Link>

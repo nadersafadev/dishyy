@@ -10,7 +10,7 @@ export enum Unit {
 export const unitLabels: Record<Unit, string> = {
   [Unit.GRAMS]: 'Grams',
   [Unit.KILOS]: 'Kilos',
-  [Unit.QUANTITY]: 'Quantity',
+  [Unit.QUANTITY]: 'Qty',
   [Unit.MILLILITERS]: 'Milliliters',
   [Unit.LITERS]: 'Liters',
   [Unit.PIECES]: 'Pieces',
