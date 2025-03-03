@@ -131,7 +131,7 @@ export function MarketingHeader() {
           {/* Auth Buttons and Mobile Menu Toggle */}
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/login">
+              <Link href="/sign-in">
                 <Button
                   variant={isTransparent ? 'outline' : 'ghost'}
                   size="sm"
@@ -144,7 +144,7 @@ export function MarketingHeader() {
                   Sign In
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/sign-up">
                 <Button
                   size="sm"
                   className={
@@ -209,7 +209,7 @@ export function MarketingHeader() {
                 </Link>
               ))}
               <div className="border-t mt-4 pt-4 px-6 space-y-3">
-                <Link href="/login" className="block">
+                <Link href="/sign-in" className="block">
                   <Button
                     variant={isTransparent ? 'outline' : 'ghost'}
                     size="sm"
@@ -222,7 +222,7 @@ export function MarketingHeader() {
                     Sign In
                   </Button>
                 </Link>
-                <Link href="/register" className="block">
+                <Link href="/sign-up" className="block">
                   <Button
                     size="sm"
                     className={`w-full ${
