@@ -15,7 +15,7 @@ import { FormTextAreaField } from '@/components/forms/form-textarea-field';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { Send } from 'lucide-react';
 
 const formSchema = z.object({
@@ -37,6 +37,7 @@ interface ContactFormProps {
 }
 
 export function ContactForm({ categories }: ContactFormProps) {
+  const { toast } = useToast();
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,11 +62,17 @@ export function ContactForm({ categories }: ContactFormProps) {
         throw new Error('Failed to send message');
       }
 
-      toast.success("Message sent successfully! We'll get back to you soon.");
       form.reset();
+      toast({
+        title: 'Message Sent',
+        description: "Thank you for your message. We'll get back to you soon!",
+      });
     } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Failed to send message. Please try again.');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to send message. Please try again.',
+      });
     }
   };
 

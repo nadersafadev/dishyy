@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/forms/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { LeavePartyDialog } from '@/components/leave-party-dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { UserPlus, Users, UserCheck, ArrowRight, User, X } from 'lucide-react';
@@ -33,6 +33,7 @@ export function PartyActions({
   partyName = 'this party',
 }: PartyActionsProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [bringingGuests, setBringingGuests] = useState<'yes' | 'no'>('no');
@@ -61,13 +62,19 @@ export function PartyActions({
         throw new Error(data.error || 'Failed to join party');
       }
 
-      toast.success('Successfully joined the party!');
+      toast({
+        title: 'Success',
+        description: 'Successfully joined the party!',
+      });
       setIsJoinDialogOpen(false);
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to join party'
-      );
+      toast({
+        title: 'Error',
+        description:
+          error instanceof Error ? error.message : 'Failed to join party',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }

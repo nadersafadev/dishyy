@@ -7,7 +7,7 @@ import { EditButton } from '@/components/ui/edit-button';
 import { DeleteButton } from '@/components/ui/delete-button';
 import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Dish } from '@prisma/client';
 import { DeleteDishDialog } from '@/components/dishes/DeleteDishDialog';
@@ -25,6 +25,7 @@ interface DishListProps {
 
 export default function DishList({ dishes, view = 'grid' }: DishListProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
 
   if (dishes.length === 0) {
@@ -79,10 +80,6 @@ export default function DishList({ dishes, view = 'grid' }: DishListProps) {
                       label={`Delete ${dish.name}`}
                     />
                   }
-                  onSuccess={() => {
-                    toast.success(`${dish.name} deleted successfully`);
-                    router.refresh();
-                  }}
                 />
               </div>
             )}
@@ -142,10 +139,6 @@ export default function DishList({ dishes, view = 'grid' }: DishListProps) {
                   dishName={dish.name}
                   inMenuCount={dish._count.parties}
                   trigger={<DeleteButton label={`Delete ${dish.name}`} />}
-                  onSuccess={() => {
-                    toast.success(`${dish.name} deleted successfully`);
-                    router.refresh();
-                  }}
                 />
               </div>
             )}

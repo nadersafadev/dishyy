@@ -9,6 +9,7 @@ import { DishesFilters } from '@/components/dishes/DishesFilters';
 import { DishesGrid } from '@/components/dishes/DishesGrid';
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher';
 import { generateMetadata } from '@/lib/metadata';
+import { Unit } from '@/lib/types';
 
 // Define the interface for dish data
 interface DishWithRelations {
@@ -16,7 +17,7 @@ interface DishWithRelations {
   name: string;
   description: string | null;
   imageUrl: string | null;
-  unit: string;
+  unit: Unit;
   categoryId: string | null;
   category: { id: string; name: string } | null;
   _count: { parties: number };

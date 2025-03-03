@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { DeleteEntityDialog } from '@/components/ui/delete-entity-dialog';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 interface LeavePartyDialogProps {
   // Required props
@@ -22,9 +22,13 @@ export function LeavePartyDialog({
   onOpenChange,
 }: LeavePartyDialogProps) {
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSuccess = () => {
-    toast.success('Successfully left the party');
+    toast({
+      title: 'Success',
+      description: 'Successfully left the party',
+    });
     router.refresh();
   };
 

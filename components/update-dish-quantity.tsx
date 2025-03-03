@@ -14,14 +14,15 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/forms/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { Unit, unitLabels } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 interface UpdateDishQuantityProps {
   partyId: string;
   dishId: string;
   dishName: string;
-  unit: string;
+  unit: Unit;
   currentAmount: number;
   isAdmin: boolean;
 }
@@ -35,6 +36,7 @@ export function UpdateDishQuantity({
   isAdmin,
 }: UpdateDishQuantityProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState(currentAmount.toString());
   const [isLoading, setIsLoading] = useState(false);
@@ -69,14 +71,19 @@ export function UpdateDishQuantity({
         throw new Error(errorData.error || 'Failed to update dish quantity');
       }
 
-      toast.success(
-        `Updated ${dishName} quantity to ${amountNumber} ${unit.toLowerCase()} per person`
-      );
+      toast({
+        title: 'Success',
+        description: `Updated ${dishName} quantity to ${amountNumber} ${unitLabels[unit].toLowerCase()} per person`,
+      });
       setOpen(false);
       router.refresh();
     } catch (error: any) {
       setError(error.message || 'Something went wrong');
-      toast.error(error.message || 'Failed to update dish quantity');
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to update dish quantity',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -97,7 +104,7 @@ export function UpdateDishQuantity({
         <div className="py-4">
           <div className="space-y-2">
             <Label htmlFor="amount">
-              Amount per person ({unit.toLowerCase()})
+              Amount per person ({unitLabels[unit].toLowerCase()})
             </Label>
             <Input
               id="amount"
@@ -105,7 +112,7 @@ export function UpdateDishQuantity({
               step="0.01"
               value={amount}
               onChange={e => setAmount(e.target.value)}
-              placeholder={`Amount in ${unit.toLowerCase()}`}
+              placeholder={`Amount in ${unitLabels[unit].toLowerCase()}`}
             />
             {error && <p className="text-sm text-destructive">{error}</p>}
           </div>

@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/forms/input';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { Party, PartyDish, PartyParticipant, Dish } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus } from 'lucide-react';
@@ -79,6 +79,7 @@ interface EditPartyFormProps {
 
 export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [selectedDishId, setSelectedDishId] = useState('');
@@ -121,12 +122,19 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
         throw new Error('Failed to update party');
       }
 
-      toast.success('Party updated successfully');
+      toast({
+        title: 'Success',
+        description: 'Party updated successfully',
+      });
       router.refresh();
       onClose();
     } catch (error) {
       console.error('Error updating party:', error);
-      toast.error('Failed to update party');
+      toast({
+        title: 'Error',
+        description: 'Failed to update party',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -134,7 +142,11 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
 
   const handleAddDish = async () => {
     if (!selectedDishId || !amountPerPerson) {
-      toast.error('Please select a dish and specify amount per person');
+      toast({
+        title: 'Error',
+        description: 'Please select a dish and specify amount per person',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -160,11 +172,18 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
       setIsAddDishDialogOpen(false);
       setSelectedDishId('');
       setAmountPerPerson('');
-      toast.success('Dish added successfully');
+      toast({
+        title: 'Success',
+        description: 'Dish added successfully',
+      });
       router.refresh();
     } catch (error) {
       console.error('Error adding dish:', error);
-      toast.error('Failed to add dish');
+      toast({
+        title: 'Error',
+        description: 'Failed to add dish',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -187,11 +206,18 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
       setPartyDishes(prev =>
         prev.filter(partyDish => partyDish.dishId !== dishId)
       );
-      toast.success('Dish removed successfully');
+      toast({
+        title: 'Success',
+        description: 'Dish removed successfully',
+      });
       router.refresh();
     } catch (error) {
       console.error('Error removing dish:', error);
-      toast.error('Failed to remove dish');
+      toast({
+        title: 'Error',
+        description: 'Failed to remove dish',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -224,11 +250,18 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
             : partyDish
         )
       );
-      toast.success('Dish amount updated successfully');
+      toast({
+        title: 'Success',
+        description: 'Dish amount updated successfully',
+      });
       router.refresh();
     } catch (error) {
       console.error('Error updating dish amount:', error);
-      toast.error('Failed to update dish amount');
+      toast({
+        title: 'Error',
+        description: 'Failed to update dish amount',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }

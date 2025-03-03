@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/forms/input';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 export function NewsletterForm() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,10 +27,17 @@ export function NewsletterForm() {
         throw new Error('Subscription failed');
       }
 
-      toast.success('Successfully subscribed to the newsletter!');
+      toast({
+        title: 'Success!',
+        description: 'Successfully subscribed to the newsletter!',
+      });
       setEmail('');
     } catch (error) {
-      toast.error('Failed to subscribe. Please try again.');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to subscribe. Please try again.',
+      });
     } finally {
       setLoading(false);
     }

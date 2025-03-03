@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
 interface RemovePartyDishProps {
@@ -30,6 +30,7 @@ export function RemovePartyDish({
   isAdmin,
 }: RemovePartyDishProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isAdmin) return null;
@@ -49,10 +50,17 @@ export function RemovePartyDish({
         throw new Error(error.error || 'Failed to remove dish');
       }
 
-      toast.success(`${dishName} removed from the party`);
+      toast({
+        title: 'Success',
+        description: `${dishName} removed from the party`,
+      });
       router.refresh();
     } catch (error: any) {
-      toast.error(error.message || 'Something went wrong');
+      toast({
+        title: 'Error',
+        description: error.message || 'Something went wrong',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }

@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Share2, Copy, Mail } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 interface SharePartyProps {
   partyId: string;
@@ -16,6 +16,7 @@ interface SharePartyProps {
 }
 
 export function ShareParty({ partyId, partyName }: SharePartyProps) {
+  const { toast } = useToast();
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
   const partyUrl = `${baseUrl}/parties/${partyId}`;
   const encodedText = encodeURIComponent(
@@ -25,10 +26,16 @@ export function ShareParty({ partyId, partyName }: SharePartyProps) {
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(partyUrl);
-      toast.success('Link copied to clipboard');
+      toast({
+        title: 'Link Copied',
+        description: 'Party link has been copied to clipboard!',
+      });
     } catch (error) {
-      console.error('Failed to copy link:', error);
-      toast.error('Failed to copy link');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to copy link. Please try again.',
+      });
     }
   };
 
@@ -37,10 +44,8 @@ export function ShareParty({ partyId, partyName }: SharePartyProps) {
   };
 
   const handleEmailShare = () => {
-    const subject = encodeURIComponent(`Join me at ${partyName}!`);
-    const body = encodeURIComponent(
-      `Hey!\n\nJoin me at ${partyName}!\n\n${partyUrl}`
-    );
+    const subject = encodeURIComponent(`Join my party: ${partyName}`);
+    const body = encodeURIComponent(`Check out my party menu at: ${partyUrl}`);
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 

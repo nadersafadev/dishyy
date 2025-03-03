@@ -13,13 +13,14 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { DishTableRow } from './DishTableRow';
+import { Unit } from '@/lib/types';
 
 interface DishWithRelations {
   id: string;
   name: string;
   description: string | null;
   imageUrl: string | null;
-  unit: string;
+  unit: Unit;
   categoryId: string | null;
   category: { id: string; name: string } | null;
   _count: { parties: number };

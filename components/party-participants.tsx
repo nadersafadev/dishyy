@@ -13,7 +13,7 @@ import {
   XIcon,
 } from 'lucide-react';
 import { Input } from '@/components/forms/input';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
 interface PartyParticipantsProps {
@@ -34,6 +34,7 @@ export function PartyParticipants({
   currentUserId,
 }: PartyParticipantsProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [editingGuests, setEditingGuests] = useState(false);
   const [numGuests, setNumGuests] = useState<number | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -99,13 +100,19 @@ export function PartyParticipants({
         throw new Error('Failed to update guests');
       }
 
-      toast.success('Successfully updated number of guests');
+      toast({
+        title: 'Success',
+        description: 'Successfully updated number of guests',
+      });
       setEditingGuests(false);
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to update guests'
-      );
+      toast({
+        title: 'Error',
+        description:
+          error instanceof Error ? error.message : 'Failed to update guests',
+        variant: 'destructive',
+      });
     } finally {
       setIsUpdating(false);
     }
