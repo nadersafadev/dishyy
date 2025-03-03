@@ -4,6 +4,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { Edit2Icon, ImageIcon, Trash2Icon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { DeleteDishDialog } from '@/components/dishes/DeleteDishDialog';
 
 interface DishTableRowProps {
@@ -18,8 +19,21 @@ interface DishTableRowProps {
 }
 
 export function DishTableRow({ dish }: DishTableRowProps) {
+  const router = useRouter();
+
+  const handleRowClick = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking on action buttons
+    if ((e.target as HTMLElement).closest('.action-buttons')) {
+      return;
+    }
+    router.push(`/dishes/${dish.id}`);
+  };
+
   return (
-    <TableRow>
+    <TableRow
+      onClick={handleRowClick}
+      className="cursor-pointer hover:bg-muted/50 transition-colors"
+    >
       <TableCell>
         <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted">
           {dish.imageUrl ? (
@@ -49,12 +63,15 @@ export function DishTableRow({ dish }: DishTableRowProps) {
       </TableCell>
       <TableCell>
         {dish.category ? (
-          <Link
-            href={`/categories/${dish.category.id}`}
-            className="hover:underline text-primary"
+          <span
+            onClick={e => {
+              e.stopPropagation();
+              router.push(`/categories/${dish.category!.id}`);
+            }}
+            className="text-primary hover:underline cursor-pointer"
           >
             {dish.category.name}
-          </Link>
+          </span>
         ) : (
           <span className="text-muted-foreground">None</span>
         )}
@@ -66,17 +83,19 @@ export function DishTableRow({ dish }: DishTableRowProps) {
         </Badge>
       </TableCell>
       <TableCell className="text-right">
-        <div className="flex justify-end gap-2">
-          <Link href={`/dishes/${dish.id}`}>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              title="View Dish"
-            >
-              <Edit2Icon className="h-4 w-4" />
-            </Button>
-          </Link>
+        <div className="flex justify-end gap-2 action-buttons">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            title="View Dish"
+            onClick={e => {
+              e.stopPropagation();
+              router.push(`/dishes/${dish.id}`);
+            }}
+          >
+            <Edit2Icon className="h-4 w-4" />
+          </Button>
           <DeleteDishDialog
             dishId={dish.id}
             dishName={dish.name}
@@ -87,6 +106,7 @@ export function DishTableRow({ dish }: DishTableRowProps) {
                 size="icon"
                 className="h-8 w-8 text-destructive hover:bg-destructive hover:text-white"
                 title="Delete Dish"
+                onClick={e => e.stopPropagation()}
               >
                 <Trash2Icon className="h-4 w-4" />
               </Button>
