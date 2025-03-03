@@ -1,14 +1,6 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { MarketingHeader } from '@/components/layout/MarketingHeader';
-
-const marketingLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/features', label: 'Features' },
-  { href: '/pricing', label: 'Pricing' },
-  { href: '/contact', label: 'Contact' },
-];
+import { NewsletterForm } from '@/components/NewsletterForm';
 
 interface MarketingLayoutProps {
   children: React.ReactNode;
@@ -29,7 +21,7 @@ export default function MarketingLayout({
       {/* Footer */}
       <footer className="border-t bg-background">
         <div className="mx-auto w-full max-w-screen-xl px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
             {/* Brand Column */}
             <div className="space-y-4">
               <Link href="/" className="flex items-center space-x-2">
@@ -40,26 +32,10 @@ export default function MarketingLayout({
               </p>
             </div>
 
-            {/* Product Column */}
+            {/* Quick Links */}
             <div>
-              <h3 className="text-sm font-semibold mb-4">Product</h3>
+              <h3 className="text-sm font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-3">
-                <li>
-                  <Link
-                    href="/features"
-                    className="text-sm text-muted-foreground hover:text-primary"
-                  >
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/pricing"
-                    className="text-sm text-muted-foreground hover:text-primary"
-                  >
-                    Pricing
-                  </Link>
-                </li>
                 <li>
                   <Link
                     href="/about"
@@ -68,13 +44,6 @@ export default function MarketingLayout({
                     About
                   </Link>
                 </li>
-              </ul>
-            </div>
-
-            {/* Company Column */}
-            <div>
-              <h3 className="text-sm font-semibold mb-4">Company</h3>
-              <ul className="space-y-3">
                 <li>
                   <Link
                     href="/contact"
@@ -85,33 +54,10 @@ export default function MarketingLayout({
                 </li>
                 <li>
                   <Link
-                    href="/blog"
-                    className="text-sm text-muted-foreground hover:text-primary"
-                  >
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/careers"
-                    className="text-sm text-muted-foreground hover:text-primary"
-                  >
-                    Careers
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal Column */}
-            <div>
-              <h3 className="text-sm font-semibold mb-4">Legal</h3>
-              <ul className="space-y-3">
-                <li>
-                  <Link
                     href="/privacy"
                     className="text-sm text-muted-foreground hover:text-primary"
                   >
-                    Privacy
+                    Privacy Policy
                   </Link>
                 </li>
                 <li>
@@ -119,10 +65,15 @@ export default function MarketingLayout({
                     href="/terms"
                     className="text-sm text-muted-foreground hover:text-primary"
                   >
-                    Terms
+                    Terms of Service
                   </Link>
                 </li>
               </ul>
+            </div>
+
+            {/* Newsletter Column */}
+            <div className="space-y-4">
+              <NewsletterForm />
             </div>
           </div>
 
