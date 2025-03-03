@@ -2,7 +2,12 @@
 User-agent: *
 Allow: /
 Disallow: /api/*
-Disallow: /dashboard/*
+
+# *
+User-agent: *
+Allow: /dashboard
+Allow: /profile
+Allow: /parties
 
 # Host
 Host: https://dishyy.com

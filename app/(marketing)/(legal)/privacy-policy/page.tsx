@@ -8,7 +8,7 @@ export const metadata = generateMetadata(
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="container max-w-4xl py-12">
+    <div className="container max-w-4xl py-12 mx-auto">
       <div className="space-y-8">
         <div className="space-y-4">
           <Link
