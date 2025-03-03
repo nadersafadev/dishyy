@@ -6,17 +6,19 @@ import { FilterPanel, FilterOption } from '@/components/ui/FilterPanel';
 interface DishesFiltersProps {
   search?: string;
   categoryId?: string;
-  hasCategory?: string;
   hasImage?: string;
   sortBy?: string;
   sortOrder?: string;
-  categories?: Array<{ id: string; name: string }>;
+  categories?: Array<{
+    id: string;
+    name: string;
+    parent?: { id: string; name: string } | null;
+  }>;
 }
 
 export function DishesFilters({
   search = '',
   categoryId = '',
-  hasCategory = 'all',
   hasImage = 'all',
   sortBy = 'name',
   sortOrder = 'asc',
@@ -25,21 +27,39 @@ export function DishesFilters({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Convert categories to filter options
+  // Convert categories to filter options with hierarchy
   const categoryOptions: FilterOption[] = [
     { id: 'all', label: 'All categories', value: 'all' },
-    ...categories.map(category => ({
-      id: category.id,
-      label: category.name,
-      value: category.id,
-    })),
-  ];
-
-  // Define filter options
-  const hasCategoryOptions: FilterOption[] = [
-    { id: 'all', label: 'All dishes', value: 'all' },
-    { id: 'true', label: 'With category', value: 'true' },
-    { id: 'false', label: 'Without category', value: 'false' },
+    // Get child categories and organize them under their parents
+    ...categories
+      .filter(category => category.parent)
+      .sort((a, b) => {
+        if (a.parent && b.parent) {
+          const parentCompare = a.parent.name.localeCompare(b.parent.name);
+          return parentCompare !== 0
+            ? parentCompare
+            : a.name.localeCompare(b.name);
+        }
+        return 0;
+      })
+      .map(category => ({
+        id: category.id,
+        label: category.name,
+        value: category.id,
+        group: category.parent?.name,
+        groupId: category.parent?.id,
+      })),
+    // Add parent categories as hidden options (only for group headers)
+    ...categories
+      .filter(category => !category.parent)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(category => ({
+        id: category.id,
+        label: category.name,
+        value: category.id,
+        isParent: true,
+        hidden: true, // Add this flag to hide from regular listings
+      })),
   ];
 
   const hasImageOptions: FilterOption[] = [
@@ -83,12 +103,6 @@ export function DishesFilters({
           options: categoryOptions,
           defaultValue: categoryId || 'all',
           placeholder: 'Select a category',
-        },
-        {
-          id: 'hasCategory',
-          label: 'Category Status',
-          options: hasCategoryOptions,
-          defaultValue: hasCategory,
         },
         {
           id: 'hasImage',

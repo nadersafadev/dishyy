@@ -153,7 +153,6 @@ export default async function DishesPage({
       <DishesFilters
         search={search}
         categoryId={categoryId}
-        hasCategory={hasCategory}
         hasImage={hasImage}
         sortBy={sortBy}
         sortOrder={sortOrder}
