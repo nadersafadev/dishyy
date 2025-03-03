@@ -5,8 +5,7 @@ import {
   Wrench,
   Bug,
   Mail,
-  Twitter,
-  Github,
+  Facebook,
 } from 'lucide-react';
 import {
   Card,
@@ -75,17 +74,12 @@ const socialLinks = [
   {
     icon: <Mail className="h-5 w-5" />,
     label: 'Email',
-    href: 'mailto:support@dishyy.app',
+    href: 'mailto:support@dishyy.com',
   },
   {
-    icon: <Twitter className="h-5 w-5" />,
-    label: 'Twitter',
-    href: 'https://twitter.com/dishyyapp',
-  },
-  {
-    icon: <Github className="h-5 w-5" />,
-    label: 'GitHub',
-    href: 'https://github.com/dishyyapp',
+    icon: <Facebook className="h-5 w-5" />,
+    label: 'Facebook',
+    href: 'https://www.facebook.com/profile.php?id=61573495006114',
   },
 ];
 
@@ -99,7 +93,7 @@ export default function ContactPage() {
     url: `${process.env.NEXT_PUBLIC_APP_URL}/contact`,
     contactPoint: {
       '@type': 'ContactPoint',
-      email: 'support@dishyy.app',
+      email: 'support@dishyy.com',
       contactType: 'customer support',
     },
   };
@@ -110,7 +104,7 @@ export default function ContactPage() {
     name: 'Dishyy',
     url: process.env.NEXT_PUBLIC_APP_URL,
     logo: `${process.env.NEXT_PUBLIC_APP_URL}/logo-black.png`,
-    sameAs: ['https://twitter.com/dishyyapp', 'https://github.com/dishyyapp'],
+    sameAs: ['https://www.facebook.com/profile.php?id=61573495006114'],
   };
 
   return (

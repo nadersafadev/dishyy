@@ -24,149 +24,237 @@ export default function TermsOfUsePage() {
         </div>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">1. Acceptance of Terms</h2>
+          <h2 className="text-xl font-semibold">1. Agreement to Terms</h2>
           <p>
-            Welcome to Dishyy. These Terms of Use govern your use of our website
-            and services. By accessing or using Dishyy, you agree to be bound by
-            these Terms. If you do not agree to these Terms, please do not use
-            our service.
+            Welcome to Dishyy. These Terms of Use constitute a legally binding
+            agreement made between you and Dishyy ("we," "us," or "our"). By
+            accessing or using our website and services, you agree to be bound
+            by these Terms and our Privacy Policy. If you do not agree to these
+            Terms, you must not access or use our service.
+          </p>
+          <p>
+            We reserve the right to change these Terms at any time. We will
+            notify you of any material changes by posting the new Terms on this
+            page and updating the "Last updated" date. Your continued use of the
+            Service after such changes constitutes your acceptance of the new
+            Terms.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">2. Description of Service</h2>
+          <h2 className="text-xl font-semibold">2. Service Description</h2>
           <p>
-            Dishyy is a party planning platform that allows users to create and
-            manage parties, dishes, and contributions. We provide tools for
-            organizing and coordinating events with friends and family. Our
-            service may change from time to time, and we reserve the right to
-            modify, suspend, or discontinue any part of our service at any time.
-          </p>
-        </section>
-
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">3. User Accounts</h2>
-          <p>
-            To use certain features of our service, you may need to create an
-            account. You are responsible for maintaining the confidentiality of
-            your account information, including your password. You agree to:
+            Dishyy is a party planning platform that helps users organize and
+            coordinate food-related events. Our service includes:
           </p>
           <ul className="list-disc pl-6 space-y-2">
-            <li>
-              Provide accurate and complete information when creating your
-              account
-            </li>
-            <li>Update your information to keep it accurate and current</li>
-            <li>
-              Be responsible for all activities that occur under your account
-            </li>
-            <li>
-              Notify us immediately of any unauthorized use of your account
-            </li>
+            <li>Party planning and organization tools</li>
+            <li>Guest list management</li>
+            <li>Dish coordination and assignment</li>
+            <li>Communication features between hosts and guests</li>
+            <li>Recipe sharing and management</li>
           </ul>
-          <p>
-            We reserve the right to suspend or terminate accounts that violate
-            these Terms or for any other reason at our sole discretion.
+          <p className="mt-4">
+            We reserve the right to modify, suspend, or discontinue any part of
+            our service at any time, with or without notice. We will not be
+            liable if any part of the service becomes unavailable.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">4. User Content</h2>
+          <h2 className="text-xl font-semibold">
+            3. User Accounts and Registration
+          </h2>
           <p>
-            Our service allows you to create, upload, and share content such as
-            party details, dishes, and comments. You retain ownership of your
-            content, but by submitting content to our service, you grant us a
-            worldwide, non-exclusive, royalty-free license to use, reproduce,
-            modify, adapt, publish, and display such content in connection with
-            providing and promoting our service.
+            To access certain features, you must register for an account. When
+            you register, you agree to:
           </p>
-          <p>
-            You are solely responsible for the content you submit. You agree not
-            to submit content that is illegal, harmful, threatening, abusive,
-            defamatory, or otherwise objectionable. We reserve the right to
-            remove any content that violates these Terms or that we find
-            objectionable for any reason.
-          </p>
-        </section>
-
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">5. Prohibited Activities</h2>
-          <p>You agree not to:</p>
           <ul className="list-disc pl-6 space-y-2">
+            <li>Provide accurate, current, and complete information</li>
+            <li>Maintain and update your information</li>
+            <li>Keep your password secure and confidential</li>
+            <li>Accept responsibility for all activities under your account</li>
+            <li>Notify us immediately of any unauthorized access</li>
+          </ul>
+          <p className="mt-4">
+            We reserve the right to disable any account if we reasonably believe
+            you have violated these Terms or if we determine the account has
+            been inactive for an extended period.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">4. User Content and Conduct</h2>
+          <p>
+            Our service allows you to post, share, and store content. You retain
+            ownership of your content, but grant us a worldwide, non-exclusive,
+            royalty-free license to use, reproduce, modify, and distribute your
+            content for the purpose of operating and improving our services.
+          </p>
+          <p className="mt-4">You agree not to post content that:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Is false, misleading, or deceptive</li>
+            <li>Infringes on intellectual property rights</li>
+            <li>Contains harmful code or malware</li>
+            <li>Violates any applicable law or regulation</li>
+            <li>Is hateful, harassing, or discriminatory</li>
             <li>
-              Use our service for any illegal purpose or in violation of any
-              laws
+              Contains personal or sensitive information about others without
+              their consent
             </li>
-            <li>Harass, abuse, or harm another person</li>
-            <li>Impersonate any person or entity</li>
-            <li>Interfere with or disrupt our service or servers</li>
-            <li>
-              Attempt to gain unauthorized access to our service or other users'
-              accounts
-            </li>
-            <li>Use our service to collect or harvest users' information</li>
-            <li>Upload viruses or other malicious code</li>
-            <li>Use our service for commercial purposes without our consent</li>
           </ul>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">6. Intellectual Property</h2>
+          <h2 className="text-xl font-semibold">
+            5. Privacy and Data Protection
+          </h2>
           <p>
-            Our service and its original content, features, and functionality
-            are owned by Dishyy and are protected by international copyright,
-            trademark, patent, trade secret, and other intellectual property
-            laws. You may not copy, modify, create derivative works, publicly
-            display, publicly perform, republish, or distribute our content
-            without our prior written consent.
+            Your privacy is important to us. Our Privacy Policy explains how we
+            collect, use, and protect your personal information. By using our
+            service, you agree to our Privacy Policy and consent to our data
+            practices described therein.
           </p>
+          <p className="mt-4">You acknowledge that:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>
+              Your personal information will be processed as described in our
+              Privacy Policy
+            </li>
+            <li>You have read and understand our Privacy Policy</li>
+            <li>You have the right to withdraw consent at any time</li>
+          </ul>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">7. Disclaimer of Warranties</h2>
+          <h2 className="text-xl font-semibold">
+            6. Intellectual Property Rights
+          </h2>
           <p>
-            Our service is provided "as is" and "as available" without any
-            warranties of any kind, either express or implied. We do not
-            guarantee that our service will be uninterrupted, timely, secure, or
-            error-free. We do not warrant that the results that may be obtained
-            from the use of the service will be accurate or reliable.
+            The Service and its original content (excluding user-generated
+            content) are and will remain the exclusive property of Dishyy and
+            its licensors. Our trademarks, service marks, logos, and trade names
+            are not granted to you under any license or right to use them.
           </p>
+          <p className="mt-4">You agree not to:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Copy, modify, or create derivative works of our service</li>
+            <li>
+              Decompile, reverse engineer, or attempt to extract our source code
+            </li>
+            <li>Remove any copyright or proprietary notices</li>
+            <li>
+              Use our intellectual property without express written permission
+            </li>
+          </ul>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">
+            7. Third-Party Services and Links
+          </h2>
+          <p>
+            Our service may contain links to third-party websites or services
+            that are not owned or controlled by Dishyy. We have no control over,
+            and assume no responsibility for:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>
+              The content, privacy policies, or practices of third-party sites
+            </li>
+            <li>
+              Any damage or loss caused by third-party content or services
+            </li>
+            <li>Any transactions between you and third-party providers</li>
+          </ul>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">8. Limitation of Liability</h2>
+          <p>To the maximum extent permitted by law:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>We provide the service "as is" without any warranty</li>
+            <li>
+              We are not liable for any indirect, incidental, special, or
+              consequential damages
+            </li>
+            <li>
+              As this is a free service, our total liability for any claims
+              shall be limited to fixing or replacing the affected service
+              feature
+            </li>
+            <li>We are not liable for any user-generated content or conduct</li>
+            <li>
+              We do not guarantee continuous, uninterrupted access to our
+              services, and operation of our website may be interfered with by
+              numerous factors outside of our control
+            </li>
+          </ul>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">9. Indemnification</h2>
           <p>
-            To the maximum extent permitted by law, we shall not be liable for
-            any indirect, incidental, special, consequential, or punitive
-            damages, including but not limited to loss of profits, data, use, or
-            other intangible losses, resulting from your use of our service or
-            any other claims related to our service.
+            You agree to defend, indemnify, and hold harmless Dishyy and its
+            officers, directors, employees, and agents from any claims, damages,
+            losses, liabilities, costs, or expenses (including reasonable
+            attorneys' fees) arising from:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Your use of the service</li>
+            <li>Your violation of these Terms</li>
+            <li>Your user content</li>
+            <li>Your interaction with other users</li>
+          </ul>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">10. Termination</h2>
+          <p>
+            We may terminate or suspend your account and access to the service
+            immediately, without prior notice or liability, for any reason,
+            including:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Violation of these Terms</li>
+            <li>Conduct that risks harm to other users</li>
+            <li>Fraudulent or illegal activities</li>
+            <li>Extended periods of inactivity</li>
+          </ul>
+          <p className="mt-4">
+            Upon termination, your right to use the service will immediately
+            cease. All provisions of the Terms which by their nature should
+            survive termination shall survive.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">9. Changes to Terms</h2>
+          <h2 className="text-xl font-semibold">11. Governing Law</h2>
           <p>
-            We may modify these Terms at any time. The updated version will be
-            indicated by an updated "Last Updated" date. It is your
-            responsibility to check these Terms periodically for changes. Your
-            continued use of our service following the posting of revised Terms
-            means that you accept and agree to the changes.
+            These Terms shall be governed by and construed in accordance with
+            the laws of Egypt, without regard to its conflict of law provisions.
+          </p>
+          <p className="mt-4">
+            Any disputes arising from these Terms or your use of the service
+            shall be subject to the exclusive jurisdiction of the courts of
+            Egypt.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">10. Contact Us</h2>
-          <p>
-            If you have any questions about these Terms, please contact us at:
-            <br />
-            <a
-              href="mailto:support@dishyy.com"
-              className="text-primary hover:underline"
-            >
-              support@dishyy.com
-            </a>
-          </p>
+          <h2 className="text-xl font-semibold">12. Contact Information</h2>
+          <p>If you have any questions about these Terms, please contact us:</p>
+          <ul className="list-none space-y-2 mt-4">
+            <li>
+              Email:{' '}
+              <a
+                href="mailto:legal@dishyy.com"
+                className="text-primary hover:underline"
+              >
+                legal@dishyy.com
+              </a>
+            </li>
+          </ul>
         </section>
       </div>
     </div>
