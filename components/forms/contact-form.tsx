@@ -12,6 +12,8 @@ import { Form } from '@/components/ui/form';
 import { FormTextField } from '@/components/forms/form-text-field';
 import { FormSingleSelect } from '@/components/forms/form-single-select';
 import { FormTextAreaField } from '@/components/forms/form-textarea-field';
+import { FormCheckboxField } from '@/components/forms/form-checkbox-field';
+import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -25,15 +27,18 @@ const formSchema = z.object({
     required_error: 'Please select a category',
   }),
   message: z.string().min(10, 'Message must be at least 10 characters'),
-});
+  consent: z.boolean().refine(val => val, {
+    message: 'You must accept the Terms and Privacy Policy',
+  }),
+}) satisfies z.ZodType<any>;
 
 type FormData = z.infer<typeof formSchema>;
 
 interface ContactFormProps {
-  categories: {
+  categories: Array<{
     title: string;
     value: string;
-  }[];
+  }>;
 }
 
 export function ContactForm({ categories }: ContactFormProps) {
@@ -45,6 +50,7 @@ export function ContactForm({ categories }: ContactFormProps) {
       email: '',
       category: '',
       message: '',
+      consent: false,
     },
   });
 
@@ -110,10 +116,33 @@ export function ContactForm({ categories }: ContactFormProps) {
               rows={6}
               className="resize-none"
             />
-            <Button type="submit" className="w-full" size="lg">
-              <Send className="mr-2 h-4 w-4" />
-              Send Message
-            </Button>
+            <div className="space-y-4">
+              <FormCheckboxField name="consent">
+                <div className="text-sm text-muted-foreground">
+                  I agree to the{' '}
+                  <Link
+                    href="/terms-of-use"
+                    className="text-primary hover:underline"
+                    target="_blank"
+                  >
+                    Terms of Use
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    href="/privacy-policy"
+                    className="text-primary hover:underline"
+                    target="_blank"
+                  >
+                    Privacy Policy
+                  </Link>
+                </div>
+              </FormCheckboxField>
+
+              <Button type="submit" className="w-full" size="lg">
+                <Send className="mr-2 h-4 w-4" />
+                Send Message
+              </Button>
+            </div>
           </form>
         </Form>
       </CardContent>

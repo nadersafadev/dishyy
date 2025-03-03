@@ -35,7 +35,8 @@ export default function PrivacyPolicyPage() {
           <p>
             By accessing or using Dishyy, you agree to this Privacy Policy. If
             you do not agree with our policies and practices, please do not use
-            our service.
+            our service. We encourage you to read this Privacy Policy carefully
+            to understand our practices regarding your information.
           </p>
         </section>
 
@@ -43,126 +44,265 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-xl font-semibold">2. Information We Collect</h2>
           <h3 className="text-lg font-medium">2.1 Personal Information</h3>
           <p>
-            We may collect personal information that you provide directly to us,
-            including but not limited to:
+            We collect personal information that you provide directly to us when
+            you:
           </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Create an account or update your profile</li>
+            <li>Create or join a party event</li>
+            <li>Submit a contact form or support request</li>
+            <li>Subscribe to our newsletter</li>
+            <li>Participate in surveys or promotions</li>
+          </ul>
+          <p>This information may include:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Name and contact information (email address, phone number)</li>
-            <li>
-              Account credentials (excluding passwords, which are handled
-              securely)
-            </li>
-            <li>Profile information (including preferences and settings)</li>
-            <li>
-              Content you create, upload, or share through our service (such as
-              party details and dishes)
-            </li>
+            <li>Profile information and preferences</li>
+            <li>Party details and dietary preferences</li>
+            <li>Communications with us</li>
+            <li>User-generated content (recipes, comments, reviews)</li>
           </ul>
 
-          <h3 className="text-lg font-medium">2.2 Usage Information</h3>
+          <h3 className="text-lg font-medium mt-6">2.2 Usage Information</h3>
           <p>
-            We may automatically collect certain information about how you
-            access and use our service, including:
+            We automatically collect certain information about your device and
+            how you interact with our service:
           </p>
           <ul className="list-disc pl-6 space-y-2">
-            <li>Device information (such as device type, operating system)</li>
-            <li>
-              Log information (such as IP address, browser type, pages visited)
-            </li>
-            <li>
-              Usage patterns (such as features used, time spent on the service)
-            </li>
+            <li>Device information (type, operating system, browser)</li>
+            <li>IP address and location data</li>
+            <li>Usage patterns and preferences</li>
+            <li>Cookies and similar tracking technologies</li>
           </ul>
+
+          <h3 className="text-lg font-medium mt-6">2.3 Cookies and Tracking</h3>
+          <p>
+            We use cookies and similar tracking technologies to enhance your
+            experience:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Essential cookies for site functionality</li>
+            <li>Analytics cookies to understand usage</li>
+            <li>Preference cookies to remember your settings</li>
+          </ul>
+          <p>
+            You can control cookies through your browser settings. Disabling
+            certain cookies may limit some features of our service.
+          </p>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">
             3. How We Use Your Information
           </h2>
-          <p>We use the information we collect to:</p>
-          <ul className="list-disc pl-6 space-y-2">
-            <li>Provide, maintain, and improve our services</li>
-            <li>Process and complete transactions</li>
-            <li>Send you technical notices, updates, and support messages</li>
-            <li>Respond to your comments, questions, and requests</li>
-            <li>Develop new products and services</li>
-            <li>
-              Protect against, identify, and prevent fraud and other harmful
-              activities
-            </li>
-            <li>Comply with our legal obligations</li>
-          </ul>
-        </section>
-
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">4. Sharing of Information</h2>
-          <p>We may share your information in the following circumstances:</p>
+          <p>We use your information for the following purposes:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li>
-              With third-party service providers who perform services on our
-              behalf
+              <strong>Core Service Functionality:</strong>
+              <ul className="list-disc pl-6 mt-2">
+                <li>Creating and managing your account</li>
+                <li>Processing party planning features</li>
+                <li>Facilitating communication between party participants</li>
+                <li>Providing customer support</li>
+              </ul>
             </li>
             <li>
-              With other users (as directed by you when using interactive
-              features)
+              <strong>Service Improvement:</strong>
+              <ul className="list-disc pl-6 mt-2">
+                <li>Analyzing usage patterns to improve features</li>
+                <li>Debugging and fixing issues</li>
+                <li>Developing new features</li>
+              </ul>
             </li>
-            <li>To comply with applicable law, regulation, or legal process</li>
             <li>
-              To protect the rights, property, or safety of Dishyy, our users,
-              or others
-            </li>
-            <li>
-              In connection with a business transaction, such as a merger or
-              acquisition
+              <strong>Communications:</strong>
+              <ul className="list-disc pl-6 mt-2">
+                <li>Sending essential service updates</li>
+                <li>Providing party reminders and notifications</li>
+                <li>Sending marketing communications (with consent)</li>
+                <li>Responding to your requests</li>
+              </ul>
             </li>
           </ul>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">5. Data Security</h2>
+          <h2 className="text-xl font-semibold">4. Your Privacy Rights</h2>
           <p>
-            We take reasonable measures to help protect your personal
-            information from loss, theft, misuse, and unauthorized access,
-            disclosure, alteration, and destruction. However, no system is
-            completely secure, and we cannot guarantee the security of your
-            information.
+            You have the following rights regarding your personal information:
           </p>
-        </section>
-
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">6. Your Choices</h2>
-          <p>
-            You can access, update, or delete your account information by
-            logging into your account and updating your profile. You may also
-            contact us directly to request access to, correction of, or deletion
-            of personal information we hold about you.
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Access your personal information</li>
+            <li>Correct inaccurate or incomplete data</li>
+            <li>Request deletion of your data</li>
+            <li>Object to or restrict processing</li>
+            <li>Export your data in a portable format</li>
+            <li>Withdraw consent for optional processing</li>
+          </ul>
+          <p className="mt-4">
+            To exercise these rights, contact us at{' '}
+            <a
+              href="mailto:privacy@dishyy.com"
+              className="text-primary hover:underline"
+            >
+              privacy@dishyy.com
+            </a>
+            . We will respond to your request within 30 days.
           </p>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">
-            7. Changes to This Privacy Policy
+            5. Data Sharing and Third Parties
           </h2>
-          <p>
-            We may update this Privacy Policy from time to time. The updated
-            version will be indicated by an updated "Last Updated" date and the
-            updated version will be effective as soon as it is accessible.
+          <p>We share your information with:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>
+              <strong>Service Providers:</strong> Companies that help us provide
+              our services (hosting, email, analytics)
+            </li>
+            <li>
+              <strong>Other Users:</strong> When you participate in parties or
+              public features (limited to necessary information)
+            </li>
+            <li>
+              <strong>Legal Requirements:</strong> When required by law or to
+              protect rights
+            </li>
+          </ul>
+          <p className="mt-4">
+            We do not sell your personal information to third parties.
           </p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">8. Contact Us</h2>
+          <h2 className="text-xl font-semibold">6. Data Security</h2>
           <p>
-            If you have questions or concerns about this Privacy Policy, please
-            contact us at:
-            <br />
-            <a
-              href="mailto:support@dishyy.com"
-              className="text-primary hover:underline"
-            >
-              support@dishyy.com
-            </a>
+            We implement appropriate technical and organizational measures to
+            protect your information:
           </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Encryption of data in transit and at rest</li>
+            <li>Regular security assessments</li>
+            <li>Access controls and authentication</li>
+            <li>Employee training on data protection</li>
+          </ul>
+          <p className="mt-4">
+            While we take reasonable steps to protect your data, no system is
+            completely secure. We cannot guarantee the absolute security of your
+            information.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">7. Data Retention</h2>
+          <p>
+            We retain your information for as long as necessary to provide our
+            services and comply with legal obligations. Specifically:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Account information: While your account is active</li>
+            <li>Party data: 90 days after party completion</li>
+            <li>Communication records: 2 years</li>
+            <li>Usage data: 1 year</li>
+          </ul>
+          <p className="mt-4">
+            You can request deletion of your data at any time through your
+            account settings or by contacting us.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">8. Marketing Communications</h2>
+          <p>
+            We may send you marketing communications about our services with
+            your consent. These may include:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Weekly newsletters with recipes and tips</li>
+            <li>Party planning ideas and inspiration</li>
+            <li>Product updates and new features</li>
+            <li>Special offers and promotions</li>
+          </ul>
+          <p className="mt-4">
+            You can opt out of marketing communications at any time:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Click the unsubscribe link in any email</li>
+            <li>Update your preferences in account settings</li>
+            <li>Contact us directly</li>
+          </ul>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">9. Children's Privacy</h2>
+          <p>
+            Our service is not directed to children under 13. We do not
+            knowingly collect personal information from children under 13. If
+            you believe we have collected information from a child under 13,
+            please contact us immediately.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">
+            10. International Data Transfers
+          </h2>
+          <p>
+            Our services are operated from Egypt. We may transfer your
+            information to countries other than where you live, particularly for
+            cloud hosting and other technical infrastructure. When we do, we
+            ensure appropriate safeguards are in place to protect your data and
+            comply with applicable data protection laws. By using our service,
+            you consent to your information being collected, processed, and
+            stored in Egypt and other countries as needed to provide you with
+            our services.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">11. Changes to This Policy</h2>
+          <p>
+            We may update this Privacy Policy from time to time. We will notify
+            you of any material changes by:
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Posting the new policy on our website</li>
+            <li>Sending an email to registered users</li>
+            <li>Displaying a notice in our application</li>
+          </ul>
+          <p className="mt-4">
+            Your continued use of our service after changes indicates your
+            acceptance of the updated policy.
+          </p>
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">12. Contact Us</h2>
+          <p>
+            If you have questions about this Privacy Policy or our privacy
+            practices, please contact us:
+          </p>
+          <ul className="list-none space-y-2 mt-4">
+            <li>
+              Email:{' '}
+              <a
+                href="mailto:privacy@dishyy.com"
+                className="text-primary hover:underline"
+              >
+                privacy@dishyy.com
+              </a>
+            </li>
+            <li>
+              Data Protection Officer:{' '}
+              <a
+                href="mailto:dpo@dishyy.com"
+                className="text-primary hover:underline"
+              >
+                dpo@dishyy.com
+              </a>
+            </li>
+          </ul>
         </section>
       </div>
     </div>

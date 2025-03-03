@@ -20,7 +20,7 @@ type InputType =
 
 interface FormTextFieldProps {
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
   type?: InputType;
   className?: string;
@@ -51,12 +51,17 @@ export function FormTextField({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-sm font-medium">
-            {label}
-            {optional && (
-              <span className="text-sm text-muted-foreground"> (Optional)</span>
-            )}
-          </FormLabel>
+          {label && (
+            <FormLabel className="text-sm font-medium">
+              {label}
+              {optional && (
+                <span className="text-sm text-muted-foreground">
+                  {' '}
+                  (Optional)
+                </span>
+              )}
+            </FormLabel>
+          )}
           <FormControl>
             <Input
               {...field}

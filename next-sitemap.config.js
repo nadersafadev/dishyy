@@ -5,22 +5,21 @@ module.exports = {
   sitemapSize: 7000,
   changefreq: 'weekly',
   priority: 0.7,
-  exclude: [
-    '/api/*',
-    '/dashboard/*',
-    '/sitemap.xml', // Exclude the sitemap itself to prevent self-referencing
-    '/server-sitemap.xml',
-    '/robots.txt',
-  ],
+  exclude: ['/api/*', '/sitemap.xml', '/server-sitemap.xml', '/robots.txt'],
   generateIndexSitemap: false, // Disable index sitemap
   robotsTxtOptions: {
     policies: [
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/*', '/dashboard/*'],
+        disallow: ['/api/*'],
+      },
+      {
+        userAgent: '*',
+        allow: ['/dashboard', '/profile', '/parties'],
       },
     ],
+    additionalSitemaps: ['https://dishyy.com/sitemap.xml'],
   },
   // Add some additional static pages
   additionalPaths: async config => {
