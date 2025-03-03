@@ -40,9 +40,18 @@ export default async function ProfilePage() {
       })
     : [];
 
-  // For contributions, use placeholder data for now
+  // Get total contributions by the user
+  const totalContributions = user
+    ? await prisma.participantDishContribution.count({
+        where: {
+          participant: {
+            userId: user.id,
+          },
+        },
+      })
+    : 0;
+
   const totalParties = userParties.length;
-  const totalContributions = 0; // Placeholder until we have the actual schema
 
   const accountCreated = clerkUser.createdAt
     ? new Date(clerkUser.createdAt).toLocaleDateString('en-US', {
