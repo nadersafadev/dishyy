@@ -17,12 +17,13 @@ import { UtensilsCrossedIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { PartyDishItem } from '@/components/party-dish-item';
+import { Unit } from '@/lib/types';
 
 interface DishesContentProps {
   dishes: (PartyDish & {
     dish: {
       name: string;
-      unit: string;
+      unit: Unit;
       description: string | null;
       imageUrl: string | null;
       categoryId: string;
@@ -40,7 +41,7 @@ interface DishesContentProps {
     contributions: (ParticipantDishContribution & {
       dish: {
         name: string;
-        unit: string;
+        unit: Unit;
       };
     })[];
   })[];
@@ -171,7 +172,7 @@ export function DishesContent({
                 partyDish: PartyDish & {
                   dish: {
                     name: string;
-                    unit: string;
+                    unit: Unit;
                     description: string | null;
                     imageUrl: string | null;
                     categoryId: string;

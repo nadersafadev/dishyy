@@ -156,7 +156,6 @@ export function PartyDishAmounts({
                     id: string;
                     name: string;
                     unit: Unit;
-                    unit: string;
                     description: string | null;
                     imageUrl: string | null;
                     categoryId: string;
