@@ -100,7 +100,7 @@ const ramadanCategories = [
   {
     icon: <Coffee className="h-8 w-8 text-primary" />,
     title: 'المشروبات والعصائر',
-    items: ['قمر الدين', 'تمر هندي', 'جلاب', 'لبن عيران'],
+    items: ['قمر الدين', 'تمر هندي', 'سوبيا', 'خروب'],
   },
   {
     icon: <Sparkles className="h-8 w-8 text-primary" />,
