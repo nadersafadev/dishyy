@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 
 const marketingLinks = [
   { href: '/', label: 'Home' },
+  { href: '/ramadan', label: 'Ramadan' },
   { href: '/about', label: 'About' },
   { href: '/features', label: 'Features' },
   { href: '/pricing', label: 'Pricing' },

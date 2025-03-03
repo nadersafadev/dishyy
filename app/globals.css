@@ -110,3 +110,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Apply Cairo font for Arabic text */
+*:lang(ar),
+[dir='rtl'] * {
+  font-family: var(--font-cairo);
+}
