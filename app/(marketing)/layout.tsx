@@ -1,20 +1,21 @@
 import { MarketingFooter } from '@/components/layout/MarketingFooter';
 import { MarketingHeader } from '@/components/layout/MarketingHeader';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 
 interface MarketingLayoutProps {
   children: React.ReactNode;
   params: { segment: string[] };
 }
 
-export const metadata: Metadata = {
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
   themeColor: '#ffffff',
+};
+
+export const metadata: Metadata = {
   formatDetection: {
     telephone: true,
     date: true,

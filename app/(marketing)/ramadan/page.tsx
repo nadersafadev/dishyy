@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import { Button } from '@/components/ui/button';
 import {
   CalendarDays,
@@ -16,6 +16,13 @@ import {
   Scroll,
   Home,
 } from 'lucide-react';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#ffffff',
+};
 
 export const metadata: Metadata = {
   title: 'تنظيم إفطارات رمضان - Dishyy | Ramadan Meal Planning',
@@ -58,9 +65,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://dishyy.app/ramadan',
   },
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
   robots: 'index, follow',
-  themeColor: '#ffffff',
 };
 
 const features = [
@@ -383,9 +388,10 @@ export default function RamadanPage() {
         </section>
 
         {/* Ramadan Tips Section */}
-        <section className="py-24 bg-[url('/pattern.png')] bg-repeat bg-primary/5 text-center">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl p-8 text-center space-y-8">
+        <section className="relative py-24 text-center">
+          <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/daqvjcynu/image/upload/v1741033184/ramadan-pattern_nv1pgb.jpg')] bg-cover opacity-70" />
+          <div className="container relative z-10 mx-auto px-4">
+            <div className="max-w-3xl mx-auto backdrop-blur-sm rounded-3xl p-8 text-center space-y-8">
               <h2 className="text-3xl font-bold" lang="ar">
                 نصائح لإفطار صحي
               </h2>

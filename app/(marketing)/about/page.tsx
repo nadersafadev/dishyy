@@ -1,8 +1,16 @@
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Users2, Calendar, Utensils } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: '#ffffff',
+};
 
 export const metadata: Metadata = {
   title: 'About Dishyy | Making Food Parties Simple & Delightful',
