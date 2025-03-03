@@ -31,6 +31,8 @@ export async function GET(request: Request) {
     // Filtering params
     const search = searchParams.get('search') || '';
     const categoryId = searchParams.get('categoryId') || undefined;
+    const includeChildCategories =
+      searchParams.get('includeChildCategories') === 'true';
     const hasCategory = searchParams.get('hasCategory') || undefined;
     const hasImage = searchParams.get('hasImage') || undefined;
 
@@ -49,9 +51,30 @@ export async function GET(request: Request) {
       ];
     }
 
-    // Filter by category
+    // Filter by category, including child categories if specified
     if (categoryId && categoryId !== 'all') {
-      where.categoryId = categoryId;
+      if (includeChildCategories) {
+        // Get all child category IDs
+        const childCategories = await prisma.category.findMany({
+          where: {
+            OR: [
+              { id: categoryId }, // Include the selected category
+              { parentId: categoryId }, // Direct children
+              {
+                parent: {
+                  parentId: categoryId, // Grandchildren
+                },
+              },
+            ],
+          },
+          select: { id: true },
+        });
+
+        const categoryIds = childCategories.map(cat => cat.id);
+        where.categoryId = { in: categoryIds };
+      } else {
+        where.categoryId = categoryId;
+      }
     }
 
     // Filter by category status
