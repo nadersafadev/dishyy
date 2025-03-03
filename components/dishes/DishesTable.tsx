@@ -94,7 +94,6 @@ export function DishesTable({
       </div>
     );
   }
-
   return (
     <div>
       <div className="rounded-md border overflow-hidden">
