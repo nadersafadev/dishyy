@@ -10,20 +10,41 @@ export enum Unit {
 export const unitLabels: Record<Unit, string> = {
   [Unit.GRAMS]: 'Grams',
   [Unit.KILOS]: 'Kilos',
-  [Unit.QUANTITY]: 'Quantity',
+  [Unit.QUANTITY]: 'Qty',
   [Unit.MILLILITERS]: 'Milliliters',
   [Unit.LITERS]: 'Liters',
   [Unit.PIECES]: 'Pieces',
+};
+
+export interface Category {
+  id: string;
+  name: string;
+  description: string | null;
+  parentId: string | null;
+  parent?: {
+    id: string;
+    name: string;
+  };
+  children?: {
+    id: string;
+    name: string;
+  }[];
+  _count?: {
+    dishes: number;
+  };
 }
 
 export interface Dish {
-  id: string
-  name: string
-  description: string | null
-  imageUrl: string | null
-  imageId: string | null
-  unit: Unit
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  imageId: string | null;
+  unit: Unit;
+  categoryId: string | null;
+  defaultAmount?: number | null;
+  category?: Category;
   _count?: {
-    parties: number
-  }
+    parties: number;
+  };
 }

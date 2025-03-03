@@ -1,12 +1,11 @@
-import { create } from "zustand"
+import { create } from 'zustand';
 
 interface UserState {
-  isAdmin: boolean
-  setIsAdmin: (isAdmin: boolean) => void
+  isAdmin: boolean;
+  setIsAdmin: (isAdmin: boolean) => void;
 }
 
-export const useUserStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>(set => ({
   isAdmin: false,
-  setIsAdmin: (isAdmin) => set({ isAdmin }),
-}))
-
+  setIsAdmin: isAdmin => set({ isAdmin }),
+}));

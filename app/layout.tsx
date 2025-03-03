@@ -1,13 +1,23 @@
-import type React from 'react'
-import { ClerkProvider } from '@clerk/nextjs'
-import './globals.css'
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import type React from 'react';
+import { ClerkProvider } from '@clerk/nextjs';
+import './globals.css';
+import type { Metadata } from 'next';
+import { Inter, Cairo } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const cairo = Cairo({
+  subsets: ['arabic', 'latin'],
+  display: 'swap',
+  variable: '--font-cairo',
+});
 
 export const metadata: Metadata = {
-  title: 'Dishy',
+  title: 'Dishyy',
   description: 'Where Flavors Unite and Friendships Simmer',
   icons: {
     icon: [
@@ -23,23 +33,23 @@ export const metadata: Metadata = {
       },
     ],
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <ClerkProvider>
-      <html lang='en'>
+      <html lang="en" className={`${inter.variable} ${cairo.variable}`}>
         <head>
-          <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         </head>
         <body className={inter.className}>{children}</body>
       </html>
     </ClerkProvider>
-  )
+  );
 }
 
-import './globals.css'
+import './globals.css';
