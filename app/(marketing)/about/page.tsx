@@ -31,7 +31,7 @@ export default function AboutPage() {
           <span className="inline-block px-4 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary mb-8 animate-fade-in">
             Our Story
           </span>
-          <h1 className="text-4xl font-bold tracking-tight text-primary sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+          <h1 className="text-4xl font-bold tracking-tight text-primary sm:text-6xl bg-clip-text  bg-gradient-to-r from-primary to-primary/80">
             Building the Future of Food Gatherings
           </h1>
           <div className="mt-6 flex flex-col gap-6 text-lg leading-8 text-muted-foreground max-w-3xl mx-auto">
