@@ -145,7 +145,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppSchema) }}
       />
 
-      <div className="min-h-screen flex flex-col">
+      <div className=" -mt-16 min-h-screen flex flex-col">
         <main className="flex-1">
           {isAuthenticated ? (
             // Authenticated view
@@ -173,7 +173,7 @@ export default async function Home() {
                     />
                   </div>
                   {/* Overlay gradients */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-black/50" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-transparent" />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/50" />
                   <div className="absolute inset-0 backdrop-blur-[2px]" />
 
@@ -186,7 +186,7 @@ export default async function Home() {
                 </div>
 
                 {/* Content */}
-                <div className="container relative z-10 py-12">
+                <div className="container relative z-10 py-12 mt-16">
                   <div className="max-w-4xl mx-auto text-center space-y-6">
                     <div className="flex justify-center transform scale-125 opacity-0 animate-fade-in">
                       <Logo size="xl" variant="light" />
@@ -416,7 +416,7 @@ export default async function Home() {
               </section>
 
               {/* Footer */}
-              <Footer />
+              {/* <Footer /> */}
             </div>
           )}
         </main>
