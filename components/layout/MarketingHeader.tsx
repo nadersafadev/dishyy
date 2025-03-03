@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LayoutDashboard } from 'lucide-react';
 import Image from 'next/image';
+import { useAuth } from '@clerk/nextjs';
 
 const marketingLinks = [
   { href: '/', label: 'Home' },
@@ -19,6 +20,7 @@ export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
+  const { isSignedIn } = useAuth();
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
@@ -131,29 +133,50 @@ export function MarketingHeader() {
           {/* Auth Buttons and Mobile Menu Toggle */}
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/sign-in">
-                <Button
-                  variant={isTransparent ? 'outline' : 'ghost'}
-                  size="sm"
-                  className={
-                    isTransparent
-                      ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
-                      : ''
-                  }
-                >
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/sign-up">
-                <Button
-                  size="sm"
-                  className={
-                    isTransparent ? 'bg-white text-black hover:bg-white/90' : ''
-                  }
-                >
-                  Get Started
-                </Button>
-              </Link>
+              {isSignedIn ? (
+                <Link href="/dashboard">
+                  <Button
+                    variant={isTransparent ? 'outline' : 'ghost'}
+                    size="sm"
+                    className={`gap-2 ${
+                      isTransparent
+                        ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
+                        : ''
+                    }`}
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Go to Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/sign-in">
+                    <Button
+                      variant={isTransparent ? 'outline' : 'ghost'}
+                      size="sm"
+                      className={
+                        isTransparent
+                          ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
+                          : ''
+                      }
+                    >
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/sign-up">
+                    <Button
+                      size="sm"
+                      className={
+                        isTransparent
+                          ? 'bg-white text-black hover:bg-white/90'
+                          : ''
+                      }
+                    >
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
 
             <Button
@@ -209,31 +232,50 @@ export function MarketingHeader() {
                 </Link>
               ))}
               <div className="border-t mt-4 pt-4 px-6 space-y-3">
-                <Link href="/sign-in" className="block">
-                  <Button
-                    variant={isTransparent ? 'outline' : 'ghost'}
-                    size="sm"
-                    className={`w-full ${
-                      isTransparent
-                        ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
-                        : ''
-                    }`}
-                  >
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/sign-up" className="block">
-                  <Button
-                    size="sm"
-                    className={`w-full ${
-                      isTransparent
-                        ? 'bg-white text-black hover:bg-white/90'
-                        : ''
-                    }`}
-                  >
-                    Get Started
-                  </Button>
-                </Link>
+                {isSignedIn ? (
+                  <Link href="/dashboard" className="block">
+                    <Button
+                      variant={isTransparent ? 'outline' : 'ghost'}
+                      size="sm"
+                      className={`w-full gap-2 ${
+                        isTransparent
+                          ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
+                          : ''
+                      }`}
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/sign-in" className="block">
+                      <Button
+                        variant={isTransparent ? 'outline' : 'ghost'}
+                        size="sm"
+                        className={`w-full ${
+                          isTransparent
+                            ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
+                            : ''
+                        }`}
+                      >
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/sign-up" className="block">
+                      <Button
+                        size="sm"
+                        className={`w-full ${
+                          isTransparent
+                            ? 'bg-white text-black hover:bg-white/90'
+                            : ''
+                        }`}
+                      >
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>

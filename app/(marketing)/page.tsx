@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/layout/Footer';
 import AuthenticatedHome from '@/components/home/AuthenticatedHome';
+import { prisma } from '@/lib/prisma';
 
 // SEO Metadata
 export const metadata: Metadata = {
@@ -70,6 +71,34 @@ export default async function Home() {
   const user = await currentUser();
   const isAuthenticated = !!userId;
 
+  // Get user stats if authenticated
+  const dbUser = userId
+    ? await prisma.user.findUnique({
+        where: { clerkId: userId },
+      })
+    : null;
+
+  let stats = null;
+  if (dbUser) {
+    const [userParties, totalContributions] = await Promise.all([
+      prisma.party.findMany({
+        where: { createdById: dbUser.id },
+      }),
+      prisma.participantDishContribution.count({
+        where: {
+          participant: {
+            userId: dbUser.id,
+          },
+        },
+      }),
+    ]);
+
+    stats = {
+      partyCount: userParties.length,
+      contributionCount: totalContributions,
+    };
+  }
+
   // Extract only the necessary user data
   const userData = user
     ? {
@@ -77,6 +106,7 @@ export default async function Home() {
         imageUrl: user.imageUrl,
         email: user.emailAddresses[0]?.emailAddress,
         createdAt: user.createdAt ? new Date(user.createdAt) : null,
+        stats: stats || undefined,
       }
     : null;
 
