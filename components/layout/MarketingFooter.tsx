@@ -46,7 +46,7 @@ export function MarketingFooter() {
               </li>
               <li>
                 <Link
-                  href="/privacy"
+                  href="/privacy-policy"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
                   Privacy Policy
@@ -54,10 +54,10 @@ export function MarketingFooter() {
               </li>
               <li>
                 <Link
-                  href="/terms"
+                  href="/terms-of-use"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  Terms of Service
+                  Terms of Use
                 </Link>
               </li>
             </ul>

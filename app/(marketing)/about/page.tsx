@@ -48,7 +48,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Link href="/auth/register">
+            <Link href="/sign-up">
               <Button size="lg" className="group">
                 Join Our Community
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -169,7 +169,7 @@ export default function AboutPage() {
                 seamlessly with your friends and family.
               </p>
               <div className="flex items-center gap-4">
-                <Link href="/auth/register">
+                <Link href="/sign-up">
                   <Button size="lg" className="group">
                     Start Planning Your Party
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -269,7 +269,7 @@ export default function AboutPage() {
                 Join thousands of hosts who are already using Dishyy to create
                 memorable food gatherings.
               </p>
-              <Link href="/auth/register">
+              <Link href="/sign-up">
                 <Button size="lg" variant="default" className="group">
                   Get Started for Free
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
