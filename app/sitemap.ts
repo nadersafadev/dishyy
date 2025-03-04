@@ -11,14 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: route === '' ? 1.0 : 0.9,
   }));
 
-  // Auth pages
-  const authPages = ['/sign-in', '/sign-up'].map(route => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.8,
-  }));
-
   // Legal pages
   const legalPages = ['/privacy-policy', '/terms-of-use'].map(route => ({
     url: `${baseUrl}${route}`,
@@ -27,5 +19,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...marketingPages, ...authPages, ...legalPages];
+  return [...marketingPages, ...legalPages];
 }

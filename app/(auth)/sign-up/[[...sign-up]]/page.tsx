@@ -1,10 +1,18 @@
 import { SignUp } from '@clerk/nextjs';
-import { generateMetadata } from '@/lib/metadata';
+import { Metadata } from 'next';
 
-export const metadata = generateMetadata(
-  'Sign Up',
-  'Create your Dishyy account'
-);
+export const metadata: Metadata = {
+  title: 'Sign Up | Dishyy',
+  description: 'Create your Dishyy account',
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
 
 export default function SignUpPage() {
   return (
@@ -24,7 +32,6 @@ export default function SignUpPage() {
         },
       }}
       path="/sign-up"
-      forceRedirectUrl="/dashboard"
       signInUrl="/sign-in"
       routing="path"
     />
