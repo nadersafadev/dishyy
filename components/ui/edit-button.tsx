@@ -1,17 +1,17 @@
 'use client';
 
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Edit2 } from 'lucide-react';
 import { ActionButtonProps } from '@/components/ui/action-button';
 
-export function EditButton({
-  onClick,
-  className,
-  label = 'Edit',
-  ...props
-}: ActionButtonProps) {
+export const EditButton = React.forwardRef<
+  HTMLButtonElement,
+  ActionButtonProps
+>(({ onClick, className, label = 'Edit', ...props }, ref) => {
   return (
     <Button
+      ref={ref}
       variant="ghost"
       size="icon"
       onClick={onClick}
@@ -22,4 +22,6 @@ export function EditButton({
       <span className="sr-only">{label}</span>
     </Button>
   );
-}
+});
+
+EditButton.displayName = 'EditButton';

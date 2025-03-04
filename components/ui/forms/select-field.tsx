@@ -25,7 +25,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/forms/select';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export type SortOption = {
   value: string;
@@ -330,9 +335,14 @@ export function SelectField<T>({
         </Popover>
 
         {/* Dialog for custom content */}
-        {dialogContent && (
+        {dialogOpen && (
           <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
-            <DialogContent>{dialogContent}</DialogContent>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Item</DialogTitle>
+              </DialogHeader>
+              {dialogContent}
+            </DialogContent>
           </Dialog>
         )}
       </div>
