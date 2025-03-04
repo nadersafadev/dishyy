@@ -1,10 +1,18 @@
 import { SignIn } from '@clerk/nextjs';
-import { generateMetadata } from '@/lib/metadata';
+import { Metadata } from 'next';
 
-export const metadata = generateMetadata(
-  'Sign In',
-  'Sign in to your Dishyy account'
-);
+export const metadata: Metadata = {
+  title: 'Sign In | Dishyy',
+  description: 'Sign in to your Dishyy account',
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
 
 export default function SignInPage({
   searchParams,
@@ -32,7 +40,7 @@ export default function SignInPage({
       }}
       path="/sign-in"
       signUpUrl="/sign-up"
-      redirectUrl={redirectUrl}
+      fallbackRedirectUrl={redirectUrl}
       routing="path"
     />
   );

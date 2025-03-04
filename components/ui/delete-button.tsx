@@ -1,17 +1,17 @@
 'use client';
 
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { ActionButtonProps } from '@/components/ui/action-button';
 
-export function DeleteButton({
-  onClick,
-  className,
-  label = 'Delete',
-  ...props
-}: ActionButtonProps) {
+export const DeleteButton = React.forwardRef<
+  HTMLButtonElement,
+  ActionButtonProps
+>(({ onClick, className, label = 'Delete', ...props }, ref) => {
   return (
     <Button
+      ref={ref}
       variant="ghost"
       size="icon"
       onClick={onClick}
@@ -22,4 +22,6 @@ export function DeleteButton({
       <span className="sr-only">{label}</span>
     </Button>
   );
-}
+});
+
+DeleteButton.displayName = 'DeleteButton';
