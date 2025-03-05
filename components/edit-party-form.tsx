@@ -14,7 +14,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/forms/input';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Party, PartyDish, PartyParticipant, Dish } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
@@ -30,35 +31,21 @@ import { Label } from '@/components/ui/label';
 import { FormTextField } from '@/components/forms/form-text-field';
 import { FormNumberField } from '@/components/forms/form-number-field';
 import { FormDateField } from '@/components/forms/form-date-field';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Privacy } from '@/lib/enums';
 
-const formSchema = z
-  .object({
-    name: z.string().min(1, 'Name is required'),
-    description: z.string().optional(),
-    date: z.date({
-      required_error: 'Date is required',
-    }),
-    maxParticipants: z
-      .union([z.string(), z.number(), z.undefined()])
-      .transform(val => {
-        if (val === '' || val === undefined) return undefined;
-        const num = Number(val);
-        return isNaN(num) ? undefined : num;
-      })
-      .optional(),
-  })
-  .refine(
-    data => {
-      if (!data.maxParticipants) return true;
-      return data.maxParticipants > 0;
-    },
-    {
-      message: 'Maximum participants must be a positive number',
-      path: ['maxParticipants'],
-    }
-  );
+const formSchema = z.object({
+  name: z.string().min(1, 'Party name is required'),
+  description: z.string().optional(),
+  date: z.string().refine(val => !isNaN(Date.parse(val)), {
+    message: 'Invalid date',
+  }),
+  maxParticipants: z.number().min(1).nullable(),
+  privacy: z.nativeEnum(Privacy).default(Privacy.PUBLIC),
+});
 
-interface PartyWithDetails extends Party {
+interface PartyWithDetails extends Omit<Party, 'privacy'> {
+  privacy: Privacy;
   dishes: (PartyDish & {
     dish: {
       name: string;
@@ -94,8 +81,9 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
     defaultValues: {
       name: party.name,
       description: party.description ?? '',
-      date: new Date(party.date),
-      maxParticipants: party.maxParticipants ?? undefined,
+      date: party.date.toISOString().split('T')[0],
+      maxParticipants: party.maxParticipants ?? null,
+      privacy: party.privacy as Privacy,
     },
   });
 
@@ -110,16 +98,23 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsLoading(true);
+      console.log('Submitting form values:', values);
+
       const response = await fetch(`/api/parties/${party.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+          date: new Date(values.date).toISOString(),
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update party');
+        const errorData = await response.json();
+        console.error('Update failed:', errorData);
+        throw new Error(errorData.error || 'Failed to update party');
       }
 
       toast({
@@ -132,7 +127,8 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
       console.error('Error updating party:', error);
       toast({
         title: 'Error',
-        description: 'Failed to update party',
+        description:
+          error instanceof Error ? error.message : 'Failed to update party',
         variant: 'destructive',
       });
     } finally {
@@ -292,6 +288,30 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
         />
 
         <FormDateField name="date" label="Date" />
+
+        <div className="space-y-2">
+          <Label>Privacy</Label>
+          <RadioGroup
+            defaultValue={party.privacy}
+            onValueChange={value => form.setValue('privacy', value as Privacy)}
+            className="flex flex-col space-y-1"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value={Privacy.PUBLIC} id="public" />
+              <Label htmlFor="public">Public - Anyone can view and join</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value={Privacy.PRIVATE} id="private" />
+              <Label htmlFor="private">
+                Private - Only invited users can join
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value={Privacy.CLOSED} id="closed" />
+              <Label htmlFor="closed">Closed - No one can join</Label>
+            </div>
+          </RadioGroup>
+        </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">

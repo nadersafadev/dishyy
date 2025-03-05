@@ -1,12 +1,19 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
+import {
+  CalendarIcon,
+  MapPinIcon,
+  UsersIcon,
+  LockIcon,
+  GlobeIcon,
+  UserIcon,
+} from 'lucide-react';
 import { PartyActions } from '@/components/party-actions';
 import { EditPartyDialog } from '@/components/edit-party-dialog';
 import { ShareParty } from '@/components/share-party';
 import { DeletePartyDialog } from '@/components/delete-party-dialog';
-import { Party } from '@prisma/client';
+import { Party, Privacy } from '@prisma/client';
 
 interface PartyHeaderProps {
   party: {
@@ -15,6 +22,7 @@ interface PartyHeaderProps {
     description: string | null;
     date: Date;
     maxParticipants: number | null;
+    privacy: Privacy;
     createdBy: {
       name: string;
     };
@@ -25,6 +33,28 @@ interface PartyHeaderProps {
   isAdmin: boolean;
   isParticipant: boolean;
 }
+
+const getPrivacyIcon = (privacy: Privacy) => {
+  switch (privacy) {
+    case Privacy.PRIVATE:
+      return <LockIcon className="h-4 w-4" />;
+    case Privacy.CLOSED:
+      return <UserIcon className="h-4 w-4" />;
+    default:
+      return <GlobeIcon className="h-4 w-4" />;
+  }
+};
+
+const getPrivacyLabel = (privacy: Privacy) => {
+  switch (privacy) {
+    case Privacy.PRIVATE:
+      return 'Private';
+    case Privacy.CLOSED:
+      return 'Closed';
+    default:
+      return 'Public';
+  }
+};
 
 export function PartyHeader({
   party,
@@ -37,7 +67,15 @@ export function PartyHeader({
   return (
     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 bg-card rounded-xl p-6 shadow-sm border">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">{party.name}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {party.name}
+          </h1>
+          <Badge variant="outline" className="flex items-center gap-1">
+            {getPrivacyIcon(party.privacy)}
+            {getPrivacyLabel(party.privacy)}
+          </Badge>
+        </div>
         <p className="text-muted-foreground">{party.description}</p>
         <div className="flex flex-wrap gap-4 pt-2">
           <div className="flex items-center gap-2 text-sm">

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { Privacy } from '@prisma/client';
 
 const partySchema = z.object({
   name: z.string().min(1, 'Party name is required'),
@@ -10,6 +11,7 @@ const partySchema = z.object({
     message: 'Invalid date',
   }),
   maxParticipants: z.number().min(1).optional(),
+  privacy: z.nativeEnum(Privacy).default(Privacy.PUBLIC),
   dishes: z
     .array(
       z.object({
@@ -226,6 +228,7 @@ export async function POST(req: Request) {
         description: validatedData.description || '',
         date: new Date(validatedData.date),
         maxParticipants: validatedData.maxParticipants,
+        privacy: validatedData.privacy,
         createdById: user.id,
         dishes: {
           create: validatedData.dishes.map(({ dishId, amountPerPerson }) => ({

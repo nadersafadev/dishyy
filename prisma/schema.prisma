@@ -31,6 +31,7 @@ model Party {
   createdById     String
   maxParticipants Int?
   status          PartyStatus        @default(OPEN)
+  privacy         Privacy            @default(PUBLIC)
   createdBy       User               @relation("CreatedParties", fields: [createdById], references: [id])
   dishes          PartyDish[]
   participants    PartyParticipant[]
@@ -128,6 +129,12 @@ enum PartyStatus {
   FULL
   CLOSED
   CANCELLED
+}
+
+enum Privacy {
+  PRIVATE
+  PUBLIC
+  CLOSED
 }
 
 enum Unit {

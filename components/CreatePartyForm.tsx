@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Unit, unitLabels, type Dish } from '@/lib/types';
+import { Privacy } from '@prisma/client';
 
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
@@ -14,6 +15,8 @@ import { FormDateField } from '@/components/forms/form-date-field';
 import { FormNumberField } from '@/components/forms/form-number-field';
 import { FormDishSelect } from '@/components/forms/form-dish-select';
 import { DishAmountField } from '@/components/forms/dish-amount-field';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -23,6 +26,7 @@ const formSchema = z.object({
   }),
   dishIds: z.array(z.string()).min(1, 'At least one dish is required'),
   maxParticipants: z.number().positive().optional(),
+  privacy: z.nativeEnum(Privacy).default(Privacy.PUBLIC),
   dishAmounts: z.record(
     z.string(),
     z.number().positive('Amount must be greater than 0')
@@ -45,6 +49,7 @@ const CreatePartyForm: React.FC = () => {
       description: '',
       dishIds: [],
       maxParticipants: undefined,
+      privacy: Privacy.PUBLIC,
       dishAmounts: {},
     },
   });
@@ -166,6 +171,34 @@ const CreatePartyForm: React.FC = () => {
           />
 
           <FormDateField name="date" label="Date" placeholder="Pick a date" />
+
+          <div className="space-y-2">
+            <Label>Privacy</Label>
+            <RadioGroup
+              defaultValue={Privacy.PUBLIC}
+              onValueChange={value =>
+                form.setValue('privacy', value as Privacy)
+              }
+              className="flex flex-col space-y-1"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value={Privacy.PUBLIC} id="public" />
+                <Label htmlFor="public">
+                  Public - Anyone can view and join
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value={Privacy.PRIVATE} id="private" />
+                <Label htmlFor="private">
+                  Private - Only invited users can join
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value={Privacy.CLOSED} id="closed" />
+                <Label htmlFor="closed">Closed - No one can join</Label>
+              </div>
+            </RadioGroup>
+          </div>
 
           <FormDishSelect
             name="dishIds"
