@@ -4,16 +4,23 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/forms/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/forms/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, SlidersHorizontal, RotateCcw } from 'lucide-react';
+import {
+  Search,
+  SlidersHorizontal,
+  RotateCcw,
+  CalendarIcon,
+} from 'lucide-react';
 import { FilterDropdown, FilterOption } from './FilterDropdown';
+import { Label } from '@/components/ui/label';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/forms/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 export type { FilterOption } from './FilterDropdown';
 
@@ -27,8 +34,9 @@ export type FilterConfig = {
   id: string;
   label: string;
   placeholder?: string;
-  options: FilterOption[];
+  options?: FilterOption[];
   defaultValue?: string;
+  type?: 'select' | 'date';
 };
 
 export type FilterPanelProps = {
@@ -46,6 +54,55 @@ export type FilterPanelProps = {
   onReset?: () => void;
   className?: string;
 };
+
+function DateInput({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const date = value ? new Date(value) : undefined;
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id} className="text-sm font-medium">
+        {label}
+      </Label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            className={cn(
+              'w-full pl-3 text-left font-normal border-input bg-background hover:bg-background hover:text-foreground focus-visible:ring-0',
+              !date && 'text-muted-foreground'
+            )}
+          >
+            {date ? format(date, 'PPP') : 'Pick a date'}
+            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 border-input" align="start">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={date => onChange(date?.toISOString() || '')}
+            disabled={date =>
+              date < new Date() || date < new Date('1900-01-01')
+            }
+            initialFocus
+            className="bg-background rounded-lg"
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
 
 export function FilterPanel({
   title = 'Filters and Sorting',
@@ -77,8 +134,15 @@ export function FilterPanel({
 
     filters.forEach(filter => {
       const valueFromUrl = searchParams.get(filter.id);
-      initialValues[filter.id] =
-        valueFromUrl || filter.defaultValue || filter.options[0]?.value || '';
+      if (filter.type === 'date') {
+        initialValues[filter.id] = valueFromUrl || '';
+      } else {
+        initialValues[filter.id] =
+          valueFromUrl ||
+          filter.defaultValue ||
+          filter.options?.[0]?.value ||
+          '';
+      }
     });
 
     setFilterValues(initialValues);
@@ -227,19 +291,29 @@ export function FilterPanel({
         <CardContent className="p-4 pt-0 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {/* Render filter dropdowns */}
-            {filters.map(filter => (
-              <FilterDropdown
-                key={filter.id}
-                id={filter.id}
-                label={filter.label}
-                placeholder={filter.placeholder}
-                options={filter.options}
-                value={filterValues[filter.id] || 'all'}
-                onChange={(value: string) => {
-                  applyFilters({ [filter.id]: value });
-                }}
-              />
-            ))}
+            {filters.map(filter =>
+              filter.type === 'date' ? (
+                <DateInput
+                  key={filter.id}
+                  id={filter.id}
+                  label={filter.label}
+                  value={filterValues[filter.id] || ''}
+                  onChange={value => applyFilters({ [filter.id]: value })}
+                />
+              ) : (
+                <FilterDropdown
+                  key={filter.id}
+                  id={filter.id}
+                  label={filter.label}
+                  placeholder={filter.placeholder}
+                  options={filter.options || []}
+                  value={filterValues[filter.id] || 'all'}
+                  onChange={(value: string) => {
+                    applyFilters({ [filter.id]: value });
+                  }}
+                />
+              )
+            )}
 
             {/* Sort By dropdown */}
             {sortOptions.length > 0 && (
