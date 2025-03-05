@@ -44,7 +44,7 @@ const formSchema = z.object({
   privacy: z.nativeEnum(Privacy).default(Privacy.PUBLIC),
 });
 
-interface PartyWithDetails extends Omit<Party, 'privacy'> {
+interface PartyWithDetails extends Party {
   privacy: Privacy;
   dishes: (PartyDish & {
     dish: {

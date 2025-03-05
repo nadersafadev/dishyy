@@ -33,6 +33,14 @@ module.exports = {
       lastmod: new Date().toISOString(),
     });
 
+    // Add Ramadan page with high priority
+    result.push({
+      loc: '/ramadan',
+      changefreq: 'weekly',
+      priority: 0.9,
+      lastmod: new Date().toISOString(),
+    });
+
     // Add authentication pages
     ['sign-in', 'sign-up'].forEach(route => {
       result.push({
@@ -58,9 +66,11 @@ module.exports = {
       priority:
         path === '/'
           ? 1.0
-          : path.includes('/sign-up') || path.includes('/sign-in')
-            ? 0.8
-            : config.priority,
+          : path === '/ramadan'
+            ? 0.9
+            : path.includes('/sign-up') || path.includes('/sign-in')
+              ? 0.8
+              : config.priority,
       lastmod: new Date().toISOString(),
     };
   },

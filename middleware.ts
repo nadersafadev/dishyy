@@ -8,6 +8,21 @@ import { NextResponse } from 'next/server';
 const isProtectedRoute = createRouteMatcher(['(app)/(.*)']);
 
 export default clerkMiddleware(async (_, req) => {
+  // Handle URL normalization (www and http redirects) only in production
+  const url = req.nextUrl;
+  const hostname = url.hostname;
+  const protocol = url.protocol;
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  // Only apply redirects in production
+  if (isProduction && (hostname === 'www.dishyy.com' || protocol === 'http:')) {
+    const canonicalUrl = new URL(
+      url.pathname + url.search,
+      'https://dishyy.com'
+    );
+    return NextResponse.redirect(canonicalUrl);
+  }
+
   // Check if the route is protected
   if (isProtectedRoute(req)) {
     // Get auth data using getAuth helper

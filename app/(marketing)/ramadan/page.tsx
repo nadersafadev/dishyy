@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata, Viewport } from 'next';
 import { Button } from '@/components/ui/button';
+import { RamadanStructuredData } from '@/components/ramadan-structured-data';
 import {
   CalendarDays,
   Users,
@@ -151,37 +152,9 @@ const traditions = [
 ];
 
 export default function RamadanPage() {
-  // Add JSON-LD structured data
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: 'تنظيم إفطارات رمضان - Dishyy',
-    description: 'نظّم إفطارات رمضان الجماعية بسهولة وفعالية مع Dishyy',
-    inLanguage: ['ar', 'en'],
-    isPartOf: {
-      '@type': 'WebSite',
-      name: 'Dishyy',
-      url: 'https://dishyy.app',
-    },
-    primaryImageOfPage: {
-      '@type': 'ImageObject',
-      contentUrl:
-        'https://res.cloudinary.com/daqvjcynu/image/upload/v1740975132/eid-celebration_dumua8.jpg',
-    },
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-    },
-  };
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <RamadanStructuredData />
       <div className="flex flex-col min-h-screen" dir="rtl">
         {/* Hero Section - Mobile Optimized */}
         <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden bg-black">
