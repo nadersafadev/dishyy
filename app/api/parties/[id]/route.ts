@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { Privacy } from '@/lib/enums';
 
 const updatePartySchema = z.object({
   name: z.string().min(1, 'Party name is required'),
@@ -10,6 +11,7 @@ const updatePartySchema = z.object({
     message: 'Invalid date',
   }),
   maxParticipants: z.number().min(1).nullable(),
+  privacy: z.nativeEnum(Privacy).optional(),
 });
 
 export async function GET(
@@ -69,20 +71,14 @@ export async function PATCH(
       where: { clerkId: userId },
     });
 
-    if (!user || user.role !== 'ADMIN') {
-      return new NextResponse('Only admins can update parties', {
-        status: 403,
-      });
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const body = await req.json();
-    const validatedData = updatePartySchema.parse(body);
-
-    // Get current party
     const party = await prisma.party.findUnique({
       where: { id: params.id },
       include: {
-        participants: true,
+        createdBy: true,
       },
     });
 
@@ -90,46 +86,63 @@ export async function PATCH(
       return NextResponse.json({ error: 'Party not found' }, { status: 404 });
     }
 
-    // If reducing max participants, check if it would exclude current participants
-    if (
-      validatedData.maxParticipants !== null &&
-      party.participants.length > 0
-    ) {
-      const totalParticipants = party.participants.reduce(
-        (sum, p) => sum + 1 + p.numGuests,
-        0
+    if (party.createdById !== user.id && user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'You are not authorized to update this party' },
+        { status: 403 }
       );
-      if (totalParticipants > validatedData.maxParticipants) {
-        return NextResponse.json(
-          {
-            error:
-              'Cannot reduce maximum participants below current participant count',
-          },
-          { status: 400 }
-        );
-      }
     }
 
-    // Update party
-    const updatedParty = await prisma.party.update({
-      where: { id: params.id },
-      data: {
+    const body = await req.json();
+    console.log('Update party request body:', body);
+
+    try {
+      const validatedData = updatePartySchema.parse(body);
+      console.log('Validated data:', validatedData);
+
+      // Create update data object, only including fields that are present
+      const updateData: any = {
         name: validatedData.name,
         description: validatedData.description || '',
         date: new Date(validatedData.date),
-        maxParticipants: validatedData.maxParticipants,
-      },
-    });
+      };
 
-    return NextResponse.json(updatedParty);
+      // Only include maxParticipants if it's provided
+      if (validatedData.maxParticipants !== undefined) {
+        updateData.maxParticipants = validatedData.maxParticipants;
+      }
+
+      // Only include privacy if it's provided
+      if (validatedData.privacy !== undefined) {
+        updateData.privacy = validatedData.privacy;
+      }
+
+      const updatedParty = await prisma.party.update({
+        where: { id: params.id },
+        data: updateData,
+        include: {
+          createdBy: true,
+          dishes: {
+            include: {
+              dish: true,
+            },
+          },
+        },
+      });
+
+      return NextResponse.json(updatedParty);
+    } catch (validationError) {
+      console.error('Validation error:', validationError);
+      if (validationError instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Invalid data', details: validationError.errors },
+          { status: 400 }
+        );
+      }
+      throw validationError;
+    }
   } catch (error) {
     console.error('Error updating party:', error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Invalid data', details: error.errors },
-        { status: 400 }
-      );
-    }
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -6,20 +6,43 @@ import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { PartyListWithViewToggle } from '@/components/party-list-with-view-toggle';
 import { generateMetadata } from '@/lib/metadata';
+import { PartyFilters, PartyWithDetails } from '@/components/parties';
+import { DataPagination } from '@/components/ui/DataPagination';
 
 export const metadata = generateMetadata(
   'Parties',
   'Browse and manage your parties'
 );
 
-export default async function PartiesPage() {
+interface PageProps {
+  searchParams: {
+    page?: string;
+    limit?: string;
+    search?: string;
+    sortBy?: 'name' | 'date' | 'createdAt' | 'participantsCount';
+    sortOrder?: 'asc' | 'desc';
+    dateFrom?: string;
+    dateTo?: string;
+  };
+}
+
+export default async function PartiesPage({ searchParams }: PageProps) {
   const { userId } = await auth();
 
   if (!userId) {
     redirect('/sign-in');
   }
 
-  const [user, parties] = await Promise.all([
+  // Parse search parameters with defaults
+  const page = Number(searchParams.page || '1');
+  const limit = Number(searchParams.limit || '10');
+  const search = searchParams.search || '';
+  const sortBy = searchParams.sortBy || 'date';
+  const sortOrder = searchParams.sortOrder || 'asc';
+  const dateFrom = searchParams.dateFrom || '';
+  const dateTo = searchParams.dateTo || '';
+
+  const [user, partiesData] = await Promise.all([
     prisma.user.findUnique({
       where: { clerkId: userId },
       select: { role: true },
@@ -42,19 +65,71 @@ export default async function PartiesPage() {
             user: true,
           },
         },
-      },
-      orderBy: {
-        date: 'asc',
-      },
-      where: {
-        date: {
-          gte: new Date(),
+        _count: {
+          select: {
+            participants: true,
+          },
         },
       },
+      where: {
+        AND: [
+          {
+            OR: [
+              { name: { contains: search, mode: 'insensitive' } },
+              { description: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+          {
+            date: {
+              gte: dateFrom ? new Date(dateFrom) : new Date(),
+              ...(dateTo && { lte: new Date(dateTo) }),
+            },
+          },
+        ],
+      },
+      orderBy: {
+        [sortBy]: sortOrder,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
     }),
   ]);
 
+  // Get total count for pagination
+  const totalCount = await prisma.party.count({
+    where: {
+      AND: [
+        {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        },
+        {
+          date: {
+            gte: dateFrom ? new Date(dateFrom) : new Date(),
+            ...(dateTo && { lte: new Date(dateTo) }),
+          },
+        },
+      ],
+    },
+  });
+
   const isAdmin = user?.role === 'ADMIN';
+  const totalPages = Math.ceil(totalCount / limit);
+
+  // Cast the parties data to the correct type
+  const parties = partiesData as unknown as PartyWithDetails[];
+
+  // Create pagination metadata
+  const pagination = {
+    page,
+    limit,
+    totalCount,
+    totalPages,
+    hasNextPage: page < totalPages,
+    hasPreviousPage: page > 1,
+  };
 
   return (
     <div className="space-y-8">
@@ -77,6 +152,15 @@ export default async function PartiesPage() {
         )}
       </div>
 
+      {/* Filters */}
+      <PartyFilters
+        search={search}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+      />
+
       <div className="card p-6">
         {parties.length === 0 ? (
           <div className="text-center">
@@ -88,11 +172,20 @@ export default async function PartiesPage() {
             )}
           </div>
         ) : (
-          <PartyListWithViewToggle
-            parties={parties}
-            title="Upcoming Dish Parties"
-            description="Browse and join upcoming dish parties in your area."
-          />
+          <>
+            <PartyListWithViewToggle
+              parties={parties}
+              title="Upcoming Dish Parties"
+              description="Browse and join upcoming dish parties in your area."
+            />
+
+            {/* Pagination */}
+            <DataPagination
+              pagination={pagination}
+              itemName="parties"
+              baseUrl="/parties"
+            />
+          </>
         )}
       </div>
     </div>

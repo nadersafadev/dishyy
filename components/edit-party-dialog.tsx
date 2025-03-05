@@ -15,8 +15,10 @@ import { Edit } from 'lucide-react';
 import { useState } from 'react';
 import { EditPartyForm } from './edit-party-form';
 import { Party, PartyDish, PartyParticipant } from '@prisma/client';
+import { Privacy } from '@/lib/enums';
 
 interface PartyWithDetails extends Party {
+  privacy: Privacy;
   dishes: (PartyDish & {
     dish: {
       name: string;
