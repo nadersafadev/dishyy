@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FilterPanel, FilterOption } from '@/components/ui/FilterPanel';
+import { FilterPanel } from '@/components/ui/filter-panel';
+import type { FilterOption } from '@/components/ui/FilterDropdown';
 
 interface CategoriesFiltersProps {
   search?: string;

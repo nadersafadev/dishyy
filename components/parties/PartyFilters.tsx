@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FilterPanel, FilterConfig } from '@/components/ui/FilterPanel';
+import { FilterPanel } from '@/components/ui/filter-panel';
+import type { FilterConfig } from '@/components/ui/filter-panel';
 import type { PartyFiltersProps } from './types';
 
 const sortOptions = [
