@@ -32,6 +32,37 @@ export const metadata: Metadata = {
         href: '/favicon.svg',
       },
     ],
+    apple: [
+      {
+        url: '/favicon.svg',
+        href: '/favicon.svg',
+      },
+    ],
+    shortcut: '/favicon.svg',
+  },
+  manifest: '/manifest.json',
+  themeColor: '#ffffff',
+  viewport: 'width=device-width, initial-scale=1',
+  robots: 'index, follow',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://dishyy.com',
+    siteName: 'Dishyy',
+    images: [
+      {
+        url: '/logo-black.png',
+        width: 800,
+        height: 600,
+        alt: 'Dishyy Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Dishyy',
+    description: 'Where Flavors Unite and Friendships Simmer',
+    images: ['/logo-black.png'],
   },
 };
 
