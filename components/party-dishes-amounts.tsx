@@ -309,20 +309,24 @@ export function PartyDishAmounts({
       ) : (
         <div className="space-y-6">
           {/* Show first category by default */}
-          {dishesByCategory.length > 0 &&
-            renderCategoryWithDishes(dishesByCategory[0])}
+          {dishesByCategory.length > 0 && (
+            <>
+              {renderCategoryWithDishes(dishesByCategory[0])}
+              {renderCategoryWithDishes(dishesByCategory[1])}
+            </>
+          )}
 
           {/* Show remaining categories when expanded */}
           {showAll && (
             <div className="space-y-6">
               {dishesByCategory
-                .slice(1)
+                .slice(2)
                 .map(category => renderCategoryWithDishes(category))}
             </div>
           )}
 
           {/* Show toggle button if there are more categories */}
-          {dishesByCategory.length > 1 && (
+          {dishesByCategory.length > 2 && (
             <Button
               variant="ghost"
               className="w-full text-muted-foreground hover:text-foreground hover:bg-transparent hover:ring-0"
@@ -330,7 +334,7 @@ export function PartyDishAmounts({
             >
               {showAll
                 ? 'Show Less'
-                : `Show ${dishesByCategory.length - 1} More Categories`}
+                : `Show ${dishesByCategory.length - 2} More Categories`}
             </Button>
           )}
         </div>
