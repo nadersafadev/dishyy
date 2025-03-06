@@ -41,8 +41,6 @@ export const metadata: Metadata = {
     shortcut: '/favicon.svg',
   },
   manifest: '/manifest.json',
-  themeColor: '#ffffff',
-  viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
@@ -64,6 +62,12 @@ export const metadata: Metadata = {
     description: 'Where Flavors Unite and Friendships Simmer',
     images: ['/logo-black.png'],
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#ffffff',
 };
 
 export default function RootLayout({
