@@ -16,6 +16,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
 
 interface PartyDishAmountsProps {
   dishes: (PartyDish & {
@@ -41,7 +42,7 @@ export function PartyDishAmounts({
   isAdmin = false,
 }: PartyDishAmountsProps) {
   const [view, setView] = useState<'grid' | 'list'>('list');
-  const [isOpen, setIsOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const params = useParams();
   const partyId = params.id as string;
 
@@ -176,7 +177,7 @@ export function PartyDishAmounts({
                   }
                 >
                   {/* Add edit controls for admin - position differently for list vs grid view */}
-                  {isAdmin && isOpen && (
+                  {isAdmin && (
                     <div
                       className={
                         view === 'grid'
@@ -286,48 +287,240 @@ export function PartyDishAmounts({
     );
   };
 
+  // Get all dishes from all categories
+  const allDishes = dishesByCategory.flatMap(category => category.dishes);
+
   return (
     <Card className="p-6 space-y-4 h-fit">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-4">
-        <div className="flex items-center justify-between">
-          <CollapsibleTrigger className="flex items-center gap-2 hover:underline">
-            <h2 className="text-lg font-medium">Amount Per Person</h2>
-            <ChevronRightIcon
-              className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-90' : ''}`}
-            />
-          </CollapsibleTrigger>
-          {isOpen && (
-            <div className="flex items-center gap-2">
-              {isAdmin && isOpen && (
-                <span className="text-xs text-muted-foreground">
-                  Tip: Click edit icon to modify amounts
-                </span>
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-medium">Amount Per Person</h2>
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <span className="text-xs text-muted-foreground">
+              Tip: Click edit icon to modify amounts
+            </span>
+          )}
+          <ViewToggle view={view} onViewChange={setView} />
+        </div>
+      </div>
+
+      {dishes.length === 0 ? (
+        <p className="text-sm text-muted-foreground py-4">
+          No dishes have been added to this party yet.
+        </p>
+      ) : (
+        <div className="space-y-6">
+          {/* Show first dish by default */}
+          {allDishes.slice(0, 1).map(partyDish => (
+            <div
+              key={partyDish.dishId}
+              className={
+                view === 'grid'
+                  ? 'flex flex-col p-3 rounded-lg border bg-card/50 hover:bg-accent/10 transition-colors relative'
+                  : 'flex items-center justify-between p-3 rounded-lg border bg-card/50 hover:bg-accent/10 transition-colors relative'
+              }
+            >
+              {isAdmin && (
+                <div
+                  className={
+                    view === 'grid'
+                      ? 'absolute top-2 right-2 z-10'
+                      : 'absolute top-1/2 right-2 -translate-y-1/2 z-10'
+                  }
+                >
+                  <UpdateDishQuantity
+                    partyId={partyId}
+                    dishId={partyDish.dishId}
+                    dishName={partyDish.dish.name}
+                    unit={partyDish.dish.unit}
+                    currentAmount={partyDish.amountPerPerson}
+                    isAdmin={isAdmin}
+                  />
+                </div>
               )}
-              <ViewToggle view={view} onViewChange={setView} />
+
+              {view === 'grid' ? (
+                <>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="relative w-10 h-10 rounded-md overflow-hidden shrink-0 bg-muted">
+                      {partyDish.dish.imageUrl ? (
+                        <Image
+                          src={partyDish.dish.imageUrl}
+                          alt={partyDish.dish.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full text-muted-foreground">
+                          <UtensilsCrossedIcon className="h-5 w-5" />
+                        </div>
+                      )}
+                    </div>
+                    <Link
+                      href={`/dishes/${partyDish.dish.id}`}
+                      className="font-medium text-sm truncate hover:underline"
+                    >
+                      {partyDish.dish.name}
+                    </Link>
+                  </div>
+                  <div className="flex items-center justify-between mt-auto">
+                    <Badge variant="outline" className="text-xs">
+                      {partyDish.dish.unit}
+                    </Badge>
+                    <span className="text-sm font-semibold">
+                      {partyDish.amountPerPerson.toFixed(1)}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-8 h-8 rounded-md overflow-hidden shrink-0 bg-muted">
+                      {partyDish.dish.imageUrl ? (
+                        <Image
+                          src={partyDish.dish.imageUrl}
+                          alt={partyDish.dish.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full text-muted-foreground">
+                          <UtensilsCrossedIcon className="h-4 w-4" />
+                        </div>
+                      )}
+                    </div>
+                    <Link
+                      href={`/dishes/${partyDish.dish.id}`}
+                      className="font-medium truncate hover:underline"
+                    >
+                      {partyDish.dish.name}
+                    </Link>
+                    <Badge variant="outline" className="shrink-0 text-xs">
+                      {partyDish.dish.unit}
+                    </Badge>
+                  </div>
+                  <span className="text-sm font-semibold whitespace-nowrap ml-2 mr-10">
+                    {partyDish.amountPerPerson.toFixed(1)}{' '}
+                    {partyDish.dish.unit.toLowerCase()}
+                  </span>
+                </>
+              )}
+            </div>
+          ))}
+
+          {/* Show toggle button if there are more than one dish */}
+          {allDishes.length > 1 && (
+            <Button
+              variant="ghost"
+              className="w-full text-muted-foreground hover:text-foreground hover:bg-transparent hover:ring-0"
+              onClick={() => setShowAll(!showAll)}
+            >
+              {showAll ? 'Show Less' : `Show ${allDishes.length - 1} More`}
+            </Button>
+          )}
+
+          {/* Show remaining dishes when expanded */}
+          {showAll && (
+            <div className="space-y-6">
+              {allDishes.slice(1).map(partyDish => (
+                <div
+                  key={partyDish.dishId}
+                  className={
+                    view === 'grid'
+                      ? 'flex flex-col p-3 rounded-lg border bg-card/50 hover:bg-accent/10 transition-colors relative'
+                      : 'flex items-center justify-between p-3 rounded-lg border bg-card/50 hover:bg-accent/10 transition-colors relative'
+                  }
+                >
+                  {isAdmin && (
+                    <div
+                      className={
+                        view === 'grid'
+                          ? 'absolute top-2 right-2 z-10'
+                          : 'absolute top-1/2 right-2 -translate-y-1/2 z-10'
+                      }
+                    >
+                      <UpdateDishQuantity
+                        partyId={partyId}
+                        dishId={partyDish.dishId}
+                        dishName={partyDish.dish.name}
+                        unit={partyDish.dish.unit}
+                        currentAmount={partyDish.amountPerPerson}
+                        isAdmin={isAdmin}
+                      />
+                    </div>
+                  )}
+
+                  {view === 'grid' ? (
+                    <>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="relative w-10 h-10 rounded-md overflow-hidden shrink-0 bg-muted">
+                          {partyDish.dish.imageUrl ? (
+                            <Image
+                              src={partyDish.dish.imageUrl}
+                              alt={partyDish.dish.name}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center w-full h-full text-muted-foreground">
+                              <UtensilsCrossedIcon className="h-5 w-5" />
+                            </div>
+                          )}
+                        </div>
+                        <Link
+                          href={`/dishes/${partyDish.dish.id}`}
+                          className="font-medium text-sm truncate hover:underline"
+                        >
+                          {partyDish.dish.name}
+                        </Link>
+                      </div>
+                      <div className="flex items-center justify-between mt-auto">
+                        <Badge variant="outline" className="text-xs">
+                          {partyDish.dish.unit}
+                        </Badge>
+                        <span className="text-sm font-semibold">
+                          {partyDish.amountPerPerson.toFixed(1)}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <div className="relative w-8 h-8 rounded-md overflow-hidden shrink-0 bg-muted">
+                          {partyDish.dish.imageUrl ? (
+                            <Image
+                              src={partyDish.dish.imageUrl}
+                              alt={partyDish.dish.name}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center w-full h-full text-muted-foreground">
+                              <UtensilsCrossedIcon className="h-4 w-4" />
+                            </div>
+                          )}
+                        </div>
+                        <Link
+                          href={`/dishes/${partyDish.dish.id}`}
+                          className="font-medium truncate hover:underline"
+                        >
+                          {partyDish.dish.name}
+                        </Link>
+                        <Badge variant="outline" className="shrink-0 text-xs">
+                          {partyDish.dish.unit}
+                        </Badge>
+                      </div>
+                      <span className="text-sm font-semibold whitespace-nowrap ml-2 mr-10">
+                        {partyDish.amountPerPerson.toFixed(1)}{' '}
+                        {partyDish.dish.unit.toLowerCase()}
+                      </span>
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>
-
-        <CollapsibleContent className="space-y-4">
-          {dishes.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">
-              No dishes have been added to this party yet.
-            </p>
-          ) : (
-            <div className="space-y-6">
-              {dishesByCategory.map(category =>
-                renderCategoryWithDishes(category)
-              )}
-            </div>
-          )}
-        </CollapsibleContent>
-      </Collapsible>
-
-      {!isOpen && dishes.length > 0 && (
-        <p className="text-sm text-muted-foreground">
-          {dishes.length} {dishes.length === 1 ? 'dish' : 'dishes'} • Click to
-          show details
-        </p>
       )}
     </Card>
   );

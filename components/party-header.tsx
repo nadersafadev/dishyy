@@ -65,19 +65,43 @@ export function PartyHeader({
   isParticipant,
 }: PartyHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 bg-card rounded-xl p-6 shadow-sm border">
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {party.name}
-          </h1>
-          <Badge variant="outline" className="flex items-center gap-1">
-            {getPrivacyIcon(party.privacy)}
-            {getPrivacyLabel(party.privacy)}
-          </Badge>
+    <div className="flex flex-col gap-4 bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold tracking-tight">
+              {party.name}
+            </h1>
+            <Badge variant="outline" className="flex items-center gap-1">
+              {getPrivacyIcon(party.privacy)}
+              {getPrivacyLabel(party.privacy)}
+            </Badge>
+          </div>
+          <p className="text-muted-foreground">{party.description}</p>
         </div>
-        <p className="text-muted-foreground">{party.description}</p>
-        <div className="flex flex-wrap gap-4 pt-2">
+        <div className="flex items-center gap-2 self-start">
+          <ShareParty
+            partyId={party.id}
+            partyName={party.name}
+            isAdmin={isAdmin}
+          />
+          {isAdmin && (
+            <>
+              <EditPartyDialog party={party as any} />
+              <DeletePartyDialog partyId={party.id} partyName={party.name} />
+            </>
+          )}
+          <PartyActions
+            partyId={party.id}
+            partyName={party.name}
+            isParticipant={isParticipant}
+            isFull={isFull}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 pt-2 border-t">
+        <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2 text-sm">
             <CalendarIcon className="h-4 w-4 text-muted-foreground" />
             <span>
@@ -107,21 +131,6 @@ export function PartyHeader({
             <span>Hosted by {party.createdBy.name}</span>
           </div>
         </div>
-      </div>
-      <div className="flex items-center gap-2 self-start mt-4 sm:mt-0">
-        <ShareParty partyId={party.id} partyName={party.name} />
-        {isAdmin && (
-          <>
-            <EditPartyDialog party={party as any} />
-            <DeletePartyDialog partyId={party.id} partyName={party.name} />
-          </>
-        )}
-        <PartyActions
-          partyId={party.id}
-          partyName={party.name}
-          isParticipant={isParticipant}
-          isFull={isFull}
-        />
       </div>
     </div>
   );

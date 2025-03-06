@@ -14,6 +14,8 @@ import { Metadata } from 'next';
 import { PartyParticipants } from '@/components/party-participants';
 import { PartyHeader } from '@/components/party-header';
 import { Unit } from '@/lib/types';
+import { InvitationForm } from '@/components/party/invitation-form';
+import { InvitationList } from '@/components/party/invitation-list';
 
 interface PartyWithDetails extends Party {
   createdBy: {
@@ -116,7 +118,7 @@ export default async function PartyPage({
     redirect('/sign-in');
   }
 
-  const isAdmin = user.role === 'ADMIN';
+  const isHost = party.createdById === user.id;
   const isParticipant = party.participants.some(p => p.userId === user.id);
   const totalParticipants = party.participants.reduce(
     (sum, p) => sum + 1 + p.numGuests,
@@ -194,7 +196,7 @@ export default async function PartyPage({
         totalParticipants={totalParticipants}
         hasMaxParticipants={hasMaxParticipants}
         isFull={isFull}
-        isAdmin={isAdmin}
+        isAdmin={isHost}
         isParticipant={isParticipant}
       />
 
@@ -203,7 +205,7 @@ export default async function PartyPage({
         {/* Left column */}
         <div className="md:col-span-5 space-y-8">
           {/* Amount Per Person Section */}
-          <PartyDishAmounts dishes={dishesWithCategories} isAdmin={isAdmin} />
+          <PartyDishAmounts dishes={dishesWithCategories} isAdmin={isHost} />
         </div>
 
         {/* Right column */}
@@ -211,10 +213,13 @@ export default async function PartyPage({
           {/* Participants Section */}
           <PartyParticipants
             participants={participantsWithContributions}
-            isAdmin={isAdmin}
+            isAdmin={isHost}
             partyId={party.id}
             currentUserId={user.id}
           />
+
+          {/* Invitation List - Only show for host */}
+          {isHost && <InvitationList partyId={party.id} />}
         </div>
       </div>
 
@@ -224,7 +229,7 @@ export default async function PartyPage({
         participants={participantsWithContributions}
         isParticipant={isParticipant}
         totalParticipants={totalParticipants}
-        isAdmin={isAdmin}
+        isAdmin={isHost}
         currentUserId={user.id}
       />
     </div>

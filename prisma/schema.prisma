@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id        String             @id @default(cuid())
-  clerkId   String             @unique
-  name      String
-  email     String             @unique
-  role      Role               @default(INDIVIDUAL)
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
-  parties   Party[]            @relation("CreatedParties")
-  attending PartyParticipant[]
+  id            String             @id @default(cuid())
+  clerkId       String             @unique
+  name          String
+  email         String             @unique
+  role          Role               @default(INDIVIDUAL)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  parties       Party[]            @relation("CreatedParties")
+  attending     PartyParticipant[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -35,6 +36,7 @@ model Party {
   createdBy       User               @relation("CreatedParties", fields: [createdById], references: [id])
   dishes          PartyDish[]
   participants    PartyParticipant[]
+  invitations     PartyInvitation[]
 
   @@map("parties")
 }
@@ -117,6 +119,33 @@ model ParticipantDishContribution {
 
   @@unique([participantId, dishId])
   @@map("participant_dish_contributions")
+}
+
+model PartyInvitation {
+  id            String   @id @default(cuid())
+  partyId       String
+  token         String   @unique
+  maxUses       Int      @default(1)
+  currentUses   Int      @default(0)
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  party         Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@map("party_invitations")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  data      Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
 
 enum Role {
