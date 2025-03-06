@@ -221,8 +221,9 @@ export function PartyDishAmounts({
                           {partyDish.dish.unit}
                         </Badge>
                         <span className="text-sm font-semibold">
-                          {partyDish.dish.unit === 'QUANTITY'
-                            ? partyDish.amountPerPerson
+                          {partyDish.dish.unit === 'QUANTITY' ||
+                          partyDish.dish.unit === 'PIECES'
+                            ? Math.ceil(partyDish.amountPerPerson)
                             : partyDish.amountPerPerson.toFixed(2)}
                         </span>
                       </div>
@@ -256,10 +257,12 @@ export function PartyDishAmounts({
                         </Badge>
                       </div>
                       <span className="text-sm font-semibold whitespace-nowrap ml-2 mr-10">
-                        {partyDish.dish.unit === 'QUANTITY'
-                          ? partyDish.amountPerPerson
+                        {partyDish.dish.unit === 'QUANTITY' ||
+                        partyDish.dish.unit === 'PIECES'
+                          ? Math.ceil(partyDish.amountPerPerson)
                           : partyDish.amountPerPerson.toFixed(2)}{' '}
-                        {partyDish.dish.unit === 'QUANTITY'
+                        {partyDish.dish.unit === 'QUANTITY' ||
+                        partyDish.dish.unit === 'PIECES'
                           ? 'pcs'
                           : partyDish.dish.unit.toLowerCase()}
                       </span>
