@@ -1,22 +1,17 @@
 'use client';
 
-import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ViewToggle } from '@/components/ui/view-toggle';
+import { UpdateDishQuantity } from '@/components/update-dish-quantity';
+import { Unit } from '@/lib/types';
 import { PartyDish } from '@prisma/client';
+import { UtensilsCrossedIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { UtensilsCrossedIcon, ChevronRightIcon } from 'lucide-react';
-import { UpdateDishQuantity } from '@/components/update-dish-quantity';
 import { useParams } from 'next/navigation';
-import { Unit } from '@/lib/types';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { Button } from '@/components/ui/button';
+import { useMemo, useState } from 'react';
 
 interface PartyDishAmountsProps {
   dishes: (PartyDish & {
@@ -226,7 +221,9 @@ export function PartyDishAmounts({
                           {partyDish.dish.unit}
                         </Badge>
                         <span className="text-sm font-semibold">
-                          {partyDish.amountPerPerson.toFixed(1)}
+                          {partyDish.dish.unit === 'QUANTITY'
+                            ? partyDish.amountPerPerson
+                            : partyDish.amountPerPerson.toFixed(2)}
                         </span>
                       </div>
                     </>
@@ -259,8 +256,12 @@ export function PartyDishAmounts({
                         </Badge>
                       </div>
                       <span className="text-sm font-semibold whitespace-nowrap ml-2 mr-10">
-                        {partyDish.amountPerPerson.toFixed(1)}{' '}
-                        {partyDish.dish.unit.toLowerCase()}
+                        {partyDish.dish.unit === 'QUANTITY'
+                          ? partyDish.amountPerPerson
+                          : partyDish.amountPerPerson.toFixed(2)}{' '}
+                        {partyDish.dish.unit === 'QUANTITY'
+                          ? 'pcs'
+                          : partyDish.dish.unit.toLowerCase()}
                       </span>
                     </>
                   )}
@@ -287,9 +288,6 @@ export function PartyDishAmounts({
     );
   };
 
-  // Get all dishes from all categories
-  const allDishes = dishesByCategory.flatMap(category => category.dishes);
-
   return (
     <Card className="p-6 space-y-4 h-fit">
       <div className="flex items-center justify-between">
@@ -310,215 +308,30 @@ export function PartyDishAmounts({
         </p>
       ) : (
         <div className="space-y-6">
-          {/* Show first dish by default */}
-          {allDishes.slice(0, 1).map(partyDish => (
-            <div
-              key={partyDish.dishId}
-              className={
-                view === 'grid'
-                  ? 'flex flex-col p-3 rounded-lg border bg-card/50 hover:bg-accent/10 transition-colors relative'
-                  : 'flex items-center justify-between p-3 rounded-lg border bg-card/50 hover:bg-accent/10 transition-colors relative'
-              }
-            >
-              {isAdmin && (
-                <div
-                  className={
-                    view === 'grid'
-                      ? 'absolute top-2 right-2 z-10'
-                      : 'absolute top-1/2 right-2 -translate-y-1/2 z-10'
-                  }
-                >
-                  <UpdateDishQuantity
-                    partyId={partyId}
-                    dishId={partyDish.dishId}
-                    dishName={partyDish.dish.name}
-                    unit={partyDish.dish.unit}
-                    currentAmount={partyDish.amountPerPerson}
-                    isAdmin={isAdmin}
-                  />
-                </div>
-              )}
+          {/* Show first category by default */}
+          {dishesByCategory.length > 0 &&
+            renderCategoryWithDishes(dishesByCategory[0])}
 
-              {view === 'grid' ? (
-                <>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="relative w-10 h-10 rounded-md overflow-hidden shrink-0 bg-muted">
-                      {partyDish.dish.imageUrl ? (
-                        <Image
-                          src={partyDish.dish.imageUrl}
-                          alt={partyDish.dish.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center w-full h-full text-muted-foreground">
-                          <UtensilsCrossedIcon className="h-5 w-5" />
-                        </div>
-                      )}
-                    </div>
-                    <Link
-                      href={`/dishes/${partyDish.dish.id}`}
-                      className="font-medium text-sm truncate hover:underline"
-                    >
-                      {partyDish.dish.name}
-                    </Link>
-                  </div>
-                  <div className="flex items-center justify-between mt-auto">
-                    <Badge variant="outline" className="text-xs">
-                      {partyDish.dish.unit}
-                    </Badge>
-                    <span className="text-sm font-semibold">
-                      {partyDish.amountPerPerson.toFixed(1)}
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2">
-                    <div className="relative w-8 h-8 rounded-md overflow-hidden shrink-0 bg-muted">
-                      {partyDish.dish.imageUrl ? (
-                        <Image
-                          src={partyDish.dish.imageUrl}
-                          alt={partyDish.dish.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center w-full h-full text-muted-foreground">
-                          <UtensilsCrossedIcon className="h-4 w-4" />
-                        </div>
-                      )}
-                    </div>
-                    <Link
-                      href={`/dishes/${partyDish.dish.id}`}
-                      className="font-medium truncate hover:underline"
-                    >
-                      {partyDish.dish.name}
-                    </Link>
-                    <Badge variant="outline" className="shrink-0 text-xs">
-                      {partyDish.dish.unit}
-                    </Badge>
-                  </div>
-                  <span className="text-sm font-semibold whitespace-nowrap ml-2 mr-10">
-                    {partyDish.amountPerPerson.toFixed(1)}{' '}
-                    {partyDish.dish.unit.toLowerCase()}
-                  </span>
-                </>
-              )}
+          {/* Show remaining categories when expanded */}
+          {showAll && (
+            <div className="space-y-6">
+              {dishesByCategory
+                .slice(1)
+                .map(category => renderCategoryWithDishes(category))}
             </div>
-          ))}
+          )}
 
-          {/* Show toggle button if there are more than one dish */}
-          {allDishes.length > 1 && (
+          {/* Show toggle button if there are more categories */}
+          {dishesByCategory.length > 1 && (
             <Button
               variant="ghost"
               className="w-full text-muted-foreground hover:text-foreground hover:bg-transparent hover:ring-0"
               onClick={() => setShowAll(!showAll)}
             >
-              {showAll ? 'Show Less' : `Show ${allDishes.length - 1} More`}
+              {showAll
+                ? 'Show Less'
+                : `Show ${dishesByCategory.length - 1} More Categories`}
             </Button>
-          )}
-
-          {/* Show remaining dishes when expanded */}
-          {showAll && (
-            <div className="space-y-6">
-              {allDishes.slice(1).map(partyDish => (
-                <div
-                  key={partyDish.dishId}
-                  className={
-                    view === 'grid'
-                      ? 'flex flex-col p-3 rounded-lg border bg-card/50 hover:bg-accent/10 transition-colors relative'
-                      : 'flex items-center justify-between p-3 rounded-lg border bg-card/50 hover:bg-accent/10 transition-colors relative'
-                  }
-                >
-                  {isAdmin && (
-                    <div
-                      className={
-                        view === 'grid'
-                          ? 'absolute top-2 right-2 z-10'
-                          : 'absolute top-1/2 right-2 -translate-y-1/2 z-10'
-                      }
-                    >
-                      <UpdateDishQuantity
-                        partyId={partyId}
-                        dishId={partyDish.dishId}
-                        dishName={partyDish.dish.name}
-                        unit={partyDish.dish.unit}
-                        currentAmount={partyDish.amountPerPerson}
-                        isAdmin={isAdmin}
-                      />
-                    </div>
-                  )}
-
-                  {view === 'grid' ? (
-                    <>
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="relative w-10 h-10 rounded-md overflow-hidden shrink-0 bg-muted">
-                          {partyDish.dish.imageUrl ? (
-                            <Image
-                              src={partyDish.dish.imageUrl}
-                              alt={partyDish.dish.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="flex items-center justify-center w-full h-full text-muted-foreground">
-                              <UtensilsCrossedIcon className="h-5 w-5" />
-                            </div>
-                          )}
-                        </div>
-                        <Link
-                          href={`/dishes/${partyDish.dish.id}`}
-                          className="font-medium text-sm truncate hover:underline"
-                        >
-                          {partyDish.dish.name}
-                        </Link>
-                      </div>
-                      <div className="flex items-center justify-between mt-auto">
-                        <Badge variant="outline" className="text-xs">
-                          {partyDish.dish.unit}
-                        </Badge>
-                        <span className="text-sm font-semibold">
-                          {partyDish.amountPerPerson.toFixed(1)}
-                        </span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <div className="relative w-8 h-8 rounded-md overflow-hidden shrink-0 bg-muted">
-                          {partyDish.dish.imageUrl ? (
-                            <Image
-                              src={partyDish.dish.imageUrl}
-                              alt={partyDish.dish.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="flex items-center justify-center w-full h-full text-muted-foreground">
-                              <UtensilsCrossedIcon className="h-4 w-4" />
-                            </div>
-                          )}
-                        </div>
-                        <Link
-                          href={`/dishes/${partyDish.dish.id}`}
-                          className="font-medium truncate hover:underline"
-                        >
-                          {partyDish.dish.name}
-                        </Link>
-                        <Badge variant="outline" className="shrink-0 text-xs">
-                          {partyDish.dish.unit}
-                        </Badge>
-                      </div>
-                      <span className="text-sm font-semibold whitespace-nowrap ml-2 mr-10">
-                        {partyDish.amountPerPerson.toFixed(1)}{' '}
-                        {partyDish.dish.unit.toLowerCase()}
-                      </span>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
           )}
         </div>
       )}
