@@ -125,6 +125,7 @@ model PartyInvitation {
   id            String   @id @default(cuid())
   partyId       String
   token         String   @unique
+  name          String?
   maxUses       Int      @default(1)
   currentUses   Int      @default(0)
   expiresAt     DateTime?

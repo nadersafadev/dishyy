@@ -13,8 +13,25 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
-import { Copy, Check, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Copy,
+  Check,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 import { format } from 'date-fns';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { DeleteEntityDialog } from '@/components/ui/delete-entity-dialog';
+import { EditInvitationForm } from '@/components/party/edit-invitation-form';
 
 interface Invitation {
   id: string;
@@ -23,6 +40,7 @@ interface Invitation {
   currentUses: number;
   expiresAt: string | null;
   createdAt: string;
+  name: string | null;
 }
 
 interface InvitationListProps {
@@ -34,6 +52,11 @@ export function InvitationList({ partyId }: InvitationListProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [editingInvitation, setEditingInvitation] = useState<Invitation | null>(
+    null
+  );
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -77,6 +100,24 @@ export function InvitationList({ partyId }: InvitationListProps) {
         variant: 'destructive',
       });
     }
+  }
+
+  async function handleEditSuccess() {
+    toast({
+      title: 'Success',
+      description: 'Invitation updated successfully!',
+    });
+    setIsEditing(false);
+    setEditingInvitation(null);
+    fetchInvitations();
+  }
+
+  async function handleEditError() {
+    toast({
+      title: 'Error',
+      description: 'Failed to update invitation',
+      variant: 'destructive',
+    });
   }
 
   if (isLoading) {
@@ -137,7 +178,8 @@ export function InvitationList({ partyId }: InvitationListProps) {
             {displayedInvitations.map(invitation => (
               <TableRow key={invitation.id}>
                 <TableCell>
-                  {format(new Date(invitation.createdAt), 'PPP')}
+                  {invitation.name ||
+                    format(new Date(invitation.createdAt), 'PPP')}
                 </TableCell>
                 <TableCell>
                   <span className="font-medium">{invitation.currentUses}</span>
@@ -151,7 +193,69 @@ export function InvitationList({ partyId }: InvitationListProps) {
                     ? format(new Date(invitation.expiresAt), 'PPP')
                     : 'Never'}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right space-x-2">
+                  <Dialog
+                    open={isEditing && editingInvitation?.id === invitation.id}
+                    onOpenChange={setIsEditing}
+                  >
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setEditingInvitation(invitation);
+                          setIsSaving(false);
+                        }}
+                        className="hover:bg-transparent hover:ring-0 hover:text-green-600"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Invitation</DialogTitle>
+                      </DialogHeader>
+                      {editingInvitation && (
+                        <EditInvitationForm
+                          invitation={editingInvitation}
+                          partyId={partyId}
+                          onSuccess={handleEditSuccess}
+                          onCancel={() => setIsEditing(false)}
+                          isSaving={isSaving}
+                        />
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                  <DeleteEntityDialog
+                    entityId={invitation.id}
+                    entityName={`Invitation ${invitation.name ? `"${invitation.name}"` : `created on ${format(new Date(invitation.createdAt), 'PPP')}`}`}
+                    entityType="Invitation"
+                    deleteEndpoint={`/api/parties/${partyId}/invitations/${invitation.id}`}
+                    warnings={[
+                      {
+                        type: 'warning',
+                        title: 'Active Invitation',
+                        message:
+                          'This invitation may still be active. Deleting it will prevent any new participants from using it.',
+                      },
+                    ]}
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-transparent hover:ring-0 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    }
+                    onSuccess={() => {
+                      toast({
+                        title: 'Success',
+                        description: 'Invitation deleted successfully!',
+                      });
+                      fetchInvitations();
+                    }}
+                  />
                   <Button
                     variant="ghost"
                     size="icon"
@@ -181,21 +285,88 @@ export function InvitationList({ partyId }: InvitationListProps) {
                   <div className="space-y-1">
                     <p className="text-sm font-medium">Created</p>
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(invitation.createdAt), 'PPP')}
+                      {invitation.name ||
+                        format(new Date(invitation.createdAt), 'PPP')}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => copyInvitationLink(invitation.token)}
-                    className="hover:bg-transparent hover:ring-0"
-                  >
-                    {copiedToken === invitation.token ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <div className="flex items-center space-x-2">
+                    <Dialog
+                      open={
+                        isEditing && editingInvitation?.id === invitation.id
+                      }
+                      onOpenChange={setIsEditing}
+                    >
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setEditingInvitation(invitation);
+                            setIsSaving(false);
+                          }}
+                          className="hover:bg-transparent hover:ring-0 hover:text-green-600"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Invitation</DialogTitle>
+                        </DialogHeader>
+                        {editingInvitation && (
+                          <EditInvitationForm
+                            invitation={editingInvitation}
+                            partyId={partyId}
+                            onSuccess={handleEditSuccess}
+                            onCancel={() => setIsEditing(false)}
+                            isSaving={isSaving}
+                          />
+                        )}
+                      </DialogContent>
+                    </Dialog>
+                    <DeleteEntityDialog
+                      entityId={invitation.id}
+                      entityName={`Invitation ${invitation.name ? `"${invitation.name}"` : `created on ${format(new Date(invitation.createdAt), 'PPP')}`}`}
+                      entityType="Invitation"
+                      deleteEndpoint={`/api/parties/${partyId}/invitations/${invitation.id}`}
+                      warnings={[
+                        {
+                          type: 'warning',
+                          title: 'Active Invitation',
+                          message:
+                            'This invitation may still be active. Deleting it will prevent any new participants from using it.',
+                        },
+                      ]}
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="hover:bg-transparent hover:ring-0 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      }
+                      onSuccess={() => {
+                        toast({
+                          title: 'Success',
+                          description: 'Invitation deleted successfully!',
+                        });
+                        fetchInvitations();
+                      }}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => copyInvitationLink(invitation.token)}
+                      className="hover:bg-transparent hover:ring-0"
+                    >
+                      {copiedToken === invitation.token ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-medium">Uses</p>

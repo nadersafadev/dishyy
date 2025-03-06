@@ -8,10 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { FormNumberField } from '@/components/forms/form-number-field';
 import { FormDateField } from '@/components/forms/form-date-field';
+import { FormTextField } from '@/components/forms/form-text-field';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { Loader2, Check, Copy, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 const formSchema = z.object({
   maxUses: z.number().min(1, 'Maximum uses must be at least 1'),
@@ -22,6 +25,7 @@ const formSchema = z.object({
       if (!val) return true; // Allow empty for optional field
       return val > new Date();
     }, 'Expiration date must be in the future'),
+  name: z.string().optional(),
 });
 
 interface InvitationFormProps {
@@ -42,6 +46,7 @@ export function InvitationForm({ partyId, onSuccess }: InvitationFormProps) {
     defaultValues: {
       maxUses: 1,
       expiresAt: undefined,
+      name: undefined,
     },
   });
 
@@ -53,6 +58,7 @@ export function InvitationForm({ partyId, onSuccess }: InvitationFormProps) {
       const submissionData = {
         maxUses: values.maxUses,
         expiresAt: values.expiresAt?.toISOString() || null,
+        name: values.name || null,
       };
 
       const response = await fetch(`/api/parties/${partyId}/invitations`, {
@@ -160,6 +166,12 @@ export function InvitationForm({ partyId, onSuccess }: InvitationFormProps) {
             <Users className="h-4 w-4" />
             <p className="text-sm">Configure your invitation link</p>
           </div>
+          <FormTextField
+            name="name"
+            label="Name"
+            placeholder="Enter invitation name"
+            optional
+          />
           <FormNumberField
             name="maxUses"
             label="Maximum Uses"
