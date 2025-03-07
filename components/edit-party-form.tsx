@@ -19,7 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Party, PartyDish, PartyParticipant, Dish } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Globe, Lock, Users } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -63,6 +63,30 @@ interface EditPartyFormProps {
   party: PartyWithDetails;
   onClose: () => void;
 }
+
+const privacyOptions = [
+  {
+    value: Privacy.PUBLIC,
+    label: 'Public',
+    description: 'Anyone can view and join the party',
+    icon: Globe,
+    variant: 'default' as const,
+  },
+  {
+    value: Privacy.CLOSED,
+    label: 'Closed',
+    description: 'Anyone can view, but joining requires approval',
+    icon: Users,
+    variant: 'secondary' as const,
+  },
+  {
+    value: Privacy.PRIVATE,
+    label: 'Private',
+    description: 'Limited visibility, invitation only',
+    icon: Lock,
+    variant: 'outline' as const,
+  },
+];
 
 export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
   const router = useRouter();
@@ -294,22 +318,37 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
           <RadioGroup
             defaultValue={party.privacy}
             onValueChange={value => form.setValue('privacy', value as Privacy)}
-            className="flex flex-col space-y-1"
+            className="flex flex-col space-y-2"
           >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value={Privacy.PUBLIC} id="public" />
-              <Label htmlFor="public">Public - Anyone can view and join</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value={Privacy.PRIVATE} id="private" />
-              <Label htmlFor="private">
-                Private - Only invited users can join
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value={Privacy.CLOSED} id="closed" />
-              <Label htmlFor="closed">Closed - No one can join</Label>
-            </div>
+            {privacyOptions.map(option => (
+              <div
+                key={option.value}
+                className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-accent/50 cursor-pointer group"
+                onClick={() =>
+                  form.setValue('privacy', option.value as Privacy)
+                }
+              >
+                <RadioGroupItem
+                  value={option.value}
+                  id={option.value}
+                  className="mt-0"
+                />
+                <div className="flex items-center gap-3">
+                  <option.icon className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
+                  <div className="flex flex-col gap-1">
+                    <Label
+                      htmlFor={option.value}
+                      className="font-medium cursor-pointer group-hover:text-accent-foreground"
+                    >
+                      {option.label}
+                    </Label>
+                    <span className="text-xs text-muted-foreground group-hover:text-accent-foreground/70">
+                      {option.description}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </RadioGroup>
         </div>
 

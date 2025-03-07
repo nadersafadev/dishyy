@@ -15,6 +15,8 @@ import {
 import { Input } from '@/components/forms/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { RestrictedContent } from '@/components/party/privacy/RestrictedContent';
+import { Card } from '@/components/ui/card';
 
 interface PartyParticipantsProps {
   participants: (PartyParticipant & {
@@ -25,6 +27,7 @@ interface PartyParticipantsProps {
   isAdmin: boolean;
   partyId: string;
   currentUserId?: string;
+  participantIds: string[];
 }
 
 export function PartyParticipants({
@@ -32,6 +35,7 @@ export function PartyParticipants({
   isAdmin,
   partyId,
   currentUserId,
+  participantIds,
 }: PartyParticipantsProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -126,133 +130,134 @@ export function PartyParticipants({
   };
 
   return (
-    <div className="card p-6 space-y-4 shadow-sm border">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">Participants</h2>
-        <span className="text-sm text-muted-foreground">
-          {participants.length} total
-        </span>
-      </div>
-      <div className="space-y-3">
-        {participants.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No participants yet. Be the first to join!
-          </p>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 gap-3">
-              {visibleParticipants.map(participant => {
-                const isCurrentUser = participant.userId === currentUserId;
-                return (
-                  <div
-                    key={participant.id}
-                    className={`flex items-center justify-between gap-4 rounded-lg ${
-                      isCurrentUser
-                        ? 'bg-primary/10 border border-primary/20 p-4'
-                        : 'bg-muted/50 py-2 px-3'
-                    }`}
-                  >
-                    <span
-                      className={`font-medium ${
-                        isCurrentUser ? 'text-base' : 'text-sm'
+    <RestrictedContent
+      partyId={partyId}
+      accessCheck="canViewParticipants"
+      userId={currentUserId}
+    >
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-medium">Participants</h2>
+          <span className="text-sm text-muted-foreground">
+            {participants.length} total
+          </span>
+        </div>
+        <div className="space-y-3">
+          {participants.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No participants yet. Be the first to join!
+            </p>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-3">
+                {visibleParticipants.map(participant => {
+                  const isCurrentUser = participant.userId === currentUserId;
+                  return (
+                    <div
+                      key={participant.id}
+                      className={`flex items-center justify-between gap-4 p-3 rounded-lg border ${
+                        isCurrentUser
+                          ? 'bg-primary/5 border-primary/20'
+                          : 'bg-card'
                       }`}
                     >
-                      {isCurrentUser ? 'You' : participant.user.name}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      {isCurrentUser && editingGuests ? (
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            min="0"
-                            value={numGuests?.toString() || '0'}
-                            onChange={e =>
-                              setNumGuests(parseInt(e.target.value, 10) || 0)
-                            }
-                            className="w-16 h-8"
-                          />
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={handleUpdateGuests}
-                            disabled={isUpdating}
-                            title="Save"
-                          >
-                            <SaveIcon className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={handleCancelEdit}
-                            title="Cancel"
-                            className="hover:bg-destructive hover:text-white transition-colors"
-                          >
-                            <XIcon className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <>
-                          {participant.numGuests > 0 && (
-                            <Badge
-                              variant="secondary"
-                              className={isCurrentUser ? '' : 'text-xs'}
-                            >
-                              +{participant.numGuests} guest
-                              {participant.numGuests !== 1 && 's'}
-                            </Badge>
-                          )}
-                          {isCurrentUser && (
+                      <span className="font-medium">
+                        {isCurrentUser ? 'You' : participant.user.name}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {isCurrentUser && editingGuests ? (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              min="0"
+                              value={numGuests?.toString() || '0'}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                              ) => {
+                                setNumGuests(parseInt(e.target.value, 10) || 0);
+                              }}
+                              className="w-16 h-8"
+                            />
                             <Button
                               size="icon"
                               variant="ghost"
-                              onClick={() => setEditingGuests(true)}
-                              title="Edit guests"
+                              onClick={handleUpdateGuests}
+                              disabled={isUpdating}
+                              title="Save"
                             >
-                              <PencilIcon className="h-4 w-4" />
+                              <SaveIcon className="h-4 w-4" />
                             </Button>
-                          )}
-                        </>
-                      )}
-                      {isAdmin && !isCurrentUser && (
-                        <RemoveParticipantButton
-                          partyId={partyId}
-                          participantId={participant.id}
-                          participantName={participant.user.name}
-                        />
-                      )}
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={handleCancelEdit}
+                              title="Cancel"
+                              className="hover:bg-destructive hover:text-white transition-colors"
+                            >
+                              <XIcon className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            {participant.numGuests > 0 && (
+                              <Badge variant="secondary">
+                                +{participant.numGuests} guest
+                                {participant.numGuests !== 1 && 's'}
+                              </Badge>
+                            )}
+                            {isCurrentUser && (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => setEditingGuests(true)}
+                                title="Edit guests"
+                              >
+                                <PencilIcon className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </>
+                        )}
+                        {isAdmin && !isCurrentUser && (
+                          <RemoveParticipantButton
+                            partyId={partyId}
+                            participantId={participant.id}
+                            participantName={participant.user.name}
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
 
-            {hasMoreParticipants && (
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-center gap-2"
-                onClick={() => setShowAllParticipants(!showAllParticipants)}
-              >
-                {showAllParticipants ? (
-                  <>
-                    Show Less
-                    <ChevronUpIcon className="h-4 w-4" />
-                  </>
-                ) : (
-                  <>
-                    Show All Participants
-                    {remainingParticipants > 0 && (
-                      <Badge variant="secondary" className="ml-2">
-                        +{remainingParticipants}
-                      </Badge>
-                    )}
-                    <ChevronDownIcon className="h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+              {hasMoreParticipants && (
+                <Button
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-2"
+                  onClick={() => setShowAllParticipants(!showAllParticipants)}
+                >
+                  {showAllParticipants ? (
+                    <>
+                      Show Less
+                      <ChevronUpIcon className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      Show All Participants
+                      {remainingParticipants > 0 && (
+                        <Badge variant="secondary" className="ml-2">
+                          +{remainingParticipants}
+                        </Badge>
+                      )}
+                      <ChevronDownIcon className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              )}
+            </>
+          )}
+        </div>
+      </Card>
+    </RestrictedContent>
   );
 }

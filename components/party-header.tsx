@@ -1,19 +1,17 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import {
-  CalendarIcon,
-  MapPinIcon,
-  UsersIcon,
-  LockIcon,
-  GlobeIcon,
-  UserIcon,
-} from 'lucide-react';
+import { CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
 import { PartyActions } from '@/components/party-actions';
 import { EditPartyDialog } from '@/components/edit-party-dialog';
 import { ShareParty } from '@/components/share-party';
 import { DeletePartyDialog } from '@/components/delete-party-dialog';
 import { Party, Privacy } from '@prisma/client';
+import { PrivacySelector } from '@/components/party/privacy/PrivacySelector';
+import { JoinRequestList } from '@/components/party/privacy/JoinRequestList';
+import { usePartyPrivacyStore } from '@/store/partyPrivacyStore';
+import { PartyPrivacyStatus, JoinRequest } from '@/lib/types/party';
+import { useEffect } from 'react';
 
 interface PartyHeaderProps {
   party: {
@@ -32,27 +30,19 @@ interface PartyHeaderProps {
   isFull: boolean;
   isAdmin: boolean;
   isParticipant: boolean;
+  joinRequests: JoinRequest[];
+  userId: string;
 }
 
-const getPrivacyIcon = (privacy: Privacy) => {
+// Map Prisma Privacy enum to our PartyPrivacyStatus
+const mapPrivacyStatus = (privacy: Privacy): PartyPrivacyStatus => {
   switch (privacy) {
     case Privacy.PRIVATE:
-      return <LockIcon className="h-4 w-4" />;
+      return PartyPrivacyStatus.PRIVATE;
     case Privacy.CLOSED:
-      return <UserIcon className="h-4 w-4" />;
+      return PartyPrivacyStatus.CLOSED;
     default:
-      return <GlobeIcon className="h-4 w-4" />;
-  }
-};
-
-const getPrivacyLabel = (privacy: Privacy) => {
-  switch (privacy) {
-    case Privacy.PRIVATE:
-      return 'Private';
-    case Privacy.CLOSED:
-      return 'Closed';
-    default:
-      return 'Public';
+      return PartyPrivacyStatus.PUBLIC;
   }
 };
 
@@ -63,7 +53,44 @@ export function PartyHeader({
   isFull,
   isAdmin,
   isParticipant,
+  joinRequests,
+  userId,
 }: PartyHeaderProps) {
+  const privacyStatus = mapPrivacyStatus(party.privacy);
+  const {
+    initializeJoinRequests,
+    setPartyParticipants,
+    setPartyPrivacy,
+    setPartyAdmin,
+  } = usePartyPrivacyStore();
+
+  // Initialize privacy settings and join requests
+  useEffect(() => {
+    setPartyPrivacy(party.id, privacyStatus);
+    initializeJoinRequests(party.id, joinRequests);
+  }, [
+    party.id,
+    privacyStatus,
+    joinRequests,
+    initializeJoinRequests,
+    setPartyPrivacy,
+  ]);
+
+  // Initialize participants and admin in the privacy store
+  useEffect(() => {
+    setPartyParticipants(party.id, isParticipant ? [userId] : []);
+    if (isAdmin) {
+      setPartyAdmin(party.id, userId);
+    }
+  }, [
+    party.id,
+    isParticipant,
+    isAdmin,
+    userId,
+    setPartyParticipants,
+    setPartyAdmin,
+  ]);
+
   return (
     <div className="flex flex-col gap-4 bg-card rounded-xl p-4 sm:p-6 shadow-sm border">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -72,10 +99,11 @@ export function PartyHeader({
             <h1 className="text-2xl font-semibold tracking-tight">
               {party.name}
             </h1>
-            <Badge variant="outline" className="flex items-center gap-1">
-              {getPrivacyIcon(party.privacy)}
-              {getPrivacyLabel(party.privacy)}
-            </Badge>
+            <PrivacySelector
+              partyId={party.id}
+              currentStatus={privacyStatus}
+              isHost={isAdmin}
+            />
           </div>
           <p className="text-muted-foreground">{party.description}</p>
         </div>
@@ -84,6 +112,7 @@ export function PartyHeader({
             partyId={party.id}
             partyName={party.name}
             isAdmin={isAdmin}
+            isParticipant={isParticipant}
           />
           {isAdmin && (
             <>
@@ -96,6 +125,9 @@ export function PartyHeader({
             partyName={party.name}
             isParticipant={isParticipant}
             isFull={isFull}
+            isAdmin={isAdmin}
+            maxParticipants={party.maxParticipants}
+            currentParticipants={totalParticipants}
           />
         </div>
       </div>
@@ -132,6 +164,13 @@ export function PartyHeader({
           </div>
         </div>
       </div>
+
+      {/* Show join requests for non-public parties and admins */}
+      {party.privacy !== Privacy.PUBLIC && isAdmin && (
+        <div className="mt-4">
+          <JoinRequestList partyId={party.id} isHost={isAdmin} />
+        </div>
+      )}
     </div>
   );
 }

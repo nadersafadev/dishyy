@@ -12,34 +12,39 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { RestrictedContent } from '@/components/party/privacy/RestrictedContent';
 
 interface PartyDishAmountsProps {
   dishes: (PartyDish & {
     dish: {
-      id: string;
       name: string;
       unit: Unit;
       description: string | null;
       imageUrl: string | null;
       categoryId: string;
       category?: {
-        id: string;
         name: string;
+        id: string;
         parentId: string | null;
       };
     };
   })[];
-  isAdmin?: boolean;
+  isAdmin: boolean;
+  userId: string;
+  partyId: string;
+  participantIds: string[];
 }
 
 export function PartyDishAmounts({
   dishes,
-  isAdmin = false,
+  isAdmin,
+  userId,
+  partyId,
+  participantIds,
 }: PartyDishAmountsProps) {
   const [view, setView] = useState<'grid' | 'list'>('list');
   const [showAll, setShowAll] = useState(false);
   const params = useParams();
-  const partyId = params.id as string;
 
   // Group dishes by category in a hierarchical structure
   const dishesByCategory = useMemo(() => {
@@ -292,56 +297,20 @@ export function PartyDishAmounts({
   };
 
   return (
-    <Card className="p-6 space-y-4 h-fit">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">Amount Per Person</h2>
-        <div className="flex items-center gap-2">
-          {isAdmin && (
-            <span className="text-xs text-muted-foreground">
-              Tip: Click edit icon to modify amounts
-            </span>
-          )}
+    <RestrictedContent
+      partyId={partyId}
+      accessCheck="canViewDishes"
+      userId={userId}
+    >
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-medium">Dishes</h2>
           <ViewToggle view={view} onViewChange={setView} />
         </div>
-      </div>
-
-      {dishes.length === 0 ? (
-        <p className="text-sm text-muted-foreground py-4">
-          No dishes have been added to this party yet.
-        </p>
-      ) : (
         <div className="space-y-6">
-          {/* Show first category by default */}
-          {dishesByCategory.length > 0 && (
-            <>
-              {renderCategoryWithDishes(dishesByCategory[0])}
-              {renderCategoryWithDishes(dishesByCategory[1])}
-            </>
-          )}
-
-          {/* Show remaining categories when expanded */}
-          {showAll && (
-            <div className="space-y-6">
-              {dishesByCategory
-                .slice(2)
-                .map(category => renderCategoryWithDishes(category))}
-            </div>
-          )}
-
-          {/* Show toggle button if there are more categories */}
-          {dishesByCategory.length > 2 && (
-            <Button
-              variant="ghost"
-              className="w-full text-muted-foreground hover:text-foreground hover:bg-transparent hover:ring-0"
-              onClick={() => setShowAll(!showAll)}
-            >
-              {showAll
-                ? 'Show Less'
-                : `Show ${dishesByCategory.length - 2} More Categories`}
-            </Button>
-          )}
+          {dishesByCategory.map(category => renderCategoryWithDishes(category))}
         </div>
-      )}
-    </Card>
+      </Card>
+    </RestrictedContent>
   );
 }

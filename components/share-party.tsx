@@ -17,19 +17,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { usePartyPrivacyStore } from '@/store/partyPrivacyStore';
+import { PartyPrivacyStatus } from '@/lib/types/party';
 
 interface SharePartyProps {
   partyId: string;
   partyName: string;
   isAdmin?: boolean;
+  isParticipant?: boolean;
 }
 
 export function ShareParty({
   partyId,
   partyName,
   isAdmin = false,
+  isParticipant = false,
 }: SharePartyProps) {
   const { toast } = useToast();
+  const { getPartyAccess } = usePartyPrivacyStore();
+  const access = getPartyAccess(partyId);
 
   const handleCopyLink = async () => {
     try {
@@ -65,6 +71,11 @@ export function ShareParty({
       subject
     )}&body=${encodeURIComponent(body)}`;
   };
+
+  // Show share button for admins (always), participants, or if the party can be joined directly
+  if (!isAdmin && !isParticipant && !access.canJoinDirectly) {
+    return null;
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -110,6 +121,7 @@ export function ShareParty({
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Show invitation creation button for admins only */}
       {isAdmin && (
         <Dialog>
           <DialogTrigger asChild>

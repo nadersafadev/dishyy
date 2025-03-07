@@ -28,6 +28,20 @@ const formSchema = z.object({
   name: z.string().optional(),
 });
 
+interface PartyInvitation {
+  id: string;
+  token: string;
+  maxUses: number;
+  currentUses: number;
+  expiresAt: string | null;
+  name: string | null;
+  createdAt: string;
+}
+
+interface ErrorResponse {
+  error: string;
+}
+
 interface InvitationFormProps {
   partyId: string;
   onSuccess?: () => void;
@@ -57,7 +71,7 @@ export function InvitationForm({ partyId, onSuccess }: InvitationFormProps) {
       // Format the data for submission
       const submissionData = {
         maxUses: values.maxUses,
-        expiresAt: values.expiresAt?.toISOString() || null,
+        expiresAt: values.expiresAt ? values.expiresAt.toISOString() : null,
         name: values.name || null,
       };
 
@@ -69,18 +83,30 @@ export function InvitationForm({ partyId, onSuccess }: InvitationFormProps) {
         body: JSON.stringify(submissionData),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as PartyInvitation | ErrorResponse;
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create invitation');
+        throw new Error(
+          'error' in data ? data.error : 'Failed to create invitation'
+        );
       }
 
-      const url = `${window.location.origin}/invite/${data.token}`;
+      const invitation = data as PartyInvitation;
+      const url =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/invite/${invitation.token}`
+          : '';
       setInvitationUrl(url);
 
-      // Copy to clipboard
-      await navigator.clipboard.writeText(url);
-      setIsCopied(true);
+      // Copy to clipboard if available
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        try {
+          await navigator.clipboard.writeText(url);
+          setIsCopied(true);
+        } catch (error) {
+          console.error('Failed to copy to clipboard:', error);
+        }
+      }
 
       toast({
         title: 'Success!',
@@ -126,9 +152,19 @@ export function InvitationForm({ partyId, onSuccess }: InvitationFormProps) {
                   size="icon"
                   className="shrink-0 self-end sm:self-auto hover:bg-transparent hover:ring-0"
                   onClick={() => {
-                    navigator.clipboard.writeText(invitationUrl!);
-                    setIsCopied(true);
-                    setTimeout(() => setIsCopied(false), 2000);
+                    if (
+                      typeof navigator !== 'undefined' &&
+                      navigator.clipboard &&
+                      invitationUrl
+                    ) {
+                      try {
+                        navigator.clipboard.writeText(invitationUrl);
+                        setIsCopied(true);
+                        setTimeout(() => setIsCopied(false), 2000);
+                      } catch (error) {
+                        console.error('Failed to copy to clipboard:', error);
+                      }
+                    }
                   }}
                 >
                   {isCopied ? (

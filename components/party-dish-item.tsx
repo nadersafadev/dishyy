@@ -1,52 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import Image from 'next/image';
+import Link from 'next/link';
+import { UtensilsCrossedIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { DishContributionForm } from '@/components/dish-contribution-form';
+import { RemovePartyDish } from '@/components/remove-party-dish';
+import { UpdateDishQuantity } from '@/components/update-dish-quantity';
 import {
-  PartyDish,
-  PartyParticipant,
-  ParticipantDishContribution,
-} from '@prisma/client';
-import { DishHeader } from '@/components/party-dish/dish-header';
-import { DishProgressBar } from '@/components/party-dish/dish-progress-bar';
-import { DishDescription } from '@/components/party-dish/dish-description';
-import { ContributionsList } from '@/components/party-dish/contributions-list';
-import { AdminControls } from '@/components/party-dish/admin-controls';
-import { Unit } from '@/lib/types';
+  PartyDishWithDetails,
+  ParticipantWithContributions,
+} from '@/lib/services/dish';
 
 interface PartyDishItemProps {
-  partyDish: PartyDish & {
-    dish: {
-      name: string;
-      unit: Unit;
-      description: string | null;
-      imageUrl: string | null;
-      categoryId: string;
-      category?: {
-        name: string;
-        id: string;
-        parentId: string | null;
-      };
-    };
-  };
-  participants: (PartyParticipant & {
-    user: {
-      name: string;
-    };
-    contributions: (ParticipantDishContribution & {
-      dish: {
-        name: string;
-        unit: Unit;
-      };
-    })[];
-  })[];
+  partyDish: PartyDishWithDetails;
+  participants: ParticipantWithContributions[];
   totalParticipants: number;
   isAdmin: boolean;
   isParticipant: boolean;
   partyId: string;
-  currentUserId?: string | null;
+  currentUserId?: string;
 }
 
 export function PartyDishItem({
@@ -56,9 +31,18 @@ export function PartyDishItem({
   isAdmin,
   isParticipant,
   partyId,
-  currentUserId = null,
+  currentUserId,
 }: PartyDishItemProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsEditing(true);
+  };
+
+  const handleEditComplete = () => {
+    setIsEditing(false);
+  };
 
   // Calculate contribution data
   const contributions = participants.flatMap(p =>
@@ -83,93 +67,97 @@ export function PartyDishItem({
   const totalContributed = contributions.reduce((sum, c) => sum + c.amount, 0);
   const totalNeeded = partyDish.amountPerPerson * totalParticipants;
   const remainingNeeded = Math.max(0, totalNeeded - totalContributed);
-  // If the user is editing, they can contribute up to their current amount + remaining needed
-  const maxEditAmount = userContribution
-    ? userContribution.amount + remainingNeeded
-    : remainingNeeded;
-  const progressPercentage = Math.min(
-    (totalContributed / totalNeeded) * 100,
-    100
-  );
 
   return (
-    <Card className="overflow-hidden group transition-all duration-200 hover:shadow-md">
-      <CardContent className="p-0">
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <div className="flex flex-col relative">
-            {/* Admin controls */}
-            <AdminControls
-              isAdmin={isAdmin}
+    <Card className="relative group">
+      <div className="p-4">
+        <div className="flex items-start gap-4">
+          {/* Image Section */}
+          <div className="relative w-16 h-16 rounded-md overflow-hidden shrink-0 bg-muted">
+            {partyDish.dish.imageUrl ? (
+              <Image
+                src={partyDish.dish.imageUrl}
+                alt={partyDish.dish.name}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex items-center justify-center w-full h-full text-muted-foreground">
+                <UtensilsCrossedIcon className="h-6 w-6" />
+              </div>
+            )}
+          </div>
+
+          {/* Content Section */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <Link
+                href={`/dishes/${partyDish.dishId}`}
+                className="font-medium hover:underline truncate"
+              >
+                {partyDish.dish.name}
+              </Link>
+              {isAdmin && (
+                <div className="flex items-center gap-2 shrink-0">
+                  <UpdateDishQuantity
+                    partyId={partyId}
+                    dishId={partyDish.dishId}
+                    dishName={partyDish.dish.name}
+                    unit={partyDish.dish.unit}
+                    currentAmount={partyDish.amountPerPerson}
+                    isAdmin={isAdmin}
+                  />
+                  <RemovePartyDish
+                    partyId={partyId}
+                    dishId={partyDish.dishId}
+                    dishName={partyDish.dish.name}
+                    isAdmin={isAdmin}
+                  />
+                </div>
+              )}
+            </div>
+
+            {partyDish.dish.description && (
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                {partyDish.dish.description}
+              </p>
+            )}
+
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-sm font-medium">
+                {partyDish.amountPerPerson} {partyDish.dish.unit.toLowerCase()}{' '}
+                per person
+              </span>
+              {isParticipant && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto"
+                  onClick={handleEditClick}
+                >
+                  {isEditing ? 'Cancel' : 'Edit Contribution'}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Contribution Form */}
+        {isEditing && (
+          <div className="mt-4 pt-4 border-t">
+            <DishContributionForm
               partyId={partyId}
               dishId={partyDish.dishId}
               dishName={partyDish.dish.name}
               unit={partyDish.dish.unit}
-              amountPerPerson={partyDish.amountPerPerson}
+              remainingNeeded={remainingNeeded}
+              isEdit={!!userContribution}
+              contributionId={userContribution?.id}
+              initialAmount={userContribution?.amount}
             />
-
-            {/* Compact header - always visible */}
-            <DishHeader
-              name={partyDish.dish.name}
-              unit={partyDish.dish.unit}
-              imageUrl={partyDish.dish.imageUrl}
-              amountPerPerson={partyDish.amountPerPerson}
-              totalContributed={totalContributed}
-              totalNeeded={totalNeeded}
-              isOpen={isOpen}
-            />
-
-            {/* Progress bar - visible in both states */}
-            <DishProgressBar progressPercentage={progressPercentage} />
-
-            {/* Expanded content */}
-            <CollapsibleContent>
-              {/* Description if available */}
-              <DishDescription description={partyDish.dish.description} />
-
-              {/* Contributions section */}
-              <div className="bg-muted/30 p-5 space-y-3 border-t">
-                <ContributionsList
-                  contributions={contributions}
-                  isParticipant={isParticipant}
-                  currentUserId={currentUserId}
-                  remainingNeeded={remainingNeeded}
-                  dishName={partyDish.dish.name}
-                  unit={partyDish.dish.unit}
-                  partyId={partyId}
-                />
-
-                {isParticipant && (
-                  <div className="border-t pt-4 mt-2">
-                    {userContribution ? (
-                      <DishContributionForm
-                        partyId={partyId}
-                        dishId={partyDish.dishId}
-                        dishName={partyDish.dish.name}
-                        unit={partyDish.dish.unit}
-                        remainingNeeded={maxEditAmount}
-                        isEdit={true}
-                        contributionId={userContribution.id}
-                        initialAmount={userContribution.amount}
-                      />
-                    ) : (
-                      remainingNeeded > 0 && (
-                        <DishContributionForm
-                          partyId={partyId}
-                          dishId={partyDish.dishId}
-                          dishName={partyDish.dish.name}
-                          unit={partyDish.dish.unit}
-                          remainingNeeded={remainingNeeded}
-                          isEdit={false}
-                        />
-                      )
-                    )}
-                  </div>
-                )}
-              </div>
-            </CollapsibleContent>
           </div>
-        </Collapsible>
-      </CardContent>
+        )}
+      </div>
     </Card>
   );
 }
