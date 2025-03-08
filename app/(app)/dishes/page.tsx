@@ -156,10 +156,11 @@ export default async function DishesPage({
           />
         ) : (
           <DishesGrid
-            dishes={dishes}
+            data={dishes}
             pagination={pagination}
             sortBy={sortBy}
             sortOrder={sortOrder}
+            baseUrl=""
           />
         )}
       </div>

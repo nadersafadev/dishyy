@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EntityTable } from '@/components/ui/entity-table';
 import { EntityTableColumn } from '@/lib/types/entity';
-import { ImageIcon } from 'lucide-react';
+import { ImageIcon, UtensilsCrossedIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { Unit, Category, DishWithRelations, PaginationMeta } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DishForm } from '@/components/DishForm';
+import { EditDishDialog } from './EditDishDialog';
 
 interface DishesTableProps {
   dishes: DishWithRelations[];
@@ -35,6 +36,9 @@ export function DishesTable({
   onDishSelect,
 }: DishesTableProps) {
   const router = useRouter();
+  const [editingDish, setEditingDish] = useState<DishWithRelations | null>(
+    null
+  );
 
   if (isLoading) {
     return (
@@ -75,8 +79,11 @@ export function DishesTable({
   }
 
   const handleCategoryClick = (e: React.MouseEvent, categoryId: string) => {
+    e.preventDefault();
     e.stopPropagation();
-    router.push(`/categories/${categoryId}`);
+    const url = new URL(window.location.href);
+    url.searchParams.set('categoryId', categoryId);
+    window.location.href = url.toString();
   };
 
   const columns: EntityTableColumn<DishWithRelations>[] = [
@@ -147,29 +154,35 @@ export function DishesTable({
   ];
 
   return (
-    <EntityTable
-      data={dishes}
-      columns={columns}
-      pagination={pagination}
-      sortBy={sortBy}
-      sortOrder={sortOrder}
-      baseUrl="/dishes"
-      editDialog={dish => (
-        <DishForm
-          dish={{
-            ...dish,
-            category: dish.category || undefined,
-            defaultAmount: null,
+    <>
+      <EntityTable
+        data={dishes}
+        columns={columns}
+        pagination={pagination}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        baseUrl="/dishes"
+        onEdit={(id: string) => {
+          const dish = dishes.find(d => d.id === id);
+          if (dish) setEditingDish(dish);
+        }}
+        onDelete={async id => {
+          // The delete functionality is handled by the DeleteEntityDialog component
+        }}
+        selectable={selectable}
+        selectedIds={selectedDishes}
+        onRowSelect={onDishSelect}
+      />
+
+      {editingDish && (
+        <EditDishDialog
+          dish={editingDish}
+          open={true}
+          onOpenChange={open => {
+            if (!open) setEditingDish(null);
           }}
         />
       )}
-      onDelete={async id => {
-        // The delete functionality is handled by the DeleteEntityDialog component
-      }}
-      selectable={selectable}
-      selectedIds={selectedDishes}
-      onRowSelect={onDishSelect}
-      onRowClick={dish => router.push(`/dishes/${dish.id}`)}
-    />
+    </>
   );
 }
