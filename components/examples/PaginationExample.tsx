@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { DataPagination, PaginationMeta } from '@/components/ui/DataPagination';
+import { DataPagination } from '@/components/ui/DataPagination';
+import { PaginationMeta } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Card,
