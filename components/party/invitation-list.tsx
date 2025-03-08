@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -32,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { DeleteEntityDialog } from '@/components/ui/delete-entity-dialog';
 import { EditInvitationForm } from '@/components/party/edit-invitation-form';
+import { toast } from '@/lib/toast';
 
 interface Invitation {
   id: string;
@@ -58,7 +58,6 @@ export function InvitationList({ partyId }: InvitationListProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
-  const { toast } = useToast();
 
   useEffect(() => {
     fetchInvitations();
@@ -73,11 +72,7 @@ export function InvitationList({ partyId }: InvitationListProps) {
       const data = await response.json();
       setInvitations(data);
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to load invitations',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'Failed to load invitations');
     } finally {
       setIsLoading(false);
     }
@@ -88,36 +83,22 @@ export function InvitationList({ partyId }: InvitationListProps) {
       const invitationUrl = `${window.location.origin}/invite/${token}`;
       await navigator.clipboard.writeText(invitationUrl);
       setCopiedToken(token);
-      toast({
-        title: 'Success',
-        description: 'Invitation link copied to clipboard!',
-      });
+      toast.success('Success', 'Invitation link copied to clipboard!');
       setTimeout(() => setCopiedToken(null), 2000);
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to copy link',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'Failed to copy link');
     }
   }
 
   async function handleEditSuccess() {
-    toast({
-      title: 'Success',
-      description: 'Invitation updated successfully!',
-    });
+    toast.success('Success', 'Invitation updated successfully!');
     setIsEditing(false);
     setEditingInvitation(null);
     fetchInvitations();
   }
 
   async function handleEditError() {
-    toast({
-      title: 'Error',
-      description: 'Failed to update invitation',
-      variant: 'destructive',
-    });
+    toast.error('Error', 'Failed to update invitation');
   }
 
   if (isLoading) {
@@ -249,10 +230,10 @@ export function InvitationList({ partyId }: InvitationListProps) {
                       </Button>
                     }
                     onSuccess={() => {
-                      toast({
-                        title: 'Success',
-                        description: 'Invitation deleted successfully!',
-                      });
+                      toast.success(
+                        'Success',
+                        'Invitation deleted successfully!'
+                      );
                       fetchInvitations();
                     }}
                   />
@@ -347,10 +328,10 @@ export function InvitationList({ partyId }: InvitationListProps) {
                         </Button>
                       }
                       onSuccess={() => {
-                        toast({
-                          title: 'Success',
-                          description: 'Invitation deleted successfully!',
-                        });
+                        toast.success(
+                          'Success',
+                          'Invitation deleted successfully!'
+                        );
                         fetchInvitations();
                       }}
                     />

@@ -9,12 +9,12 @@ import { Form } from '@/components/ui/form';
 import { FormNumberField } from '@/components/forms/form-number-field';
 import { FormDateField } from '@/components/forms/form-date-field';
 import { FormTextField } from '@/components/forms/form-text-field';
-import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { Loader2, Check, Copy, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { toast } from '@/lib/toast';
 
 const formSchema = z.object({
   maxUses: z.number().min(1, 'Maximum uses must be at least 1'),
@@ -53,7 +53,6 @@ export function InvitationForm({ partyId, onSuccess }: InvitationFormProps) {
   const [invitationUrl, setInvitationUrl] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const router = useRouter();
-  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -108,10 +107,7 @@ export function InvitationForm({ partyId, onSuccess }: InvitationFormProps) {
         }
       }
 
-      toast({
-        title: 'Success!',
-        description: 'Invitation created and copied to clipboard!',
-      });
+      toast.success('Success!', 'Invitation created and copied to clipboard!');
 
       setIsSuccess(true);
       form.reset();
@@ -122,12 +118,10 @@ export function InvitationForm({ partyId, onSuccess }: InvitationFormProps) {
       setTimeout(() => setIsCopied(false), 2000);
     } catch (error) {
       console.error('Form submission error:', error);
-      toast({
-        title: 'Error',
-        description:
-          error instanceof Error ? error.message : 'Something went wrong',
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        error instanceof Error ? error.message : 'Something went wrong'
+      );
     } finally {
       setIsLoading(false);
     }

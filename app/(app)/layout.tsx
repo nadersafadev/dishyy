@@ -1,7 +1,7 @@
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { Toaster } from '@/components/ui/toaster';
+import { ToastProvider } from '@/components/providers/ToastProvider';
 
 export default function DashboardLayout({
   children,
@@ -24,7 +24,7 @@ export default function DashboardLayout({
       <SignedOut>
         <RedirectToSignIn />
       </SignedOut>
-      <Toaster />
+      <ToastProvider />
     </>
   );
 }

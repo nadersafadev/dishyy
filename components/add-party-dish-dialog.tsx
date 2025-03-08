@@ -18,7 +18,7 @@ import * as z from 'zod';
 import { Form } from '@/components/ui/form';
 import { FormTextField } from '@/components/forms/form-text-field';
 import { FormNumberField } from '@/components/forms/form-number-field';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/lib/toast';
 
 interface AddPartyDishDialogProps {
   partyId: string;
@@ -31,7 +31,6 @@ const formSchema = z.object({
 
 export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dishes, setDishes] = useState<{ id: string; name: string }[]>([]);
@@ -55,11 +54,7 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
       setDishes(data.dishes || []); // Use data.dishes if available, otherwise empty array
     } catch (error) {
       console.error('Error fetching dishes:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load dishes',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'Failed to load dishes');
       setDishes([]); // Set empty array on error
     }
   };
@@ -80,21 +75,16 @@ export function AddPartyDishDialog({ partyId }: AddPartyDishDialogProps) {
         throw new Error(data.error || 'Failed to add dish');
       }
 
-      toast({
-        title: 'Success',
-        description: 'Dish added to party successfully',
-      });
+      toast.success('Success', 'Dish added to party successfully');
       setIsOpen(false);
       form.reset();
       router.refresh();
     } catch (error) {
       console.error('Error adding dish:', error);
-      toast({
-        title: 'Error',
-        description:
-          error instanceof Error ? error.message : 'Failed to add dish',
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to add dish'
+      );
     } finally {
       setIsSubmitting(false);
     }

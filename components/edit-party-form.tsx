@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
 import { Party, PartyDish, PartyParticipant, Dish } from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, Globe, Lock, Users } from 'lucide-react';
@@ -33,6 +32,7 @@ import { FormNumberField } from '@/components/forms/form-number-field';
 import { FormDateField } from '@/components/forms/form-date-field';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Privacy } from '@/lib/enums';
+import { toast } from '@/lib/toast';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Party name is required'),
@@ -90,7 +90,6 @@ const privacyOptions = [
 
 export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [selectedDishId, setSelectedDishId] = useState('');
@@ -141,20 +140,15 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
         throw new Error(errorData.error || 'Failed to update party');
       }
 
-      toast({
-        title: 'Success',
-        description: 'Party updated successfully',
-      });
+      toast.success('Success', 'Party updated successfully');
       router.refresh();
       onClose();
     } catch (error) {
       console.error('Error updating party:', error);
-      toast({
-        title: 'Error',
-        description:
-          error instanceof Error ? error.message : 'Failed to update party',
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to update party'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -162,11 +156,10 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
 
   const handleAddDish = async () => {
     if (!selectedDishId || !amountPerPerson) {
-      toast({
-        title: 'Error',
-        description: 'Please select a dish and specify amount per person',
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        'Please select a dish and specify amount per person'
+      );
       return;
     }
 
@@ -192,18 +185,11 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
       setIsAddDishDialogOpen(false);
       setSelectedDishId('');
       setAmountPerPerson('');
-      toast({
-        title: 'Success',
-        description: 'Dish added successfully',
-      });
+      toast.success('Success', 'Dish added successfully');
       router.refresh();
     } catch (error) {
       console.error('Error adding dish:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to add dish',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'Failed to add dish');
     } finally {
       setIsLoading(false);
     }
@@ -226,18 +212,11 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
       setPartyDishes(prev =>
         prev.filter(partyDish => partyDish.dishId !== dishId)
       );
-      toast({
-        title: 'Success',
-        description: 'Dish removed successfully',
-      });
+      toast.success('Success', 'Dish removed successfully');
       router.refresh();
     } catch (error) {
       console.error('Error removing dish:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to remove dish',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'Failed to remove dish');
     } finally {
       setIsLoading(false);
     }
@@ -270,18 +249,11 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
             : partyDish
         )
       );
-      toast({
-        title: 'Success',
-        description: 'Dish amount updated successfully',
-      });
+      toast.success('Success', 'Dish amount updated successfully');
       router.refresh();
     } catch (error) {
       console.error('Error updating dish amount:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update dish amount',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'Failed to update dish amount');
     } finally {
       setIsLoading(false);
     }

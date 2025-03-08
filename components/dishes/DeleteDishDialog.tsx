@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/lib/toast';
 import { DeleteEntityDialog } from '@/components/ui/delete-entity-dialog';
 
 interface DeleteDishDialogProps {
@@ -18,7 +18,6 @@ export function DeleteDishDialog({
   trigger,
 }: DeleteDishDialogProps) {
   const router = useRouter();
-  const { toast } = useToast();
 
   const warnings =
     inMenuCount > 0
@@ -26,7 +25,9 @@ export function DeleteDishDialog({
           {
             type: 'warning' as const,
             title: 'This dish is used in parties',
-            message: `This dish is currently used in ${inMenuCount} ${inMenuCount === 1 ? 'party' : 'parties'}. Deleting it will remove it from those parties.`,
+            message: `This dish is currently used in ${inMenuCount} ${
+              inMenuCount === 1 ? 'party' : 'parties'
+            }. Deleting it will remove it from those parties.`,
           },
         ]
       : [];
@@ -40,10 +41,10 @@ export function DeleteDishDialog({
       warnings={warnings}
       trigger={trigger}
       onSuccess={() => {
-        toast({
-          title: 'Dish Deleted',
-          description: `${dishName} has been successfully deleted.`,
-        });
+        toast.success(
+          'Dish Deleted',
+          `${dishName} has been successfully deleted.`
+        );
         router.refresh();
       }}
     />

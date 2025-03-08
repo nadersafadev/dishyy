@@ -7,11 +7,11 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { FormTextarea } from '@/components/forms/form-textarea';
-import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { Loader2, Check, Copy, AlertCircle, ArrowRight } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { GuestSelection } from '@/components/forms/guest-selection';
+import { toast } from '@/lib/toast';
 
 const formSchema = z.object({
   numGuests: z.number().min(0, 'Number of guests cannot be negative'),
@@ -44,7 +44,6 @@ export function AcceptInvitationForm({
   const [isCopied, setIsCopied] = useState(false);
   const [error, setError] = useState<ErrorResponse | null>(null);
   const router = useRouter();
-  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,10 +74,10 @@ export function AcceptInvitationForm({
       }
 
       setIsSuccess(true);
-      toast({
-        title: 'Success!',
-        description: 'You have been added to the party! Redirecting you...',
-      });
+      toast.success(
+        'Success!',
+        'You have been added to the party! Redirecting you...'
+      );
 
       // Wait a moment to show the success state
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -87,12 +86,10 @@ export function AcceptInvitationForm({
       router.push(`/parties/${partyId}`);
     } catch (error) {
       console.error('Error accepting invitation:', error);
-      toast({
-        title: 'Error',
-        description:
-          error instanceof Error ? error.message : 'Something went wrong',
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        error instanceof Error ? error.message : 'Something went wrong'
+      );
     } finally {
       setIsLoading(false);
     }

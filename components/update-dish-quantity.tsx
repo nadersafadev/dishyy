@@ -16,7 +16,7 @@ import { Input } from '@/components/forms/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { Unit, unitLabels } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/lib/toast';
 
 interface UpdateDishQuantityProps {
   partyId: string;
@@ -36,7 +36,6 @@ export function UpdateDishQuantity({
   isAdmin,
 }: UpdateDishQuantityProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState(currentAmount.toString());
   const [isLoading, setIsLoading] = useState(false);
@@ -71,19 +70,15 @@ export function UpdateDishQuantity({
         throw new Error(errorData.error || 'Failed to update dish quantity');
       }
 
-      toast({
-        title: 'Success',
-        description: `Updated ${dishName} quantity to ${amountNumber} ${unitLabels[unit].toLowerCase()} per person`,
-      });
+      toast.success(
+        'Success',
+        `Updated ${dishName} quantity to ${amountNumber} ${unitLabels[unit].toLowerCase()} per person`
+      );
       setOpen(false);
       router.refresh();
     } catch (error: any) {
       setError(error.message || 'Something went wrong');
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to update dish quantity',
-        variant: 'destructive',
-      });
+      toast.error('Error', error.message || 'Failed to update dish quantity');
     } finally {
       setIsLoading(false);
     }

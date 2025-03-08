@@ -8,7 +8,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Share2, Copy, Mail, UserPlus } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { InvitationForm } from '@/components/party/invitation-form';
 import {
   Dialog,
@@ -19,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { usePartyPrivacyStore } from '@/store/partyPrivacyStore';
 import { PartyPrivacyStatus } from '@/lib/types/party';
+import { toast } from '@/lib/toast';
 
 interface SharePartyProps {
   partyId: string;
@@ -33,7 +33,6 @@ export function ShareParty({
   isAdmin = false,
   isParticipant = false,
 }: SharePartyProps) {
-  const { toast } = useToast();
   const { getPartyAccess } = usePartyPrivacyStore();
   const access = getPartyAccess(partyId);
 
@@ -41,16 +40,12 @@ export function ShareParty({
     try {
       const url = `${window.location.origin}/parties/${partyId}`;
       await navigator.clipboard.writeText(url);
-      toast({
-        title: 'Link copied!',
-        description: 'Party link has been copied to your clipboard.',
-      });
+      toast.success(
+        'Link copied!',
+        'Party link has been copied to your clipboard.'
+      );
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to copy link to clipboard.',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'Failed to copy link to clipboard.');
     }
   };
 

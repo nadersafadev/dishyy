@@ -16,9 +16,9 @@ import { DeleteDishDialog } from '@/components/dishes/DeleteDishDialog';
 import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/forms/input';
 import { FilterDropdown, FilterOption } from '@/components/ui/FilterDropdown';
-import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Unit, unitLabels } from '@/lib/types';
+import { toast } from '@/lib/toast';
 
 interface Category {
   id: string;
@@ -45,7 +45,6 @@ interface FeedbackMessage {
 
 export function DishTableRow({ dish }: DishTableRowProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(dish.name);
@@ -231,13 +230,13 @@ export function DishTableRow({ dish }: DishTableRowProps) {
 
       setIsEditing(false);
       router.refresh();
-      setShowSuccessFeedback(true);
+      toast.success('Success', 'Dish updated successfully');
     } catch (error) {
       console.error('Error updating dish:', error);
-      setFeedback({
-        type: 'error',
-        text: error instanceof Error ? error.message : 'Failed to update dish',
-      });
+      toast.error(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to update dish'
+      );
     } finally {
       setIsSaving(false);
     }

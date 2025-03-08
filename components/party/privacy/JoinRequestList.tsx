@@ -5,9 +5,9 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from '@/lib/toast';
 
 interface JoinRequestListProps {
   partyId: string;
@@ -15,7 +15,6 @@ interface JoinRequestListProps {
 }
 
 export function JoinRequestList({ partyId, isHost }: JoinRequestListProps) {
-  const { toast } = useToast();
   const router = useRouter();
   const { getPartyJoinRequests, updateJoinRequest } = usePartyPrivacyStore();
   const requests = getPartyJoinRequests(partyId).filter(
@@ -61,22 +60,17 @@ export function JoinRequestList({ partyId, isHost }: JoinRequestListProps) {
       // Update local store after successful API call
       updateJoinRequest(partyId, requestId, { status });
 
-      toast({
-        title: 'Success',
-        description: `Request ${status.toLowerCase()} successfully`,
-      });
+      toast.success('Success', `Request ${status.toLowerCase()} successfully`);
 
       // Refresh the page to update participant status if request was approved
       if (status === JoinRequestStatus.APPROVED) {
         router.refresh();
       }
     } catch (error) {
-      toast({
-        title: 'Error',
-        description:
-          error instanceof Error ? error.message : 'An error occurred',
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        error instanceof Error ? error.message : 'An error occurred'
+      );
     }
   };
 

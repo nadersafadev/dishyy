@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { DeleteButton } from '@/components/ui/delete-button';
-import { useToast } from '@/hooks/use-toast';
 import { DeleteEntityDialog } from '@/components/ui/delete-entity-dialog';
+import { toast } from '@/lib/toast';
 
 interface DeletePartyDialogProps {
   partyId: string;
@@ -15,13 +15,9 @@ export function DeletePartyDialog({
   partyName,
 }: DeletePartyDialogProps) {
   const router = useRouter();
-  const { toast } = useToast();
 
   const handleSuccess = () => {
-    toast({
-      title: 'Success',
-      description: 'Party deleted successfully',
-    });
+    toast.success('Success', 'Party deleted successfully');
     router.push('/parties');
   };
 

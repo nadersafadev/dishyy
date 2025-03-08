@@ -3,6 +3,8 @@ import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter, Cairo } from 'next/font/google';
+import { ThemeProvider } from '@/components/theme-provider';
+import { ToastProvider } from '@/components/providers/ToastProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -81,7 +83,17 @@ export default function RootLayout({
         <head>
           <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         </head>
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <ToastProvider />
+          </ThemeProvider>
+        </body>
       </html>
     </ClerkProvider>
   );

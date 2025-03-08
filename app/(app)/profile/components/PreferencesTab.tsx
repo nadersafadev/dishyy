@@ -18,11 +18,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { toast } from '@/components/ui/use-toast';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Bell, Palette } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { toast } from '@/lib/toast';
 
 export function PreferencesTab() {
   const { theme, setTheme } = useTheme();
@@ -33,10 +33,10 @@ export function PreferencesTab() {
   const [dishUpdates, setDishUpdates] = useState(true);
 
   const handleSaveNotifications = () => {
-    toast({
-      title: 'Notification preferences saved',
-      description: 'Your notification settings have been updated.',
-    });
+    toast.success(
+      'Notification preferences saved',
+      'Your notification settings have been updated.'
+    );
     setIsNotificationsModalOpen(false);
   };
 
@@ -45,59 +45,49 @@ export function PreferencesTab() {
       <Card>
         <CardHeader>
           <CardTitle>Appearance</CardTitle>
-          <CardDescription>Customize how Dishyy looks for you</CardDescription>
+          <CardDescription>
+            Customize how Dishyy looks on your device
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Palette className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="font-medium">Theme Preference</p>
-                <p className="text-sm text-muted-foreground">
-                  Choose between light, dark, or system theme
-                </p>
+          <div className="space-y-4">
+            <div className="flex flex-col gap-2">
+              <Label>Theme</Label>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={theme === 'light' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => {
+                    setTheme('light');
+                    toast.info('Theme updated', 'Light theme applied.');
+                  }}
+                >
+                  Light
+                </Button>
+                <Button
+                  variant={theme === 'dark' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => {
+                    setTheme('dark');
+                    toast.info('Theme updated', 'Dark theme applied.');
+                  }}
+                >
+                  Dark
+                </Button>
+                <Button
+                  variant={theme === 'system' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => {
+                    setTheme('system');
+                    toast.info(
+                      'Theme updated',
+                      'System theme preference applied.'
+                    );
+                  }}
+                >
+                  System
+                </Button>
               </div>
-            </div>
-            <div className="flex space-x-2">
-              <Button
-                variant={theme === 'light' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => {
-                  setTheme('light');
-                  toast({
-                    title: 'Theme updated',
-                    description: 'Light theme applied successfully.',
-                  });
-                }}
-              >
-                Light
-              </Button>
-              <Button
-                variant={theme === 'dark' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => {
-                  setTheme('dark');
-                  toast({
-                    title: 'Theme updated',
-                    description: 'Dark theme applied successfully.',
-                  });
-                }}
-              >
-                Dark
-              </Button>
-              <Button
-                variant={theme === 'system' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => {
-                  setTheme('system');
-                  toast({
-                    title: 'Theme updated',
-                    description: 'System theme preference applied.',
-                  });
-                }}
-              >
-                System
-              </Button>
             </div>
           </div>
         </CardContent>
@@ -126,55 +116,32 @@ export function PreferencesTab() {
         open={isNotificationsModalOpen}
         onOpenChange={setIsNotificationsModalOpen}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Notification Settings</DialogTitle>
+            <DialogTitle>Notification Preferences</DialogTitle>
             <DialogDescription>
-              Customize which notifications you receive from Dishyy.
+              Choose which notifications you want to receive
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4 space-y-4">
+          <div className="space-y-4 py-4">
             <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="email-notifications" className="font-medium">
-                  Email Notifications
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Receive email updates about activity on Dishyy
-                </p>
-              </div>
+              <Label htmlFor="email-notifications">Email Notifications</Label>
               <Switch
                 id="email-notifications"
                 checked={emailNotifications}
                 onCheckedChange={setEmailNotifications}
               />
             </div>
-
             <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="party-invites" className="font-medium">
-                  Party Invitations
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Get notified when you're invited to a party
-                </p>
-              </div>
+              <Label htmlFor="party-invites">Party Invites</Label>
               <Switch
                 id="party-invites"
                 checked={partyInvites}
                 onCheckedChange={setPartyInvites}
               />
             </div>
-
             <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="dish-updates" className="font-medium">
-                  Dish Updates
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Receive updates about dishes you've contributed to
-                </p>
-              </div>
+              <Label htmlFor="dish-updates">Dish Updates</Label>
               <Switch
                 id="dish-updates"
                 checked={dishUpdates}
@@ -183,13 +150,7 @@ export function PreferencesTab() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="ghost"
-              onClick={() => setIsNotificationsModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSaveNotifications}>Save Preferences</Button>
+            <Button onClick={handleSaveNotifications}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

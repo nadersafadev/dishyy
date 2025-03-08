@@ -12,7 +12,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
 import { LeavePartyDialog } from '@/components/leave-party-dialog';
 import { UserPlus, UserCheck, Clock } from 'lucide-react';
 import { GuestSelection } from '@/components/forms/guest-selection';
@@ -20,6 +19,7 @@ import { usePartyPrivacyStore } from '@/store/partyPrivacyStore';
 import { JoinRequestStatus } from '@prisma/client';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/lib/toast';
 
 interface PartyActionsProps {
   partyId: string;
@@ -41,7 +41,6 @@ export function PartyActions({
   currentParticipants = 0,
 }: PartyActionsProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const [numGuests, setNumGuests] = useState(0);
@@ -78,10 +77,7 @@ export function PartyActions({
           throw new Error(data.error || 'Failed to join party');
         }
 
-        toast({
-          title: 'Success',
-          description: 'Successfully joined the party!',
-        });
+        toast.success('Success', 'Successfully joined the party!');
         setIsJoinDialogOpen(false);
         router.refresh();
         return;
@@ -109,12 +105,10 @@ export function PartyActions({
         // Add to local store after successful API call
         addJoinRequest(data.data);
 
-        toast({
-          title: 'Success',
-          description:
-            data.message ||
-            'Your request to join has been submitted to the host.',
-        });
+        toast.success(
+          'Success',
+          data.message || 'Your request to join has been submitted to the host.'
+        );
         setIsJoinDialogOpen(false);
         setMessage('');
         setNumGuests(0);
@@ -137,19 +131,14 @@ export function PartyActions({
         throw new Error(data.error || 'Failed to join party');
       }
 
-      toast({
-        title: 'Success',
-        description: 'Successfully joined the party!',
-      });
+      toast.success('Success', 'Successfully joined the party!');
       setIsJoinDialogOpen(false);
       router.refresh();
     } catch (error) {
-      toast({
-        title: 'Error',
-        description:
-          error instanceof Error ? error.message : 'Failed to join party',
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to join party'
+      );
     } finally {
       setIsLoading(false);
     }
