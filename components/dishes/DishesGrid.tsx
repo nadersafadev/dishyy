@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { DataPagination } from '@/components/ui/DataPagination';
 import { Button } from '@/components/ui/button';
 import { DishCard } from './DishCard';
+import { Unit, PaginationMeta } from '@/lib/types';
 
 interface DishWithRelations {
   id: string;
   name: string;
   description: string | null;
   imageUrl: string | null;
-  unit: string;
+  unit: Unit;
   categoryId: string | null;
   category: { id: string; name: string } | null;
   _count: {
@@ -18,20 +19,11 @@ interface DishWithRelations {
   };
 }
 
-interface PaginationMeta {
-  page: number;
-  limit: number;
-  totalCount: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
 interface DishesGridProps {
   dishes: DishWithRelations[];
   pagination: PaginationMeta;
-  sortBy: string;
-  sortOrder: string;
+  sortBy?: string;
+  sortOrder?: string;
 }
 
 export function DishesGrid({

@@ -16,6 +16,15 @@ export const unitLabels: Record<Unit, string> = {
   [Unit.PIECES]: 'Pieces',
 };
 
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  totalCount: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -47,4 +56,16 @@ export interface Dish {
   _count?: {
     parties: number;
   };
+}
+
+export interface DishWithRelations {
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  imageId: string | null;
+  unit: Unit;
+  categoryId: string | null;
+  category: Category | null;
+  _count: { parties: number };
 }

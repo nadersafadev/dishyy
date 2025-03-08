@@ -7,6 +7,7 @@ import { CategoryHierarchy } from '@/components/categories/CategoryHierarchy';
 import { CategoryCard } from '@/components/categories/CategoryCard';
 import { CategoriesFilters } from '@/components/categories/CategoriesFilters';
 import { generateMetadata } from '@/lib/metadata';
+import { PaginationMeta } from '@/lib/types';
 
 export const metadata = generateMetadata(
   'Categories',
@@ -35,16 +36,6 @@ interface CategoryWithRelations {
   parentId: string | null;
   parent: { id: string; name: string } | null;
   _count?: { dishes: number };
-}
-
-// Define the pagination metadata structure
-interface PaginationMeta {
-  page: number;
-  limit: number;
-  totalCount: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
 }
 
 export default async function CategoriesPage({ searchParams }: PageProps) {

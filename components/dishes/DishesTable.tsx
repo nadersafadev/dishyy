@@ -1,41 +1,17 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DataPagination } from '@/components/ui/DataPagination';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { EntityTable } from '@/components/ui/entity-table';
+import { EntityTableColumn } from '@/lib/types/entity';
+import { ImageIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { DishTableRow } from './DishTableRow';
-import { Unit } from '@/lib/types';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import Image from 'next/image';
+import { Unit, Category, DishWithRelations, PaginationMeta } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-
-interface DishWithRelations {
-  id: string;
-  name: string;
-  description: string | null;
-  imageUrl: string | null;
-  unit: Unit;
-  categoryId: string | null;
-  category: { id: string; name: string } | null;
-  _count: { parties: number };
-}
-
-interface PaginationMeta {
-  page: number;
-  limit: number;
-  totalCount: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
+import { DishForm } from '@/components/DishForm';
 
 interface DishesTableProps {
   dishes: DishWithRelations[];
@@ -58,75 +34,27 @@ export function DishesTable({
   selectedDishes = [],
   onDishSelect,
 }: DishesTableProps) {
-  const searchParams = useSearchParams();
-
-  // Check if sortable column is active
-  const isSortActive = (column: string) => sortBy === column;
-
-  // Create sort URL for a column
-  const createSortURL = (column: string) => {
-    const params = new URLSearchParams(searchParams?.toString() || '');
-
-    // If already sorting by this column, toggle the order
-    if (sortBy === column) {
-      params.set('sortOrder', sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      params.set('sortBy', column);
-      params.set('sortOrder', 'asc'); // Default to ascending for new column
-    }
-
-    return `/dishes?${params.toString()}`;
-  };
-
-  // Get sort icon based on current state
-  const getSortIcon = (column: string) => {
-    if (!isSortActive(column)) return <ArrowUpDown className="h-4 w-4 ml-1" />;
-    return sortOrder === 'asc' ? (
-      <ArrowUp className="h-4 w-4 ml-1" />
-    ) : (
-      <ArrowDown className="h-4 w-4 ml-1" />
-    );
-  };
+  const router = useRouter();
 
   if (isLoading) {
     return (
       <div>
         <div className="rounded-md border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-24">Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Usage Count</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Skeleton className="h-12 w-12" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-32" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-24" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-16" />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-end gap-2">
-                      <Skeleton className="h-8 w-8" />
-                      <Skeleton className="h-8 w-8" />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="grid gap-4">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="flex items-center gap-4 p-4">
+                <Skeleton className="h-12 w-12" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <div className="flex gap-2">
+                  <Skeleton className="h-8 w-8" />
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="mt-4">
           <Skeleton className="h-10 w-full" />
@@ -146,55 +74,102 @@ export function DishesTable({
     );
   }
 
-  return (
-    <div>
-      <div className="rounded-md border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-24">Image</TableHead>
-              <TableHead>
-                <Link
-                  href={createSortURL('name')}
-                  className="flex items-center hover:underline"
-                >
-                  Name
-                  {getSortIcon('name')}
-                </Link>
-              </TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>
-                <Link
-                  href={createSortURL('usageCount')}
-                  className="flex items-center hover:underline"
-                >
-                  Usage Count
-                  {getSortIcon('usageCount')}
-                </Link>
-              </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {dishes.map(dish => (
-              <DishTableRow
-                key={dish.id}
-                dish={dish}
-                selectable={selectable}
-                selected={selectedDishes.includes(dish.id)}
-                onSelect={onDishSelect}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+  const handleCategoryClick = (e: React.MouseEvent, categoryId: string) => {
+    e.stopPropagation();
+    router.push(`/categories/${categoryId}`);
+  };
 
-      {/* Pagination UI */}
-      <DataPagination
-        pagination={pagination}
-        itemName="dishes"
-        baseUrl="/dishes"
-      />
-    </div>
+  const columns: EntityTableColumn<DishWithRelations>[] = [
+    {
+      key: 'image',
+      header: 'Image',
+      width: '100px',
+      render: dish => (
+        <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted">
+          {dish.imageUrl ? (
+            <Image
+              src={dish.imageUrl}
+              alt={dish.name}
+              fill
+              sizes="64px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <ImageIcon className="h-6 w-6 text-muted-foreground/50" />
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'name',
+      header: 'Name',
+      render: dish => (
+        <div>
+          <div>{dish.name}</div>
+          {dish.description && (
+            <p className="text-sm text-muted-foreground line-clamp-1">
+              {dish.description}
+            </p>
+          )}
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'category',
+      header: 'Category',
+      render: dish =>
+        dish.category ? (
+          <span
+            className="text-primary hover:underline cursor-pointer"
+            onClick={e => handleCategoryClick(e, dish.category!.id)}
+            data-no-row-click="true"
+          >
+            {dish.category.name}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">None</span>
+        ),
+    },
+    {
+      key: 'usageCount',
+      header: 'Usage Count',
+      render: dish => (
+        <Badge variant="outline">
+          {dish._count.parties}{' '}
+          {dish._count.parties === 1 ? 'party' : 'parties'}
+        </Badge>
+      ),
+      sortable: true,
+    },
+  ];
+
+  return (
+    <EntityTable
+      data={dishes}
+      columns={columns}
+      pagination={pagination}
+      sortBy={sortBy}
+      sortOrder={sortOrder}
+      baseUrl="/dishes"
+      editDialog={dish => (
+        <DishForm
+          dish={{
+            ...dish,
+            category: dish.category || undefined,
+            defaultAmount: null,
+          }}
+        />
+      )}
+      onDelete={async id => {
+        // The delete functionality is handled by the DeleteEntityDialog component
+      }}
+      selectable={selectable}
+      selectedIds={selectedDishes}
+      onRowSelect={onDishSelect}
+      onRowClick={dish => router.push(`/dishes/${dish.id}`)}
+    />
   );
 }
