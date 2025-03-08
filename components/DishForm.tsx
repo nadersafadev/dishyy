@@ -42,9 +42,10 @@ type FormData = z.infer<typeof formSchema>;
 
 interface DishFormProps {
   dish?: Dish;
+  onSuccess?: (dish: Dish) => void;
 }
 
-export function DishForm({ dish }: DishFormProps) {
+export function DishForm({ dish, onSuccess }: DishFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -110,6 +111,7 @@ export function DishForm({ dish }: DishFormProps) {
           form.reset();
         }
         router.refresh();
+        onSuccess?.(responseData.dish);
       } else {
         setError(responseData.error || 'Failed to save dish');
       }

@@ -11,7 +11,6 @@ import { Form } from '@/components/ui/form';
 import { FormTextField } from '@/components/forms/form-text-field';
 import { FormDateField } from '@/components/forms/form-date-field';
 import { FormNumberField } from '@/components/forms/form-number-field';
-
 import { Card } from '@/components/ui/card';
 import {
   ArrowLeft,
@@ -26,8 +25,9 @@ import {
 import { cn } from '@/lib/utils';
 import { FormTextAreaField } from './forms/form-textarea-field';
 import { FormRadioField } from './forms/form-radio-field';
-
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/forms/input';
+import { DishSelector } from './dishes/DishSelector';
+import { DishWithRelations } from '@/lib/types';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -41,7 +41,7 @@ const formSchema = z.object({
     .array(
       z.object({
         dishId: z.string(),
-        amountPerPerson: z.number().positive('Amount must be greater than 0'),
+        amountPerPerson: z.number().min(0, 'Amount cannot be negative'),
       })
     )
     .min(1, 'At least one dish is required'),
@@ -78,45 +78,44 @@ const steps: StepProps[] = [
   },
 ];
 
-interface DishWithRelations {
-  id: string;
-  name: string;
-  description: string | null;
-  imageUrl: string | null;
-  unit: string;
-  categoryId: string | null;
-  category: { id: string; name: string } | null;
-  _count: {
-    parties: number;
-  };
-}
-
 const CreatePartyForm: React.FC = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [dishes, setDishes] = useState<DishWithRelations[]>([]);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 12,
-    totalCount: 0,
-    totalPages: 1,
-    hasNextPage: false,
-    hasPreviousPage: false,
-  });
+  const [availableDishes, setAvailableDishes] = useState<DishWithRelations[]>(
+    []
+  );
+  const [selectedDishes, setSelectedDishes] = useState<DishWithRelations[]>([]);
+  const [isLoadingDishes, setIsLoadingDishes] = useState(false);
+
+  const fetchDishes = async (search?: string) => {
+    try {
+      setIsLoadingDishes(true);
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+
+      const response = await fetch(`/api/dishes?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableDishes(data.dishes);
+      }
+    } catch (error) {
+      console.error('Error fetching dishes:', error);
+    } finally {
+      setIsLoadingDishes(false);
+    }
+  };
 
   useEffect(() => {
     if (currentStep === 3) {
-      fetch('/api/dishes')
-        .then(res => res.json())
-        .then(data => {
-          setDishes(data.dishes);
-          setPagination(data.pagination);
-        })
-        .catch(error => console.error('Error fetching dishes:', error));
+      fetchDishes();
     }
   }, [currentStep]);
+
+  const handleDishSearch = (query: string) => {
+    fetchDishes(query);
+  };
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -153,6 +152,7 @@ const CreatePartyForm: React.FC = () => {
       if (response.ok) {
         setSuccess(true);
         form.reset();
+        router.push(`/parties/${responseData.id}`);
         router.refresh();
       } else {
         setError(responseData.error || 'Failed to create party');
@@ -169,6 +169,55 @@ const CreatePartyForm: React.FC = () => {
 
   const prevStep = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
+  };
+
+  const handleDishCreated = (dish: DishWithRelations) => {
+    // Clear any existing error
+    setError(null);
+    // Add to available dishes
+    setAvailableDishes(prev => [...prev, dish]);
+  };
+
+  const handleDishSelect = (dish: DishWithRelations) => {
+    // Clear any existing error
+    setError(null);
+
+    // Update selected dishes
+    setSelectedDishes(prev => {
+      if (prev.some(d => d.id === dish.id)) {
+        return prev;
+      }
+      return [...prev, dish];
+    });
+
+    // Update form value
+    const currentDishes = form.getValues('dishes') || [];
+    if (!currentDishes.some(d => d.dishId === dish.id)) {
+      form.setValue(
+        'dishes',
+        [...currentDishes, { dishId: dish.id, amountPerPerson: 1 }],
+        { shouldValidate: true }
+      );
+    }
+  };
+
+  const handleDishDeselect = (dishId: string) => {
+    setSelectedDishes(prev => prev.filter(dish => dish.id !== dishId));
+    const currentDishes = form.getValues('dishes') || [];
+    form.setValue(
+      'dishes',
+      currentDishes.filter(dish => dish.dishId !== dishId)
+    );
+  };
+
+  const handleAmountChange = (dishId: string, amount: number) => {
+    const currentDishes = form.getValues('dishes') || [];
+    form.setValue(
+      'dishes',
+      currentDishes.map(dish =>
+        dish.dishId === dishId ? { ...dish, amountPerPerson: amount } : dish
+      )
+    );
   };
 
   const renderStepContent = (step: number) => {
@@ -232,58 +281,61 @@ const CreatePartyForm: React.FC = () => {
         );
       case 3:
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {form.formState.errors.dishes && (
               <p className="text-sm text-destructive">
                 {form.formState.errors.dishes.message}
               </p>
             )}
-            <div className="space-y-2">
-              <h3 className="font-medium">Selected Dishes</h3>
-              {form.watch('dishes')?.map(dish => (
-                <div
-                  key={dish.dishId}
-                  className="flex items-center justify-between gap-4 p-3 bg-muted/50 rounded-lg"
-                >
-                  <div className="flex items-center gap-2">
-                    <span>{dishes.find(d => d.id === dish.dishId)?.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="number"
-                      min="0.1"
-                      step="0.1"
-                      value={dish.amountPerPerson}
-                      onChange={e => {
-                        const newDishes = form.watch('dishes').map(d =>
-                          d.dishId === dish.dishId
-                            ? {
-                                ...d,
-                                amountPerPerson: parseFloat(e.target.value),
-                              }
-                            : d
-                        );
-                        form.setValue('dishes', newDishes);
-                      }}
-                      className="w-24"
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => {
-                        const newDishes = form
-                          .watch('dishes')
-                          .filter(d => d.dishId !== dish.dishId);
-                        form.setValue('dishes', newDishes);
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
+
+            <DishSelector
+              availableDishes={availableDishes}
+              selectedDishes={selectedDishes}
+              onDishSelect={handleDishSelect}
+              onDishDeselect={handleDishDeselect}
+              onDishCreated={handleDishCreated}
+              onSearch={handleDishSearch}
+              isLoading={isLoadingDishes}
+            />
+
+            {selectedDishes.length > 0 && (
+              <Card className="p-4">
+                <h3 className="font-medium mb-4">Amount per Person</h3>
+                <div className="space-y-4">
+                  {form.watch('dishes')?.map(dish => {
+                    const dishDetails = selectedDishes.find(
+                      d => d.id === dish.dishId
+                    );
+                    return (
+                      <div
+                        key={dish.dishId}
+                        className="flex items-center gap-4"
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium">{dishDetails?.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {dishDetails?.unit}
+                          </div>
+                        </div>
+                        <Input
+                          type="number"
+                          min={0}
+                          step={0.01}
+                          value={dish.amountPerPerson}
+                          onChange={e =>
+                            handleAmountChange(
+                              dish.dishId,
+                              parseFloat(e.target.value) || 0
+                            )
+                          }
+                          className="w-24"
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
+              </Card>
+            )}
           </div>
         );
       default:
@@ -292,7 +344,7 @@ const CreatePartyForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto">
       {/* Progress Steps */}
       <div className="mb-4">
         <div className="grid grid-cols-4 gap-8">
