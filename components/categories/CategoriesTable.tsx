@@ -56,7 +56,7 @@ export function CategoriesTable({
   const searchParams = useSearchParams();
 
   const createPageURL = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('page', pageNumber.toString());
     return `/categories?${params.toString()}`;
   };
@@ -66,7 +66,7 @@ export function CategoriesTable({
 
   // Create sort URL for a column
   const createSortURL = (column: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
 
     // If already sorting by this column, toggle the order
     if (sortBy === column) {

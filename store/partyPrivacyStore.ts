@@ -1,12 +1,45 @@
 import { create } from 'zustand';
-import {
-  PartyPrivacyStatus,
-  JoinRequest,
-  PartyPrivacySettings,
-  PARTY_ACCESS_MATRIX,
-  PartyAccessControl,
-} from '@/lib/types/party';
-import { JoinRequestStatus } from '@prisma/client';
+import { Privacy } from '@prisma/client';
+import { JoinRequest } from '@/lib/types/party';
+
+interface PartyPrivacySettings {
+  status: Privacy;
+  allowJoinRequests: boolean;
+  requireApproval: boolean;
+}
+
+interface PartyAccessControl {
+  canViewParty: boolean;
+  canJoinDirectly: boolean;
+  canViewParticipants: boolean;
+  canViewDishes: boolean;
+  canViewAmountPerPerson: boolean;
+}
+
+// Matrix defining access rights for different privacy statuses
+const PARTY_ACCESS_MATRIX: Record<Privacy, PartyAccessControl> = {
+  [Privacy.PUBLIC]: {
+    canViewParty: true,
+    canJoinDirectly: true,
+    canViewParticipants: true,
+    canViewDishes: true,
+    canViewAmountPerPerson: true,
+  },
+  [Privacy.CLOSED]: {
+    canViewParty: true,
+    canJoinDirectly: false,
+    canViewParticipants: true,
+    canViewDishes: true,
+    canViewAmountPerPerson: true,
+  },
+  [Privacy.PRIVATE]: {
+    canViewParty: true,
+    canJoinDirectly: false,
+    canViewParticipants: false,
+    canViewDishes: false,
+    canViewAmountPerPerson: false,
+  },
+};
 
 interface PartyPrivacyStore {
   // State
@@ -16,7 +49,7 @@ interface PartyPrivacyStore {
   adminUsers: Record<string, string[]>; // partyId -> userIds
 
   // Actions
-  setPartyPrivacy: (partyId: string, status: PartyPrivacyStatus) => void;
+  setPartyPrivacy: (partyId: string, status: Privacy) => void;
   updatePrivacySettings: (
     partyId: string,
     settings: Partial<PartyPrivacySettings>
@@ -145,7 +178,7 @@ export const usePartyPrivacyStore = create<PartyPrivacyStore>((set, get) => ({
     }
 
     // Default to most restrictive if no settings
-    if (!settings) return PARTY_ACCESS_MATRIX[PartyPrivacyStatus.PRIVATE];
+    if (!settings) return PARTY_ACCESS_MATRIX[Privacy.PRIVATE];
     return PARTY_ACCESS_MATRIX[settings.status];
   },
 

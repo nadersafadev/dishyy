@@ -16,7 +16,13 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Party, PartyDish, PartyParticipant, Dish } from '@prisma/client';
+import {
+  Party,
+  PartyDish,
+  PartyParticipant,
+  Dish,
+  Privacy,
+} from '@prisma/client';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, Globe, Lock, Users } from 'lucide-react';
 import {
@@ -30,8 +36,7 @@ import { Label } from '@/components/ui/label';
 import { FormTextField } from '@/components/forms/form-text-field';
 import { FormNumberField } from '@/components/forms/form-number-field';
 import { FormDateField } from '@/components/forms/form-date-field';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Privacy } from '@/lib/enums';
+import { FormRadioField } from '@/components/forms/form-radio-field';
 import { toast } from '@/lib/toast';
 
 const formSchema = z.object({
@@ -63,30 +68,6 @@ interface EditPartyFormProps {
   party: PartyWithDetails;
   onClose: () => void;
 }
-
-const privacyOptions = [
-  {
-    value: Privacy.PUBLIC,
-    label: 'Public',
-    description: 'Anyone can view and join the party',
-    icon: Globe,
-    variant: 'default' as const,
-  },
-  {
-    value: Privacy.CLOSED,
-    label: 'Closed',
-    description: 'Anyone can view, but joining requires approval',
-    icon: Users,
-    variant: 'secondary' as const,
-  },
-  {
-    value: Privacy.PRIVATE,
-    label: 'Private',
-    description: 'Limited visibility, invitation only',
-    icon: Lock,
-    variant: 'outline' as const,
-  },
-];
 
 export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
   const router = useRouter();
@@ -285,44 +266,30 @@ export function EditPartyForm({ party, onClose }: EditPartyFormProps) {
 
         <FormDateField name="date" label="Date" />
 
-        <div className="space-y-2">
-          <Label>Privacy</Label>
-          <RadioGroup
-            defaultValue={party.privacy}
-            onValueChange={value => form.setValue('privacy', value as Privacy)}
-            className="flex flex-col space-y-2"
-          >
-            {privacyOptions.map(option => (
-              <div
-                key={option.value}
-                className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-accent/50 cursor-pointer group"
-                onClick={() =>
-                  form.setValue('privacy', option.value as Privacy)
-                }
-              >
-                <RadioGroupItem
-                  value={option.value}
-                  id={option.value}
-                  className="mt-0"
-                />
-                <div className="flex items-center gap-3">
-                  <option.icon className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
-                  <div className="flex flex-col gap-1">
-                    <Label
-                      htmlFor={option.value}
-                      className="font-medium cursor-pointer group-hover:text-accent-foreground"
-                    >
-                      {option.label}
-                    </Label>
-                    <span className="text-xs text-muted-foreground group-hover:text-accent-foreground/70">
-                      {option.description}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
+        <FormRadioField
+          name="privacy"
+          label="Privacy"
+          options={[
+            {
+              value: Privacy.PUBLIC,
+              label: 'Public',
+              description: 'Anyone can view and join the party',
+              icon: Globe,
+            },
+            {
+              value: Privacy.CLOSED,
+              label: 'Closed',
+              description: 'Anyone can view, but joining requires approval',
+              icon: Users,
+            },
+            {
+              value: Privacy.PRIVATE,
+              label: 'Private',
+              description: 'Limited visibility, invitation only',
+              icon: Lock,
+            },
+          ]}
+        />
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">

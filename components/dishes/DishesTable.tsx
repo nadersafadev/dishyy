@@ -5,6 +5,7 @@ import { DataPagination } from '@/components/ui/DataPagination';
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -14,6 +15,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { DishTableRow } from './DishTableRow';
 import { Unit } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DishWithRelations {
   id: string;
@@ -40,6 +42,10 @@ interface DishesTableProps {
   pagination: PaginationMeta;
   sortBy?: string;
   sortOrder?: string;
+  isLoading?: boolean;
+  selectable?: boolean;
+  selectedDishes?: string[];
+  onDishSelect?: (dishId: string) => void;
 }
 
 export function DishesTable({
@@ -47,21 +53,19 @@ export function DishesTable({
   pagination,
   sortBy = 'name',
   sortOrder = 'asc',
+  isLoading = false,
+  selectable = false,
+  selectedDishes = [],
+  onDishSelect,
 }: DishesTableProps) {
   const searchParams = useSearchParams();
-
-  const createPageURL = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', pageNumber.toString());
-    return `/dishes?${params.toString()}`;
-  };
 
   // Check if sortable column is active
   const isSortActive = (column: string) => sortBy === column;
 
   // Create sort URL for a column
   const createSortURL = (column: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
 
     // If already sorting by this column, toggle the order
     if (sortBy === column) {
@@ -84,6 +88,53 @@ export function DishesTable({
     );
   };
 
+  if (isLoading) {
+    return (
+      <div>
+        <div className="rounded-md border overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-24">Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Usage Count</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-12 w-12" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-end gap-2">
+                      <Skeleton className="h-8 w-8" />
+                      <Skeleton className="h-8 w-8" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="mt-4">
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </div>
+    );
+  }
+
   if (dishes.length === 0) {
     return (
       <div className="text-center py-6">
@@ -94,6 +145,7 @@ export function DishesTable({
       </div>
     );
   }
+
   return (
     <div>
       <div className="rounded-md border overflow-hidden">
@@ -125,7 +177,13 @@ export function DishesTable({
           </TableHeader>
           <TableBody>
             {dishes.map(dish => (
-              <DishTableRow key={dish.id} dish={dish} />
+              <DishTableRow
+                key={dish.id}
+                dish={dish}
+                selectable={selectable}
+                selected={selectedDishes.includes(dish.id)}
+                onSelect={onDishSelect}
+              />
             ))}
           </TableBody>
         </Table>

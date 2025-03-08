@@ -56,7 +56,6 @@ export function PartyHeader({
   joinRequests,
   userId,
 }: PartyHeaderProps) {
-  const privacyStatus = mapPrivacyStatus(party.privacy);
   const {
     initializeJoinRequests,
     setPartyParticipants,
@@ -66,11 +65,11 @@ export function PartyHeader({
 
   // Initialize privacy settings and join requests
   useEffect(() => {
-    setPartyPrivacy(party.id, privacyStatus);
+    setPartyPrivacy(party.id, party.privacy);
     initializeJoinRequests(party.id, joinRequests);
   }, [
     party.id,
-    privacyStatus,
+    party.privacy,
     joinRequests,
     initializeJoinRequests,
     setPartyPrivacy,
@@ -101,7 +100,7 @@ export function PartyHeader({
             </h1>
             <PrivacySelector
               partyId={party.id}
-              currentStatus={privacyStatus}
+              currentStatus={party.privacy}
               isHost={isAdmin}
             />
           </div>

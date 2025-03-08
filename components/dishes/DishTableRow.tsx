@@ -36,6 +36,9 @@ interface DishTableRowProps {
     unit: Unit;
     _count: { parties: number };
   };
+  selectable?: boolean;
+  selected?: boolean;
+  onSelect?: (dishId: string) => void;
 }
 
 interface FeedbackMessage {
@@ -43,7 +46,12 @@ interface FeedbackMessage {
   text: string;
 }
 
-export function DishTableRow({ dish }: DishTableRowProps) {
+export function DishTableRow({
+  dish,
+  selectable = false,
+  selected = false,
+  onSelect,
+}: DishTableRowProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -174,6 +182,12 @@ export function DishTableRow({ dish }: DishTableRowProps) {
     if ((e.target as HTMLElement).closest('.action-buttons') || isEditing) {
       return;
     }
+
+    if (selectable && onSelect) {
+      onSelect(dish.id);
+      return;
+    }
+
     router.push(`/dishes/${dish.id}`);
   };
 
@@ -256,7 +270,11 @@ export function DishTableRow({ dish }: DishTableRowProps) {
     <>
       <TableRow
         onClick={handleRowClick}
-        className={`transition-colors ${isEditing ? '' : 'cursor-pointer hover:bg-muted/50'}`}
+        className={cn(
+          'cursor-pointer hover:bg-muted/50 transition-colors',
+          selected && 'bg-muted',
+          isEditing && 'cursor-default hover:bg-transparent'
+        )}
       >
         <TableCell>
           <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted group">

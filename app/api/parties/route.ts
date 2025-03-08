@@ -186,6 +186,24 @@ export async function GET(request: Request) {
   }
 }
 
+const createPartySchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  description: z.string().optional(),
+  date: z.string().refine(val => !isNaN(Date.parse(val)), {
+    message: 'Invalid date',
+  }),
+  maxParticipants: z.number().positive().optional(),
+  privacy: z.nativeEnum(Privacy).default(Privacy.PUBLIC),
+  dishes: z
+    .array(
+      z.object({
+        dishId: z.string(),
+        amountPerPerson: z.number().positive('Amount must be greater than 0'),
+      })
+    )
+    .min(1, 'At least one dish is required'),
+});
+
 // CREATE a new party
 export async function POST(req: Request) {
   try {
@@ -200,47 +218,29 @@ export async function POST(req: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return new NextResponse('User not found', { status: 404 });
     }
 
     const body = await req.json();
-    const validatedData = partySchema.parse(body);
+    const validatedData = createPartySchema.parse(body);
 
-    // Verify all dishes exist
-    const dishes = await prisma.dish.findMany({
-      where: {
-        id: {
-          in: validatedData.dishes.map(d => d.dishId),
-        },
-      },
-    });
-
-    if (dishes.length !== validatedData.dishes.length) {
-      return NextResponse.json(
-        { error: 'One or more dishes not found' },
-        { status: 400 }
-      );
-    }
-
+    // Create party with dishes
     const party = await prisma.party.create({
       data: {
         name: validatedData.name,
-        description: validatedData.description || '',
+        description: validatedData.description,
         date: new Date(validatedData.date),
         maxParticipants: validatedData.maxParticipants,
         privacy: validatedData.privacy,
         createdById: user.id,
         dishes: {
-          create: validatedData.dishes.map(({ dishId, amountPerPerson }) => ({
-            dish: {
-              connect: { id: dishId },
-            },
-            amountPerPerson,
+          create: validatedData.dishes.map(dish => ({
+            dishId: dish.dishId,
+            amountPerPerson: dish.amountPerPerson,
           })),
         },
       },
       include: {
-        createdBy: true,
         dishes: {
           include: {
             dish: true,
@@ -254,12 +254,12 @@ export async function POST(req: Request) {
     console.error('Error creating party:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid data', details: error.errors },
+        { error: error.errors[0].message },
         { status: 400 }
       );
     }
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to create party' },
       { status: 500 }
     );
   }

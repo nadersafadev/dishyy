@@ -27,7 +27,7 @@ export default async function NewPartyPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="mx-auto space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">
           Create a New Party

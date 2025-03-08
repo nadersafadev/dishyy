@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { NavItem } from './NavItem';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { LucideIcon, LucideProps } from 'lucide-react';
 
 interface HeaderClientProps {
   userId: string | null;
@@ -34,9 +35,9 @@ export function HeaderClient({
   isAdmin,
   filteredNavItems,
 }: HeaderClientProps) {
-  const getIcon = (iconName: string) => {
-    const Icon = Icons[iconName as keyof typeof Icons];
-    return Icon || Icons.HelpCircle;
+  const getIcon = (iconName: string): LucideIcon => {
+    const icon = Icons[iconName as keyof typeof Icons];
+    return icon as LucideIcon;
   };
 
   return (

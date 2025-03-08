@@ -53,7 +53,7 @@ export function DataPagination({
       return '#'; // Use # when using callback instead of navigation
     }
 
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('page', pageNumber.toString());
     return `${baseUrl || ''}?${params.toString()}`;
   };

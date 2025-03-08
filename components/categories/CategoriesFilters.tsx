@@ -44,7 +44,7 @@ export function CategoriesFilters({
 
   // Handle search change
   const handleSearchChange = (value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
 
     if (value) {
       params.set('search', value);
