@@ -15,7 +15,7 @@ export function ViewSwitcher({ currentView }: ViewSwitcherProps) {
   const searchParams = useSearchParams();
 
   const createViewURL = (view: ViewMode) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('view', view);
     return `?${params.toString()}`;
   };

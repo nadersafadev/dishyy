@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/forms/input';
-import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,6 +10,7 @@ import { Form } from '@/components/ui/form';
 import { FormTextField } from '@/components/forms/form-text-field';
 import { FormCheckboxField } from '@/components/forms/form-checkbox-field';
 import Link from 'next/link';
+import { toast } from '@/lib/toast';
 
 const formSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -23,7 +23,6 @@ type FormData = z.infer<typeof formSchema>;
 
 export function NewsletterForm() {
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -49,17 +48,10 @@ export function NewsletterForm() {
         throw new Error('Subscription failed');
       }
 
-      toast({
-        title: 'Success!',
-        description: 'Successfully subscribed to the newsletter!',
-      });
+      toast.success('Success!', 'Successfully subscribed to the newsletter!');
       form.reset();
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to subscribe. Please try again.',
-      });
+      toast.error('Error', 'Failed to subscribe. Please try again.');
     } finally {
       setLoading(false);
     }

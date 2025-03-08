@@ -1,49 +1,50 @@
 'use client';
 
-import { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ViewToggle } from '@/components/ui/view-toggle';
+import { UpdateDishQuantity } from '@/components/update-dish-quantity';
+import { Unit } from '@/lib/types';
 import { PartyDish } from '@prisma/client';
+import { UtensilsCrossedIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { UtensilsCrossedIcon, ChevronRightIcon } from 'lucide-react';
-import { UpdateDishQuantity } from '@/components/update-dish-quantity';
 import { useParams } from 'next/navigation';
-import { Unit } from '@/lib/types';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { useMemo, useState } from 'react';
+import { RestrictedContent } from '@/components/party/privacy/RestrictedContent';
 
 interface PartyDishAmountsProps {
   dishes: (PartyDish & {
     dish: {
-      id: string;
       name: string;
       unit: Unit;
       description: string | null;
       imageUrl: string | null;
       categoryId: string;
       category?: {
-        id: string;
         name: string;
+        id: string;
         parentId: string | null;
       };
     };
   })[];
-  isAdmin?: boolean;
+  isAdmin: boolean;
+  userId: string;
+  partyId: string;
+  participantIds: string[];
 }
 
 export function PartyDishAmounts({
   dishes,
-  isAdmin = false,
+  isAdmin,
+  userId,
+  partyId,
+  participantIds,
 }: PartyDishAmountsProps) {
   const [view, setView] = useState<'grid' | 'list'>('list');
-  const [isOpen, setIsOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const params = useParams();
-  const partyId = params.id as string;
 
   // Group dishes by category in a hierarchical structure
   const dishesByCategory = useMemo(() => {
@@ -176,7 +177,7 @@ export function PartyDishAmounts({
                   }
                 >
                   {/* Add edit controls for admin - position differently for list vs grid view */}
-                  {isAdmin && isOpen && (
+                  {isAdmin && (
                     <div
                       className={
                         view === 'grid'
@@ -225,7 +226,10 @@ export function PartyDishAmounts({
                           {partyDish.dish.unit}
                         </Badge>
                         <span className="text-sm font-semibold">
-                          {partyDish.amountPerPerson.toFixed(1)}
+                          {partyDish.dish.unit === 'QUANTITY' ||
+                          partyDish.dish.unit === 'PIECES'
+                            ? Math.ceil(partyDish.amountPerPerson)
+                            : partyDish.amountPerPerson.toFixed(2)}
                         </span>
                       </div>
                     </>
@@ -258,8 +262,14 @@ export function PartyDishAmounts({
                         </Badge>
                       </div>
                       <span className="text-sm font-semibold whitespace-nowrap ml-2 mr-10">
-                        {partyDish.amountPerPerson.toFixed(1)}{' '}
-                        {partyDish.dish.unit.toLowerCase()}
+                        {partyDish.dish.unit === 'QUANTITY' ||
+                        partyDish.dish.unit === 'PIECES'
+                          ? Math.ceil(partyDish.amountPerPerson)
+                          : partyDish.amountPerPerson.toFixed(2)}{' '}
+                        {partyDish.dish.unit === 'QUANTITY' ||
+                        partyDish.dish.unit === 'PIECES'
+                          ? 'pcs'
+                          : partyDish.dish.unit.toLowerCase()}
                       </span>
                     </>
                   )}
@@ -287,48 +297,20 @@ export function PartyDishAmounts({
   };
 
   return (
-    <Card className="p-6 space-y-4 h-fit">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-4">
-        <div className="flex items-center justify-between">
-          <CollapsibleTrigger className="flex items-center gap-2 hover:underline">
-            <h2 className="text-lg font-medium">Amount Per Person</h2>
-            <ChevronRightIcon
-              className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-90' : ''}`}
-            />
-          </CollapsibleTrigger>
-          {isOpen && (
-            <div className="flex items-center gap-2">
-              {isAdmin && isOpen && (
-                <span className="text-xs text-muted-foreground">
-                  Tip: Click edit icon to modify amounts
-                </span>
-              )}
-              <ViewToggle view={view} onViewChange={setView} />
-            </div>
-          )}
+    <RestrictedContent
+      partyId={partyId}
+      accessCheck="canViewDishes"
+      userId={userId}
+    >
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-medium">Dishes</h2>
+          <ViewToggle view={view} onViewChange={setView} />
         </div>
-
-        <CollapsibleContent className="space-y-4">
-          {dishes.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">
-              No dishes have been added to this party yet.
-            </p>
-          ) : (
-            <div className="space-y-6">
-              {dishesByCategory.map(category =>
-                renderCategoryWithDishes(category)
-              )}
-            </div>
-          )}
-        </CollapsibleContent>
-      </Collapsible>
-
-      {!isOpen && dishes.length > 0 && (
-        <p className="text-sm text-muted-foreground">
-          {dishes.length} {dishes.length === 1 ? 'dish' : 'dishes'} • Click to
-          show details
-        </p>
-      )}
-    </Card>
+        <div className="space-y-6">
+          {dishesByCategory.map(category => renderCategoryWithDishes(category))}
+        </div>
+      </Card>
+    </RestrictedContent>
   );
 }

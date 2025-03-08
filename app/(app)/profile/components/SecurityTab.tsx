@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/forms/input';
 import { Label } from '@/components/ui/label';
 import { Key, Shield } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/lib/toast';
 import { useUser } from '@clerk/nextjs';
 
 export function SecurityTab() {
@@ -36,29 +36,27 @@ export function SecurityTab() {
     try {
       // Password validation
       if (newPassword !== confirmPassword) {
-        toast({
-          title: "Passwords don't match",
-          description: 'New password and confirmation must match.',
-          variant: 'destructive',
-        });
+        toast.error(
+          "Passwords don't match",
+          'New password and confirmation must match.'
+        );
         return;
       }
 
       if (newPassword.length < 8) {
-        toast({
-          title: 'Password too short',
-          description: 'Password must be at least 8 characters long.',
-          variant: 'destructive',
-        });
+        toast.error(
+          'Password too short',
+          'Password must be at least 8 characters long.'
+        );
         return;
       }
 
       // This would be the actual Clerk update password code
       // For now, we're simulating success
-      toast({
-        title: 'Password updated',
-        description: 'Your password has been updated successfully.',
-      });
+      toast.success(
+        'Password updated',
+        'Your password has been updated successfully.'
+      );
       setIsPasswordModalOpen(false);
 
       // Reset form
@@ -67,20 +65,16 @@ export function SecurityTab() {
       setConfirmPassword('');
     } catch (error) {
       console.error('Error updating password:', error);
-      toast({
-        title: 'Error',
-        description: 'There was a problem updating your password.',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'There was a problem updating your password.');
     }
   };
 
   const handleEnable2FA = async () => {
     try {
-      toast({
-        title: 'Two-factor authentication',
-        description: "We've sent verification instructions to your email.",
-      });
+      toast.success(
+        'Two-factor authentication',
+        "We've sent verification instructions to your email."
+      );
       setIsTwoFactorModalOpen(false);
 
       // In a real implementation, this would:
@@ -90,11 +84,10 @@ export function SecurityTab() {
       // 4. Enable 2FA if verification is successful
     } catch (error) {
       console.error('Error enabling 2FA:', error);
-      toast({
-        title: 'Error',
-        description: 'There was a problem enabling two-factor authentication.',
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        'There was a problem enabling two-factor authentication.'
+      );
     }
   };
 

@@ -41,7 +41,7 @@ export function PartyFilters({
 
   // Handle search change
   const handleSearchChange = (value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
 
     if (value) {
       params.set('search', value);
@@ -55,7 +55,7 @@ export function PartyFilters({
 
   // Handle filter changes
   const handleFiltersChange = (filters: Record<string, string>) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
 
     Object.entries(filters).forEach(([key, value]) => {
       if (value) {
@@ -71,7 +71,7 @@ export function PartyFilters({
 
   // Handle sort changes
   const handleSortChange = (sortId: string, sortOrder: 'asc' | 'desc') => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('sortBy', sortId);
     params.set('sortOrder', sortOrder);
     params.set('page', '1');

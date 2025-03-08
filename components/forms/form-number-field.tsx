@@ -1,6 +1,7 @@
 import { useFormContext } from 'react-hook-form';
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,6 +20,7 @@ interface FormNumberFieldProps {
   optional?: boolean;
   disabled?: boolean;
   onChange?: (value: number | undefined) => void;
+  description?: string;
 }
 
 export function FormNumberField({
@@ -32,6 +34,7 @@ export function FormNumberField({
   optional = false,
   disabled = false,
   onChange,
+  description,
 }: FormNumberFieldProps) {
   const form = useFormContext();
 
@@ -79,6 +82,9 @@ export function FormNumberField({
               }}
             />
           </FormControl>
+          {description && (
+            <FormDescription className="text-xs">{description}</FormDescription>
+          )}
           <FormMessage className="text-xs" />
         </FormItem>
       )}

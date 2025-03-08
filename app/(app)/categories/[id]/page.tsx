@@ -93,9 +93,9 @@ export default async function CategoryDetailPage({
       {/* Associated Dishes */}
       <CategoryCard
         title="Associated Dishes"
-        description="Dishes that belong to this category"
+        description="Dishes that belong to this category."
       >
-        <DishesGrid dishes={category.dishes} />
+        <DishesGrid data={category.dishes} />
       </CategoryCard>
     </div>
   );

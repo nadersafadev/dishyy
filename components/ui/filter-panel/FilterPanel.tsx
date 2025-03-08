@@ -55,7 +55,7 @@ export function FilterPanel({
     const initialValues: Record<string, string> = {};
 
     filters.forEach(filter => {
-      const valueFromUrl = searchParams.get(filter.id);
+      const valueFromUrl = searchParams?.get(filter.id);
       if (filter.type === 'date') {
         initialValues[filter.id] = valueFromUrl || '';
       } else {
@@ -89,7 +89,7 @@ export function FilterPanel({
       onFiltersChange({ ...filterValues, ...newFilters });
     } else {
       // Default behavior: update URL
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams?.toString() || '');
 
       // Update params with new values
       Object.entries(newFilters).forEach(([key, value]) => {
@@ -117,7 +117,7 @@ export function FilterPanel({
       onSortChange(newSortId, newSortOrder);
     } else {
       // Default behavior: update URL
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams?.toString() || '');
 
       if (newSortId) {
         params.set('sortBy', newSortId);

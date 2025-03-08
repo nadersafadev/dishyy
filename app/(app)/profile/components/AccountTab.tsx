@@ -12,7 +12,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useUser } from '@clerk/nextjs';
 import { Github, Twitter } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/lib/toast';
 
 interface AccountTabProps {
   dbUser?: { role: string } | null;
@@ -102,10 +102,10 @@ export function AccountTab({ dbUser }: AccountTabProps) {
               name="Twitter"
               description="Connect your Twitter account"
               onConnect={() =>
-                toast({
-                  title: 'Twitter integration',
-                  description: 'Twitter integration coming soon!',
-                })
+                toast.info(
+                  'Twitter integration',
+                  'Twitter integration coming soon!'
+                )
               }
             />
           </div>

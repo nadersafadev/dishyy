@@ -9,15 +9,7 @@ import {
   ChevronRight,
   ChevronsRight,
 } from 'lucide-react';
-
-export interface PaginationMeta {
-  page: number;
-  limit: number;
-  totalCount: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
+import { PaginationMeta } from '@/lib/types';
 
 export interface DataPaginationProps {
   pagination: PaginationMeta;
@@ -53,7 +45,7 @@ export function DataPagination({
       return '#'; // Use # when using callback instead of navigation
     }
 
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('page', pageNumber.toString());
     return `${baseUrl || ''}?${params.toString()}`;
   };

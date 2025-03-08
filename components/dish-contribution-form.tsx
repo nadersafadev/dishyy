@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/lib/toast';
 import * as z from 'zod';
 
 interface DishContributionFormProps {
@@ -32,7 +32,6 @@ export function DishContributionForm({
   initialAmount = 0,
 }: DishContributionFormProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formSchema = z.object({
@@ -80,14 +79,14 @@ export function DishContributionForm({
           throw new Error(data.error || 'Failed to update contribution');
         }
 
-        toast({
-          title: 'Success',
-          description: `Successfully updated contribution to ${
+        toast.success(
+          'Success',
+          `Successfully updated contribution to ${
             unit === 'QUANTITY'
               ? `${Math.ceil(values.amount)}`
               : `${values.amount.toFixed(1)} ${unit.toLowerCase()}`
-          } of ${dishName}`,
-        });
+          } of ${dishName}`
+        );
       } else {
         // Add new contribution
         response = await fetch(`/api/parties/${partyId}/contributions`, {
@@ -106,28 +105,26 @@ export function DishContributionForm({
           throw new Error(data.error || 'Failed to add contribution');
         }
 
-        toast({
-          title: 'Success',
-          description: `Successfully contributed ${
+        toast.success(
+          'Success',
+          `Successfully contributed ${
             unit === 'QUANTITY'
               ? `${Math.ceil(values.amount)}`
               : `${values.amount.toFixed(1)} ${unit.toLowerCase()}`
-          } of ${dishName}`,
-        });
+          } of ${dishName}`
+        );
       }
 
       form.reset();
       router.refresh();
     } catch (error) {
       console.error('Error with contribution:', error);
-      toast({
-        title: 'Error',
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Failed to process contribution',
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        error instanceof Error
+          ? error.message
+          : 'Failed to process contribution'
+      );
     } finally {
       setIsSubmitting(false);
     }

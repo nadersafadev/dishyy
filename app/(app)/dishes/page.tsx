@@ -9,29 +9,7 @@ import { DishesFilters } from '@/components/dishes/DishesFilters';
 import { DishesGrid } from '@/components/dishes/DishesGrid';
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher';
 import { generateMetadata } from '@/lib/metadata';
-import { Unit } from '@/lib/types';
-
-// Define the interface for dish data
-interface DishWithRelations {
-  id: string;
-  name: string;
-  description: string | null;
-  imageUrl: string | null;
-  unit: Unit;
-  categoryId: string | null;
-  category: { id: string; name: string } | null;
-  _count: { parties: number };
-}
-
-// Define pagination metadata interface
-interface PaginationMeta {
-  page: number;
-  limit: number;
-  totalCount: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
+import { Unit, DishWithRelations, PaginationMeta } from '@/lib/types';
 
 export const metadata = generateMetadata(
   'Dishes',
@@ -178,10 +156,11 @@ export default async function DishesPage({
           />
         ) : (
           <DishesGrid
-            dishes={dishes}
+            data={dishes}
             pagination={pagination}
             sortBy={sortBy}
             sortOrder={sortOrder}
+            baseUrl=""
           />
         )}
       </div>

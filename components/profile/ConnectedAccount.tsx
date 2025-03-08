@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/lib/toast';
 
 interface ConnectedAccountProps {
   icon: React.ReactNode;
@@ -37,10 +37,10 @@ export function ConnectedAccount({
         }
 
         setIsConnected(false);
-        toast({
-          title: `${name} disconnected`,
-          description: `Your ${name} account has been disconnected successfully.`,
-        });
+        toast.success(
+          `${name} disconnected`,
+          `Your ${name} account has been disconnected successfully.`
+        );
       } else {
         // Simulate the OAuth connection process
         await new Promise(resolve => setTimeout(resolve, 800));
@@ -50,21 +50,20 @@ export function ConnectedAccount({
         }
 
         setIsConnected(true);
-        toast({
-          title: `${name} connected`,
-          description: `Your ${name} account has been connected successfully.`,
-        });
+        toast.success(
+          `${name} connected`,
+          `Your ${name} account has been connected successfully.`
+        );
       }
     } catch (error) {
       console.error(
         `Error ${isConnected ? 'disconnecting' : 'connecting'} account:`,
         error
       );
-      toast({
-        title: 'Error',
-        description: `There was a problem ${isConnected ? 'disconnecting' : 'connecting'} your ${name} account.`,
-        variant: 'destructive',
-      });
+      toast.error(
+        'Error',
+        `There was a problem ${isConnected ? 'disconnecting' : 'connecting'} your ${name} account.`
+      );
     } finally {
       setIsLoading(false);
     }

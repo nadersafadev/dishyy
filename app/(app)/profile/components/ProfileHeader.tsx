@@ -17,7 +17,7 @@ import { Input } from '@/components/forms/input';
 import { Label } from '@/components/ui/label';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/lib/toast';
 
 interface ProfileHeaderProps {
   dbUser?: { role: string } | null;
@@ -47,20 +47,16 @@ export function ProfileHeader({ dbUser, accountCreated }: ProfileHeaderProps) {
         lastName,
       });
 
-      toast({
-        title: 'Profile updated',
-        description: 'Your profile information has been updated successfully.',
-      });
+      toast.success(
+        'Profile updated',
+        'Your profile information has been updated successfully.'
+      );
 
       setIsEditModalOpen(false);
       router.refresh(); // Refresh the page to show updated data
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast({
-        title: 'Error',
-        description: 'There was a problem updating your profile.',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'There was a problem updating your profile.');
     }
   };
 

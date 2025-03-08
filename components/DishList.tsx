@@ -7,10 +7,10 @@ import { EditButton } from '@/components/ui/edit-button';
 import { DeleteButton } from '@/components/ui/delete-button';
 import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
-import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Dish } from '@prisma/client';
 import { DeleteDishDialog } from '@/components/dishes/DeleteDishDialog';
+import { toast } from '@/lib/toast';
 
 interface DishWithCount extends Dish {
   _count: {
@@ -25,7 +25,6 @@ interface DishListProps {
 
 export default function DishList({ dishes, view = 'grid' }: DishListProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
 
   if (dishes.length === 0) {

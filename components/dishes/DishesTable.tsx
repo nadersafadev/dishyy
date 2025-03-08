@@ -1,45 +1,28 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DataPagination } from '@/components/ui/DataPagination';
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { EntityTable } from '@/components/ui/entity-table';
+import { EntityTableColumn } from '@/lib/types/entity';
+import { ImageIcon, UtensilsCrossedIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { DishTableRow } from './DishTableRow';
-import { Unit } from '@/lib/types';
-
-interface DishWithRelations {
-  id: string;
-  name: string;
-  description: string | null;
-  imageUrl: string | null;
-  unit: Unit;
-  categoryId: string | null;
-  category: { id: string; name: string } | null;
-  _count: { parties: number };
-}
-
-interface PaginationMeta {
-  page: number;
-  limit: number;
-  totalCount: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import Image from 'next/image';
+import { Unit, Category, DishWithRelations, PaginationMeta } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
+import { DishForm } from '@/components/DishForm';
+import { EditDishDialog } from './EditDishDialog';
 
 interface DishesTableProps {
   dishes: DishWithRelations[];
   pagination: PaginationMeta;
   sortBy?: string;
   sortOrder?: string;
+  isLoading?: boolean;
+  selectable?: boolean;
+  selectedDishes?: string[];
+  onDishSelect?: (dishId: string) => void;
 }
 
 export function DishesTable({
@@ -47,42 +30,42 @@ export function DishesTable({
   pagination,
   sortBy = 'name',
   sortOrder = 'asc',
+  isLoading = false,
+  selectable = false,
+  selectedDishes = [],
+  onDishSelect,
 }: DishesTableProps) {
-  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [editingDish, setEditingDish] = useState<DishWithRelations | null>(
+    null
+  );
 
-  const createPageURL = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', pageNumber.toString());
-    return `/dishes?${params.toString()}`;
-  };
-
-  // Check if sortable column is active
-  const isSortActive = (column: string) => sortBy === column;
-
-  // Create sort URL for a column
-  const createSortURL = (column: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    // If already sorting by this column, toggle the order
-    if (sortBy === column) {
-      params.set('sortOrder', sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      params.set('sortBy', column);
-      params.set('sortOrder', 'asc'); // Default to ascending for new column
-    }
-
-    return `/dishes?${params.toString()}`;
-  };
-
-  // Get sort icon based on current state
-  const getSortIcon = (column: string) => {
-    if (!isSortActive(column)) return <ArrowUpDown className="h-4 w-4 ml-1" />;
-    return sortOrder === 'asc' ? (
-      <ArrowUp className="h-4 w-4 ml-1" />
-    ) : (
-      <ArrowDown className="h-4 w-4 ml-1" />
+  if (isLoading) {
+    return (
+      <div>
+        <div className="rounded-md border overflow-hidden">
+          <div className="grid gap-4">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="flex items-center gap-4 p-4">
+                <Skeleton className="h-12 w-12" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <div className="flex gap-2">
+                  <Skeleton className="h-8 w-8" />
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-4">
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </div>
     );
-  };
+  }
 
   if (dishes.length === 0) {
     return (
@@ -94,49 +77,112 @@ export function DishesTable({
       </div>
     );
   }
-  return (
-    <div>
-      <div className="rounded-md border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-24">Image</TableHead>
-              <TableHead>
-                <Link
-                  href={createSortURL('name')}
-                  className="flex items-center hover:underline"
-                >
-                  Name
-                  {getSortIcon('name')}
-                </Link>
-              </TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>
-                <Link
-                  href={createSortURL('usageCount')}
-                  className="flex items-center hover:underline"
-                >
-                  Usage Count
-                  {getSortIcon('usageCount')}
-                </Link>
-              </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {dishes.map(dish => (
-              <DishTableRow key={dish.id} dish={dish} />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
 
-      {/* Pagination UI */}
-      <DataPagination
+  const handleCategoryClick = (e: React.MouseEvent, categoryId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = new URL(window.location.href);
+    url.searchParams.set('categoryId', categoryId);
+    window.location.href = url.toString();
+  };
+
+  const columns: EntityTableColumn<DishWithRelations>[] = [
+    {
+      key: 'image',
+      header: 'Image',
+      width: '100px',
+      render: dish => (
+        <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted">
+          {dish.imageUrl ? (
+            <Image
+              src={dish.imageUrl}
+              alt={dish.name}
+              fill
+              sizes="64px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <ImageIcon className="h-6 w-6 text-muted-foreground/50" />
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'name',
+      header: 'Name',
+      render: dish => (
+        <div>
+          <div>{dish.name}</div>
+          {dish.description && (
+            <p className="text-sm text-muted-foreground line-clamp-1">
+              {dish.description}
+            </p>
+          )}
+        </div>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'category',
+      header: 'Category',
+      render: dish =>
+        dish.category ? (
+          <span
+            className="text-primary hover:underline cursor-pointer"
+            onClick={e => handleCategoryClick(e, dish.category!.id)}
+            data-no-row-click="true"
+          >
+            {dish.category.name}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">None</span>
+        ),
+    },
+    {
+      key: 'usageCount',
+      header: 'Usage Count',
+      render: dish => (
+        <Badge variant="outline">
+          {dish._count.parties}{' '}
+          {dish._count.parties === 1 ? 'party' : 'parties'}
+        </Badge>
+      ),
+      sortable: true,
+    },
+  ];
+
+  return (
+    <>
+      <EntityTable
+        data={dishes}
+        columns={columns}
         pagination={pagination}
-        itemName="dishes"
+        sortBy={sortBy}
+        sortOrder={sortOrder}
         baseUrl="/dishes"
+        onEdit={(id: string) => {
+          const dish = dishes.find(d => d.id === id);
+          if (dish) setEditingDish(dish);
+        }}
+        onDelete={async id => {
+          // The delete functionality is handled by the DeleteEntityDialog component
+        }}
+        selectable={selectable}
+        selectedIds={selectedDishes}
+        onRowSelect={onDishSelect}
       />
-    </div>
+
+      {editingDish && (
+        <EditDishDialog
+          dish={editingDish}
+          open={true}
+          onOpenChange={open => {
+            if (!open) setEditingDish(null);
+          }}
+        />
+      )}
+    </>
   );
 }

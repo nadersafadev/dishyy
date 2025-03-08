@@ -15,8 +15,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { UserX } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { toast } from '@/lib/toast';
 
 interface RemoveParticipantButtonProps {
   partyId: string;
@@ -30,7 +30,6 @@ export function RemoveParticipantButton({
   participantName,
 }: RemoveParticipantButtonProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
 
@@ -48,19 +47,15 @@ export function RemoveParticipantButton({
         throw new Error('Failed to remove participant');
       }
 
-      toast({
-        title: 'Success',
-        description: `${participantName} has been removed from the party`,
-      });
+      toast.success(
+        'Success',
+        `${participantName} has been removed from the party`
+      );
       router.refresh();
       setIsOpen(false);
     } catch (error) {
       console.error('Error removing participant:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to remove participant',
-        variant: 'destructive',
-      });
+      toast.error('Error', 'Failed to remove participant');
     } finally {
       setIsRemoving(false);
     }

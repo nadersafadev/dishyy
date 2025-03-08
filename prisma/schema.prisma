@@ -8,15 +8,17 @@ datasource db {
 }
 
 model User {
-  id        String             @id @default(cuid())
-  clerkId   String             @unique
-  name      String
-  email     String             @unique
-  role      Role               @default(INDIVIDUAL)
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
-  parties   Party[]            @relation("CreatedParties")
-  attending PartyParticipant[]
+  id            String             @id @default(cuid())
+  clerkId       String             @unique
+  name          String
+  email         String             @unique
+  role          Role               @default(INDIVIDUAL)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  joinRequests  JoinRequest[]
+  notifications Notification[]
+  parties       Party[]            @relation("CreatedParties")
+  attending     PartyParticipant[]
 
   @@map("users")
 }
@@ -32,27 +34,25 @@ model Party {
   maxParticipants Int?
   status          PartyStatus        @default(OPEN)
   privacy         Privacy            @default(PUBLIC)
+  joinRequests    JoinRequest[]
   createdBy       User               @relation("CreatedParties", fields: [createdById], references: [id])
   dishes          PartyDish[]
+  invitations     PartyInvitation[]
   participants    PartyParticipant[]
 
   @@map("parties")
 }
 
 model Category {
-  id           String     @id @default(cuid())
-  name         String     @unique
-  description  String?
-  parentId     String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  
-  // Self-relation for hierarchical structure
-  parent       Category?  @relation("CategoryParentChild", fields: [parentId], references: [id])
-  children     Category[] @relation("CategoryParentChild")
-  
-  // Relation to dishes
-  dishes       Dish[]
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  parentId    String?
+  parent      Category?  @relation("CategoryParentChild", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryParentChild")
+  dishes      Dish[]
 
   @@map("categories")
 }
@@ -66,11 +66,8 @@ model Dish {
   imageId       String?
   imageUrl      String?
   unit          Unit                          @default(QUANTITY)
-  
-  // Add category relation
   categoryId    String?
   category      Category?                     @relation(fields: [categoryId], references: [id])
-  
   contributions ParticipantDishContribution[]
   parties       PartyDish[]
 
@@ -119,6 +116,51 @@ model ParticipantDishContribution {
   @@map("participant_dish_contributions")
 }
 
+model PartyInvitation {
+  id          String    @id @default(cuid())
+  partyId     String
+  token       String    @unique
+  maxUses     Int       @default(1)
+  currentUses Int       @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  name        String?
+  party       Party     @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@map("party_invitations")
+}
+
+model JoinRequest {
+  id        String            @id @default(cuid())
+  partyId   String
+  userId    String
+  status    JoinRequestStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  message   String?
+  numGuests Int              @default(0)
+  party     Party             @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id])
+
+  @@unique([userId, partyId, createdAt])
+  @@index([userId, partyId, createdAt])
+  @@map("join_requests")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  data      Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
 enum Role {
   ADMIN
   INDIVIDUAL
@@ -144,4 +186,10 @@ enum Unit {
   MILLILITERS
   LITERS
   PIECES
+}
+
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
