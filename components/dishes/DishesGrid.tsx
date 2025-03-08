@@ -7,13 +7,21 @@ import { Unit, DishWithRelations, PaginationMeta } from '@/lib/types';
 import { BaseEntityGridProps } from '@/lib/types/entity';
 import { EntityGrid } from '@/components/ui/entity-grid';
 
+type DishesGridProps = Omit<
+  BaseEntityGridProps<DishWithRelations>,
+  'renderCard'
+> & {
+  renderCard?: (dish: DishWithRelations) => React.ReactNode;
+};
+
 export function DishesGrid({
   data,
   pagination,
   sortBy,
   sortOrder,
   baseUrl = '',
-}: BaseEntityGridProps<DishWithRelations>) {
+  renderCard = dish => <DishCard key={dish.id} dish={dish} />,
+}: DishesGridProps) {
   if (data.length === 0) {
     return (
       <div className="text-center py-8">
@@ -32,7 +40,7 @@ export function DishesGrid({
       sortBy={sortBy}
       sortOrder={sortOrder}
       baseUrl={baseUrl}
-      renderCard={dish => <DishCard key={dish.id} dish={dish} />}
+      renderCard={renderCard}
     />
   );
 }
