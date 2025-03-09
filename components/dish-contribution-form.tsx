@@ -34,14 +34,19 @@ export function DishContributionForm({
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isQuantityUnit = ['QUANTITY', 'PIECES'].includes(unit);
+  const maxAmount = isQuantityUnit
+    ? Math.ceil(remainingNeeded)
+    : remainingNeeded;
+
   const formSchema = z.object({
     amount: z
       .number()
       .positive('Amount must be positive')
       .max(
-        remainingNeeded,
-        unit === 'QUANTITY'
-          ? `Cannot exceed ${Math.ceil(remainingNeeded)}`
+        maxAmount,
+        isQuantityUnit
+          ? `Cannot exceed ${maxAmount}`
           : `Cannot exceed ${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`
       ),
   });
@@ -138,16 +143,16 @@ export function DishContributionForm({
             name="amount"
             label=""
             placeholder={`${
-              unit === 'QUANTITY'
+              isQuantityUnit
                 ? 'Amount in QTY'
                 : `Amount in ${unit.toLowerCase()}`
             } (max: ${
-              unit === 'QUANTITY'
-                ? `${Math.ceil(remainingNeeded)}`
+              isQuantityUnit
+                ? maxAmount
                 : `${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`
             })`}
-            step={['QUANTITY', 'PIECES'].includes(unit) ? '1' : '0.01'}
-            max={remainingNeeded}
+            step={isQuantityUnit ? '1' : '0.01'}
+            max={maxAmount}
           />
         </div>
         <div className="flex items-start pt-[6px]">

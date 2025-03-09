@@ -59,6 +59,17 @@ export function PartyDishItem({
   const totalContributed = contributions.reduce((sum, c) => sum + c.amount, 0);
   const totalNeeded = partyDish.amountPerPerson * totalParticipants;
   const remainingNeeded = Math.max(0, totalNeeded - totalContributed);
+  const isQuantityUnit =
+    partyDish.dish.unit === 'QUANTITY' || partyDish.dish.unit === 'PIECES';
+  const displayedTotalContributed = isQuantityUnit
+    ? Math.ceil(totalContributed)
+    : totalContributed;
+  const displayedTotalNeeded = isQuantityUnit
+    ? Math.ceil(totalNeeded)
+    : totalNeeded;
+  const displayedRemainingNeeded = isQuantityUnit
+    ? Math.ceil(remainingNeeded)
+    : remainingNeeded;
   const progressPercentage = Math.min(
     (totalContributed / totalNeeded) * 100,
     100
@@ -72,6 +83,9 @@ export function PartyDishItem({
     (sum, c) => sum + c.amount,
     0
   );
+  const displayedUserTotalContribution = isQuantityUnit
+    ? Math.ceil(userTotalContribution)
+    : userTotalContribution;
 
   const handleContributeClick = () => {
     setIsExpanded(true);
@@ -142,16 +156,16 @@ export function PartyDishItem({
             <div className="mt-2 flex items-center gap-2">
               <div className="flex items-center gap-4 flex-1">
                 <span className="text-sm font-medium">
-                  {partyDish.dish.unit === 'QUANTITY'
-                    ? `${Math.ceil(totalContributed)}/${Math.ceil(totalNeeded)}`
+                  {isQuantityUnit
+                    ? `${displayedTotalContributed}/${displayedTotalNeeded}`
                     : `${totalContributed.toFixed(1)}/${totalNeeded.toFixed(1)}`}{' '}
                   {partyDish.dish.unit.toLowerCase()}
                 </span>
                 {isParticipant && userTotalContribution > 0 && (
                   <span className="text-sm text-muted-foreground">
                     Your contribution:{' '}
-                    {partyDish.dish.unit === 'QUANTITY'
-                      ? Math.ceil(userTotalContribution)
+                    {isQuantityUnit
+                      ? displayedUserTotalContribution
                       : userTotalContribution.toFixed(1)}{' '}
                     {partyDish.dish.unit.toLowerCase()}
                   </span>
@@ -189,7 +203,7 @@ export function PartyDishItem({
               contributions={contributions}
               isParticipant={isParticipant}
               currentUserId={currentUserId || null}
-              remainingNeeded={remainingNeeded}
+              remainingNeeded={displayedRemainingNeeded}
               dishName={partyDish.dish.name}
               unit={partyDish.dish.unit}
               partyId={partyId}
@@ -202,7 +216,7 @@ export function PartyDishItem({
                   dishId={partyDish.dishId}
                   dishName={partyDish.dish.name}
                   unit={partyDish.dish.unit}
-                  remainingNeeded={remainingNeeded}
+                  remainingNeeded={displayedRemainingNeeded}
                   isEdit={false}
                 />
               </div>

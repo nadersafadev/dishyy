@@ -233,13 +233,22 @@ export async function PATCH(
 
     // Check if the new amount would exceed the maximum needed
     const newTotalContributed = totalContributedByOthers + validatedData.amount;
+    const remainingNeeded = totalNeeded - totalContributedByOthers;
+    const isQuantityUnit = ['QUANTITY', 'PIECES'].includes(
+      contribution.dish.unit
+    );
+    const displayedRemainingNeeded = isQuantityUnit
+      ? Math.ceil(remainingNeeded)
+      : remainingNeeded;
 
-    if (newTotalContributed > totalNeeded) {
+    if (validatedData.amount > displayedRemainingNeeded) {
       return NextResponse.json(
         {
-          error: `Your contribution would exceed the needed amount. Maximum you can contribute is ${(
-            totalNeeded - totalContributedByOthers
-          ).toFixed(1)} ${contribution.dish.unit.toLowerCase()}`,
+          error: `Your contribution would exceed the needed amount. Maximum you can contribute is ${
+            isQuantityUnit
+              ? Math.ceil(remainingNeeded)
+              : remainingNeeded.toFixed(1)
+          }${isQuantityUnit ? '' : ` ${contribution.dish.unit.toLowerCase()}`}`,
         },
         { status: 400 }
       );
