@@ -64,6 +64,11 @@ export async function POST(
               participants: true,
             },
           },
+          dish: {
+            select: {
+              unit: true,
+            },
+          },
         },
       }),
       prisma.participantDishContribution.findMany({
@@ -106,13 +111,20 @@ export async function POST(
       totalNeeded - currentContributions + userCurrentAmount
     );
 
+    const isQuantityUnit = ['QUANTITY', 'PIECES'].includes(partyDish.dish.unit);
+    const displayedRemainingNeeded = isQuantityUnit
+      ? Math.ceil(remainingNeeded)
+      : remainingNeeded;
+
     // Check if the new contribution would exceed the needed amount
-    if (validatedData.amount > remainingNeeded) {
+    if (validatedData.amount > displayedRemainingNeeded) {
       return NextResponse.json(
         {
-          error: `Cannot contribute more than needed. Maximum allowed: ${remainingNeeded.toFixed(
-            1
-          )}`,
+          error: `Cannot contribute more than needed. Maximum allowed: ${
+            isQuantityUnit
+              ? Math.ceil(remainingNeeded)
+              : remainingNeeded.toFixed(1)
+          }${isQuantityUnit ? '' : ` ${partyDish.dish.unit.toLowerCase()}`}`,
         },
         { status: 400 }
       );

@@ -77,7 +77,7 @@ export function ContributionsList({
         <div className="text-sm font-medium flex items-center gap-2">
           <span className="text-muted-foreground">Still needed:</span>
           <Badge variant="outline" className="font-normal">
-            {unit === 'QUANTITY'
+            {['QUANTITY', 'PIECES'].includes(unit)
               ? `${Math.ceil(remainingNeeded)}`
               : `${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`}
           </Badge>
