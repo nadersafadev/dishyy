@@ -13,6 +13,8 @@ import {
   PartyDishWithDetails,
   ParticipantWithContributions,
 } from '@/lib/services/dish';
+import { DishProgressBar } from '@/components/party-dish/dish-progress-bar';
+import { ContributionsList } from '@/components/party-dish/contributions-list';
 
 interface PartyDishItemProps {
   partyDish: PartyDishWithDetails;
@@ -33,16 +35,7 @@ export function PartyDishItem({
   partyId,
   currentUserId,
 }: PartyDishItemProps) {
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleEditClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsEditing(true);
-  };
-
-  const handleEditComplete = () => {
-    setIsEditing(false);
-  };
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Calculate contribution data
   const contributions = participants.flatMap(p =>
@@ -50,6 +43,10 @@ export function PartyDishItem({
       .filter(c => c.dishId === partyDish.dishId)
       .map(c => ({
         ...c,
+        dish: {
+          name: partyDish.dish.name,
+          unit: partyDish.dish.unit,
+        },
         participant: {
           userId: p.userId,
           user: {
@@ -59,18 +56,37 @@ export function PartyDishItem({
       }))
   );
 
-  // Check if current user already has a contribution for this dish
-  const userContribution = currentUserId
-    ? contributions.find(c => c.participant.userId === currentUserId)
-    : null;
-
   const totalContributed = contributions.reduce((sum, c) => sum + c.amount, 0);
   const totalNeeded = partyDish.amountPerPerson * totalParticipants;
   const remainingNeeded = Math.max(0, totalNeeded - totalContributed);
+  const progressPercentage = Math.min(
+    (totalContributed / totalNeeded) * 100,
+    100
+  );
+
+  // Calculate user's total contributions
+  const userContributions = currentUserId
+    ? contributions.filter(c => c.participant.userId === currentUserId)
+    : [];
+  const userTotalContribution = userContributions.reduce(
+    (sum, c) => sum + c.amount,
+    0
+  );
+
+  const handleContributeClick = () => {
+    setIsExpanded(true);
+    // Use setTimeout to ensure the element exists after expansion
+    setTimeout(() => {
+      const contributionForm = document.querySelector(
+        `[data-dish-contribution-form="${partyDish.dishId}"]`
+      );
+      contributionForm?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  };
 
   return (
-    <Card className="relative group">
-      <div className="p-4">
+    <Card className="relative overflow-hidden">
+      <div className="p-4 space-y-4">
         <div className="flex items-start gap-4">
           {/* Image Section */}
           <div className="relative w-16 h-16 rounded-md overflow-hidden shrink-0 bg-muted">
@@ -124,37 +140,73 @@ export function PartyDishItem({
             )}
 
             <div className="mt-2 flex items-center gap-2">
-              <span className="text-sm font-medium">
-                {partyDish.amountPerPerson} {partyDish.dish.unit.toLowerCase()}{' '}
-                per person
-              </span>
-              {isParticipant && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="ml-auto"
-                  onClick={handleEditClick}
-                >
-                  {isEditing ? 'Cancel' : 'Edit Contribution'}
-                </Button>
-              )}
+              <div className="flex items-center gap-4 flex-1">
+                <span className="text-sm font-medium">
+                  {partyDish.dish.unit === 'QUANTITY'
+                    ? `${Math.ceil(totalContributed)}/${Math.ceil(totalNeeded)}`
+                    : `${totalContributed.toFixed(1)}/${totalNeeded.toFixed(1)}`}{' '}
+                  {partyDish.dish.unit.toLowerCase()}
+                </span>
+                {isParticipant && userTotalContribution > 0 && (
+                  <span className="text-sm text-muted-foreground">
+                    Your contribution:{' '}
+                    {partyDish.dish.unit === 'QUANTITY'
+                      ? Math.ceil(userTotalContribution)
+                      : userTotalContribution.toFixed(1)}{' '}
+                    {partyDish.dish.unit.toLowerCase()}
+                  </span>
+                )}
+              </div>
+              {isParticipant &&
+                (userTotalContribution > 0 ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                  >
+                    {isExpanded ? 'Hide Details' : 'Show Details'}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={handleContributeClick}
+                  >
+                    Contribute
+                  </Button>
+                ))}
             </div>
           </div>
         </div>
 
-        {/* Contribution Form */}
-        {isEditing && (
-          <div className="mt-4 pt-4 border-t">
-            <DishContributionForm
-              partyId={partyId}
-              dishId={partyDish.dishId}
+        {/* Progress Bar */}
+        <DishProgressBar progressPercentage={progressPercentage} />
+
+        {/* Contribution Details */}
+        {isExpanded && (
+          <div className="mt-4 pt-4 border-t space-y-4">
+            <ContributionsList
+              contributions={contributions}
+              isParticipant={isParticipant}
+              currentUserId={currentUserId || null}
+              remainingNeeded={remainingNeeded}
               dishName={partyDish.dish.name}
               unit={partyDish.dish.unit}
-              remainingNeeded={remainingNeeded}
-              isEdit={!!userContribution}
-              contributionId={userContribution?.id}
-              initialAmount={userContribution?.amount}
+              partyId={partyId}
             />
+
+            {isParticipant && remainingNeeded > 0 && (
+              <div data-dish-contribution-form={partyDish.dishId}>
+                <DishContributionForm
+                  partyId={partyId}
+                  dishId={partyDish.dishId}
+                  dishName={partyDish.dish.name}
+                  unit={partyDish.dish.unit}
+                  remainingNeeded={remainingNeeded}
+                  isEdit={false}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
