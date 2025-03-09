@@ -61,12 +61,3 @@ export default async function EditDishPage({
     </div>
   );
 }
-
-// Generate dynamic metadata for the edit dish page
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
-  return baseGenerateMetadata('Edit Dish');
-}

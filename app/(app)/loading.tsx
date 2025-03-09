@@ -48,7 +48,7 @@ export default function AppLoading() {
         >
           {/* Main Content */}
           <div className="space-y-2 sm:space-y-3">
-            <h1 className="text-2xl sm:text-4xl font-bold tracking-tighter sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/50 leading-tight sm:leading-tight">
+            <h1 className="text-2xl sm:text-4xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/50 leading-tight sm:leading-tight">
               Loading
             </h1>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-[300px] sm:max-w-[500px] mx-auto leading-relaxed sm:leading-relaxed">
