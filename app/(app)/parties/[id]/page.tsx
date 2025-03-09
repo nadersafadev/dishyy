@@ -15,6 +15,7 @@ import {
   enhancePartyWithCategories,
   type PartyWithDetails,
 } from '@/lib/services/party';
+import { ParticipantContributions } from '@/components/party/ParticipantContributions';
 
 export default async function PartyPage({
   params,
@@ -96,6 +97,16 @@ export default async function PartyPage({
             partyId={party.id}
             participantIds={participantIds}
           />
+
+          {/* Participant Contributions Section - Only show for participants */}
+          {isParticipant && (
+            <ParticipantContributions
+              participants={participantsWithContributions}
+              isParticipant={isParticipant}
+              currentUserId={user.id}
+              partyId={party.id}
+            />
+          )}
         </div>
 
         {/* Right column */}
@@ -115,16 +126,18 @@ export default async function PartyPage({
       </div>
 
       {/* Dishes Section - Full Width */}
-      <DishesContent
-        dishes={dishesWithCategories}
-        participants={participantsWithContributions}
-        isParticipant={isParticipant}
-        totalParticipants={totalParticipants}
-        isAdmin={isHost}
-        currentUserId={user.id}
-        partyId={party.id}
-        participantIds={participantIds}
-      />
+      <div data-dishes-section>
+        <DishesContent
+          dishes={dishesWithCategories}
+          participants={participantsWithContributions}
+          isParticipant={isParticipant}
+          totalParticipants={totalParticipants}
+          isAdmin={isHost}
+          currentUserId={user.id}
+          partyId={party.id}
+          participantIds={participantIds}
+        />
+      </div>
     </div>
   );
 }
