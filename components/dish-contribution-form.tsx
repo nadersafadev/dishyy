@@ -146,7 +146,7 @@ export function DishContributionForm({
                 ? `${Math.ceil(remainingNeeded)}`
                 : `${remainingNeeded.toFixed(1)} ${unit.toLowerCase()}`
             })`}
-            step={unit === 'QUANTITY' ? '1' : '0.01'}
+            step={['QUANTITY', 'PIECES'].includes(unit) ? '1' : '0.01'}
             max={remainingNeeded}
           />
         </div>

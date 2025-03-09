@@ -89,13 +89,15 @@ export default async function PartyPage({
         {/* Left column */}
         <div className="md:col-span-5 space-y-8">
           {/* Amount Per Person Section */}
-          <PartyDishAmounts
-            dishes={dishesWithCategories}
-            isAdmin={isHost}
-            userId={user.id}
-            partyId={party.id}
-            participantIds={participantIds}
-          />
+          {isHost && (
+            <PartyDishAmounts
+              dishes={dishesWithCategories}
+              isAdmin={isHost}
+              userId={user.id}
+              partyId={party.id}
+              participantIds={participantIds}
+            />
+          )}
 
           {/* Participant Contributions Section - Only show for participants */}
           {isParticipant && (
