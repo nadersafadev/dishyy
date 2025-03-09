@@ -1,36 +1,33 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { DishForm } from '@/components/DishForm';
-import { generateMetadata } from '@/lib/metadata';
+import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
+import { Metadata } from 'next';
 
-export const metadata = generateMetadata(
-  'Create Dish',
-  'Add a new dish to your collection'
-);
+export const metadata: Metadata = baseGenerateMetadata('New Dish');
 
 export default async function NewDishPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
   const user = await prisma.user.findUnique({
     where: { clerkId: userId },
-    select: { role: true },
+    select: { id: true, role: true },
   });
 
   if (!user || user.role !== 'ADMIN') {
-    redirect('/dashboard');
+    throw new Error('Unauthorized access');
   }
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Add New Dish</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">New Dish</h1>
         <p className="text-muted-foreground">
-          Create a new dish that can be added to parties.
+          Add a new dish to your collection.
         </p>
       </div>
 

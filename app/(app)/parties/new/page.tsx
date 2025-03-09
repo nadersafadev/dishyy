@@ -1,40 +1,33 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import CreatePartyForm from '@/components/CreatePartyForm';
-import { generateMetadata } from '@/lib/metadata';
+import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
+import { Metadata } from 'next';
 
-export const metadata = generateMetadata(
-  'Create Party',
-  'Create a new dish party'
-);
+export const metadata: Metadata = baseGenerateMetadata('New Party');
 
 export default async function NewPartyPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
-  // Check if user is admin
   const user = await prisma.user.findUnique({
     where: { clerkId: userId },
-    select: { role: true },
+    select: { id: true, role: true },
   });
 
   if (!user || user.role !== 'ADMIN') {
-    redirect('/dashboard');
+    throw new Error('Unauthorized access');
   }
 
   return (
-    <div className="mx-auto space-y-8">
+    <div className="max-w-2xl mx-auto space-y-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Create a New Party
-        </h1>
+        <h1 className="text-2xl font-semibold tracking-tight">New Party</h1>
         <p className="text-muted-foreground">
-          Set up a new dish party and invite others to join the culinary
-          adventure.
+          Create a new dish party and invite others to join.
         </p>
       </div>
 

@@ -1,5 +1,4 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -49,32 +48,31 @@ export default async function DishPage({ params }: { params: { id: string } }) {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
-  // Get current user for role check
   const user = await prisma.user.findUnique({
     where: { clerkId: userId },
     select: { id: true, role: true },
   });
 
-  if (!user) {
-    redirect('/sign-in');
+  if (!user || user.role !== 'ADMIN') {
+    throw new Error('Unauthorized access');
   }
 
-  // Only admin users can access this page
-  if (user.role !== 'ADMIN') {
-    redirect('/dishes');
-  }
-
-  // Fetch the dish with its category
   const dish = await prisma.dish.findUnique({
     where: { id: params.id },
     include: {
-      category: {
-        select: {
-          id: true,
-          name: true,
+      category: true,
+      parties: {
+        include: {
+          party: {
+            select: {
+              id: true,
+              name: true,
+              date: true,
+            },
+          },
         },
       },
     },

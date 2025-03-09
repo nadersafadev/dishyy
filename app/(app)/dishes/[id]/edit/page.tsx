@@ -1,10 +1,12 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
+import { notFound } from 'next/navigation';
 import { DishForm } from '@/components/DishForm';
 import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
 import { Metadata } from 'next';
 import { Dish, Unit } from '@/lib/types';
+
+export const metadata: Metadata = baseGenerateMetadata('Edit Dish');
 
 export default async function EditDishPage({
   params,
@@ -14,31 +16,34 @@ export default async function EditDishPage({
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
-  const [user, dbDish] = await Promise.all([
-    prisma.user.findUnique({
-      where: { clerkId: userId },
-      select: { role: true },
-    }),
-    prisma.dish.findUnique({
-      where: { id: params.id },
-    }),
-  ]);
+  const user = await prisma.user.findUnique({
+    where: { clerkId: userId },
+    select: { id: true, role: true },
+  });
 
   if (!user || user.role !== 'ADMIN') {
-    redirect('/dashboard');
+    throw new Error('Unauthorized access');
   }
 
+  const dbDish = await prisma.dish.findUnique({
+    where: { id: params.id },
+    include: {
+      category: true,
+    },
+  });
+
   if (!dbDish) {
-    redirect('/dishes');
+    notFound();
   }
 
   // Convert Prisma dish to app Dish type
   const dish: Dish = {
     ...dbDish,
     unit: dbDish.unit as unknown as Unit, // Type conversion
+    category: dbDish.category || undefined, // Handle null case
   };
 
   return (
@@ -63,5 +68,5 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
-  return baseGenerateMetadata('Edit Dish', 'Update dish details');
+  return baseGenerateMetadata('Edit Dish');
 }

@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+- always use zustand for managing client state
+- always use [form-number-field.tsx](mdc:components/forms/form-number-field.tsx) [form-text-field.tsx](mdc:components/forms/form-text-field.tsx) [form-checkbox-field.tsx](mdc:components/forms/form-checkbox-field.tsx) for forms do not create from scratch
+- you have a component for delete dialog [delete-entity-dialog.tsx](mdc:components/ui/delete-entity-dialog.tsx)
+
+

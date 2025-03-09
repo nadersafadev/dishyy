@@ -1,5 +1,4 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -10,63 +9,47 @@ import { DishesGrid } from '@/components/dishes/DishesGrid';
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher';
 import { generateMetadata } from '@/lib/metadata';
 import { Unit, DishWithRelations, PaginationMeta } from '@/lib/types';
+import { redirect } from 'next/navigation';
 
 export const metadata = generateMetadata(
   'Dishes',
   'Browse and manage your dishes collection'
 );
 
-export default async function DishesPage({
-  searchParams,
-}: {
+interface PageProps {
   searchParams: {
     page?: string;
     limit?: string;
     search?: string;
-    categoryId?: string;
-    hasCategory?: string;
-    hasImage?: string;
-    sortBy?: string;
-    sortOrder?: string;
-    view?: string;
+    sortBy?: 'name' | 'createdAt';
+    sortOrder?: 'asc' | 'desc';
+    view?: ViewMode;
   };
-}) {
+}
+
+export default async function DishesPage({ searchParams }: PageProps) {
   const { userId } = await auth();
 
   if (!userId) {
     redirect('/sign-in');
   }
 
-  // Get user for role checking
   const user = await prisma.user.findUnique({
     where: { clerkId: userId },
-    select: { role: true },
+    select: { id: true, role: true },
   });
 
   if (!user || user.role !== 'ADMIN') {
-    redirect('/dashboard');
+    redirect('/unauthorized');
   }
 
-  // Parse search parameters
-  const page = Number(searchParams.page || '1');
-  const limit = Number(searchParams.limit || '10');
-  const search =
-    typeof searchParams.search === 'string' ? searchParams.search : '';
-  const categoryId =
-    typeof searchParams.categoryId === 'string' ? searchParams.categoryId : '';
-  const hasCategory =
-    typeof searchParams.hasCategory === 'string'
-      ? searchParams.hasCategory
-      : 'all';
-  const hasImage =
-    typeof searchParams.hasImage === 'string' ? searchParams.hasImage : 'all';
-  const sortBy =
-    typeof searchParams.sortBy === 'string' ? searchParams.sortBy : 'name';
-  const sortOrder =
-    typeof searchParams.sortOrder === 'string' ? searchParams.sortOrder : 'asc';
-
-  // Add view mode parsing
-  const viewMode = (searchParams.view as ViewMode) || 'list';
+  // Get query parameters with defaults
+  const page = parseInt(searchParams.page || '1');
+  const limit = parseInt(searchParams.limit || '10');
+  const sortBy = searchParams.sortBy || 'name';
+  const sortOrder = searchParams.sortOrder || 'asc';
+  const search = searchParams.search || '';
+  const view = searchParams.view || 'grid';
 
   // Fetch categories for the filter dropdown
   const categories = await prisma.category.findMany({
@@ -89,14 +72,6 @@ export default async function DishesPage({
   apiUrl.searchParams.set('page', page.toString());
   apiUrl.searchParams.set('limit', limit.toString());
   if (search) apiUrl.searchParams.set('search', search);
-  if (categoryId) {
-    apiUrl.searchParams.set('categoryId', categoryId);
-    // Always include child categories when a category is selected
-    apiUrl.searchParams.set('includeChildCategories', 'true');
-  }
-  if (hasCategory !== 'all')
-    apiUrl.searchParams.set('hasCategory', hasCategory);
-  if (hasImage !== 'all') apiUrl.searchParams.set('hasImage', hasImage);
   apiUrl.searchParams.set('sortBy', sortBy);
   apiUrl.searchParams.set('sortOrder', sortOrder);
 
@@ -118,7 +93,7 @@ export default async function DishesPage({
           <h1 className="text-2xl font-bold tracking-tight">Dishes</h1>
         </div>
         <div className="flex items-center gap-4">
-          <ViewSwitcher currentView={viewMode} />
+          <ViewSwitcher currentView={view} />
           <Link href="/dishes/new" className="self-start sm:self-auto">
             <Button className="gap-2 w-full sm:w-auto">
               <PlusIcon className="h-4 w-4" />
@@ -131,8 +106,6 @@ export default async function DishesPage({
       {/* Filters */}
       <DishesFilters
         search={search}
-        categoryId={categoryId}
-        hasImage={hasImage}
         sortBy={sortBy}
         sortOrder={sortOrder}
         categories={categories}
@@ -147,7 +120,7 @@ export default async function DishesPage({
               <Link href="/dishes/new">Create Your First Dish</Link>
             </Button>
           </div>
-        ) : viewMode === 'list' ? (
+        ) : view === 'list' ? (
           <DishesTable
             dishes={dishes}
             pagination={pagination}

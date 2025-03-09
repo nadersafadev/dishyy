@@ -1,30 +1,18 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ShieldAlert, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
-  useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
-  }, [error]);
-
+export default function UnauthorizedPage() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-grid-small-black/[0.2] relative">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/50 to-background pointer-events-none" />
 
       <div className="relative">
-        {/* Error Icon */}
+        {/* Shield Icon */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -36,7 +24,7 @@ export default function Error({
           className="absolute -top-32 left-1/2 -translate-x-1/2"
         >
           <div className="w-24 h-24 rounded-full bg-destructive/10 flex items-center justify-center">
-            <AlertCircle className="w-12 h-12 text-destructive" />
+            <ShieldAlert className="w-12 h-12 text-destructive" />
           </div>
         </motion.div>
 
@@ -49,29 +37,21 @@ export default function Error({
           {/* Main Content */}
           <div className="space-y-4 px-4">
             <h1 className="text-4xl font-bold tracking-tighter sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-destructive to-destructive/50">
-              Something went wrong
+              Access Denied
             </h1>
             <p className="text-muted-foreground text-lg max-w-[500px] mx-auto">
-              {error.message || 'An unexpected error occurred'}
+              You don't have permission to access this page.
             </p>
           </div>
 
           {/* Button Group */}
           <div className="flex justify-center gap-4">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                onClick={reset}
-                size="lg"
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <RefreshCw size={16} className="animate-spin-slow" />
-                Try Again
-              </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button asChild size="lg" variant="default">
-                <Link href="/">Go home</Link>
+                <Link href="/" className="flex items-center gap-2">
+                  <ArrowLeft size={16} />
+                  Back to Home
+                </Link>
               </Button>
             </motion.div>
           </div>

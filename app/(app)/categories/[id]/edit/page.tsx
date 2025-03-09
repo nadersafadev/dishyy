@@ -1,7 +1,12 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
+import { notFound } from 'next/navigation';
 import { CategoryForm } from '@/components/CategoryForm';
+import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
+import { Metadata } from 'next';
+import { Category } from '@/lib/types';
+
+export const metadata: Metadata = baseGenerateMetadata('Edit Category');
 
 export default async function EditCategoryPage({
   params,
@@ -11,37 +16,50 @@ export default async function EditCategoryPage({
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
   const user = await prisma.user.findUnique({
     where: { clerkId: userId },
-    select: { role: true },
+    select: { id: true, role: true },
   });
 
   if (!user || user.role !== 'ADMIN') {
-    redirect('/dashboard');
+    throw new Error('Unauthorized access');
   }
 
-  // Fetch the category
-  const category = await prisma.category.findUnique({
+  const dbCategory = await prisma.category.findUnique({
     where: { id: params.id },
+    include: {
+      parent: true,
+    },
   });
 
-  if (!category) {
-    redirect('/categories');
+  if (!dbCategory) {
+    notFound();
   }
 
+  // Transform the category data to match the expected type
+  const category: Category = {
+    ...dbCategory,
+    parent: dbCategory.parent
+      ? {
+          id: dbCategory.parent.id,
+          name: dbCategory.parent.name,
+        }
+      : undefined,
+  };
+
   return (
-    <div className="container mx-auto py-10 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Edit Category</h1>
+    <div className="max-w-2xl mx-auto space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight">Edit Category</h1>
         <p className="text-muted-foreground">
-          Update the details for this category.
+          Update category details and information.
         </p>
       </div>
 
-      <div className="p-6 bg-card rounded-lg shadow">
+      <div className="card p-6">
         <CategoryForm category={category} />
       </div>
     </div>
