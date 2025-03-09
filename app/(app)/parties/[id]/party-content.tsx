@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import { ViewToggle } from '@/components/ui/view-toggle';
-import { AddPartyDishDialog } from '@/components/add-party-dish-dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { PartyDishItem } from '@/components/party-dish-item';
+import { ManagePartyDishesModal } from '@/components/party/ManagePartyDishesModal';
 import {
   PartyDishWithDetails,
   ParticipantWithContributions,
@@ -106,7 +106,12 @@ export function DishesContent({
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Dishes</h2>
           <div className="flex items-center gap-4">
-            {isAdmin && <AddPartyDishDialog partyId={partyId} />}
+            {isAdmin && (
+              <ManagePartyDishesModal
+                partyId={partyId}
+                currentDishes={dishes}
+              />
+            )}
             <ViewToggle view={view} onViewChange={setView} />
           </div>
         </div>
@@ -121,7 +126,11 @@ export function DishesContent({
                 className="mt-4"
                 variant="outline"
                 onClick={() =>
-                  document.getElementById('add-dish-trigger')?.click()
+                  (
+                    document.querySelector(
+                      '[data-manage-dishes-trigger]'
+                    ) as HTMLElement
+                  )?.click()
                 }
               >
                 Add First Dish
