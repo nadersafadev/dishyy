@@ -1,5 +1,4 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { PageHeader } from '@/components/categories/PageHeader';
 import { CategoriesTable } from '@/components/categories/CategoriesTable';
@@ -19,9 +18,9 @@ interface PageProps {
   searchParams: {
     page?: string;
     limit?: string;
-    sortBy?: string;
-    sortOrder?: string;
     search?: string;
+    sortBy?: 'name' | 'createdAt';
+    sortOrder?: 'asc' | 'desc';
     parentId?: string;
     hasParent?: string;
     hasDishes?: string;
@@ -39,11 +38,10 @@ interface CategoryWithRelations {
 }
 
 export default async function CategoriesPage({ searchParams }: PageProps) {
-  // Get authentication data
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
   // Check user permissions directly from the database (server component)
@@ -53,7 +51,7 @@ export default async function CategoriesPage({ searchParams }: PageProps) {
   });
 
   if (!user || user.role !== 'ADMIN') {
-    redirect('/dashboard');
+    throw new Error('Unauthorized access');
   }
 
   // Get query parameters with defaults

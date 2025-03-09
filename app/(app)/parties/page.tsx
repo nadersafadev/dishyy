@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { Button } from '@/components/ui/button';
@@ -30,23 +29,28 @@ export default async function PartiesPage({ searchParams }: PageProps) {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
-  // Parse search parameters with defaults
-  const page = Number(searchParams.page || '1');
-  const limit = Number(searchParams.limit || '10');
-  const search = searchParams.search || '';
-  const sortBy = searchParams.sortBy || 'date';
+  const user = await prisma.user.findUnique({
+    where: { clerkId: userId },
+    select: { id: true, role: true },
+  });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Get query parameters with defaults
+  const page = parseInt(searchParams.page || '1');
+  const limit = parseInt(searchParams.limit || '10');
+  const sortBy = searchParams.sortBy || 'name';
   const sortOrder = searchParams.sortOrder || 'asc';
+  const search = searchParams.search || '';
   const dateFrom = searchParams.dateFrom || '';
   const dateTo = searchParams.dateTo || '';
 
-  const [user, partiesData] = await Promise.all([
-    prisma.user.findUnique({
-      where: { clerkId: userId },
-      select: { role: true },
-    }),
+  const [partiesData] = await Promise.all([
     prisma.party.findMany({
       include: {
         createdBy: true,
@@ -115,7 +119,7 @@ export default async function PartiesPage({ searchParams }: PageProps) {
     },
   });
 
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = user.role === 'ADMIN';
   const totalPages = Math.ceil(totalCount / limit);
 
   // Cast the parties data to the correct type

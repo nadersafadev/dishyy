@@ -1,8 +1,8 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserCircle, Shield, Settings } from 'lucide-react';
-import { generateMetadata } from '@/lib/metadata';
+import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
+import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 
 // Import our custom components
@@ -12,26 +12,26 @@ import { AccountTab } from './components/AccountTab';
 import { SecurityTab } from './components/SecurityTab';
 import { PreferencesTab } from './components/PreferencesTab';
 
-export const metadata = generateMetadata(
-  'Profile',
-  'Manage your profile and account settings'
-);
+export const metadata: Metadata = baseGenerateMetadata('Profile');
 
 export default async function ProfilePage() {
   const { userId } = await auth();
+
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
-  const clerkUser = await currentUser();
-  if (!clerkUser) {
-    redirect('/sign-in');
-  }
+  const [user, clerkUser] = await Promise.all([
+    prisma.user.findUnique({
+      where: { clerkId: userId },
+      select: { id: true, role: true },
+    }),
+    currentUser(),
+  ]);
 
-  // Get user from database
-  const user = await prisma.user.findUnique({
-    where: { clerkId: userId },
-  });
+  if (!user || !clerkUser) {
+    throw new Error('User not found');
+  }
 
   // Get parties created by user using the correct relation field
   const userParties = user
@@ -61,57 +61,47 @@ export default async function ProfilePage() {
       })
     : 'Unknown';
 
-  // Only pass DB-related info that can't be accessed from Clerk's hooks
-  const dbUserInfo = user ? { role: user.role } : null;
-
   return (
-    <div className="w-full mx-auto py-10 px-4 md:px-8 lg:px-10">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">My Profile</h1>
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
+        <p className="text-muted-foreground">
+          Manage your profile and account settings.
+        </p>
+      </div>
 
-        <div className="mb-8">
-          <ProfileHeader dbUser={dbUserInfo} accountCreated={accountCreated} />
-        </div>
+      <div className="card p-6">
+        <Tabs defaultValue="account" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="account" className="flex items-center gap-2">
+              <UserCircle className="h-4 w-4" />
+              Account
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Security
+            </TabsTrigger>
+            <TabsTrigger
+              value="preferences"
+              className="flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Preferences
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="grid md:grid-cols-4 gap-6">
-          <div className="md:col-span-1">
-            <ProfileStats
-              totalParties={totalParties}
-              totalContributions={totalContributions}
-            />
-          </div>
+          <TabsContent value="account" className="space-y-4">
+            <AccountTab />
+          </TabsContent>
 
-          <div className="md:col-span-3">
-            <Tabs defaultValue="account">
-              <TabsList className="mb-6">
-                <TabsTrigger value="account">
-                  <UserCircle className="h-4 w-4 mr-2" />
-                  Account
-                </TabsTrigger>
-                <TabsTrigger value="security">
-                  <Shield className="h-4 w-4 mr-2" />
-                  Security
-                </TabsTrigger>
-                <TabsTrigger value="preferences">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Preferences
-                </TabsTrigger>
-              </TabsList>
+          <TabsContent value="security" className="space-y-4">
+            <SecurityTab />
+          </TabsContent>
 
-              <TabsContent value="account">
-                <AccountTab dbUser={dbUserInfo} />
-              </TabsContent>
-
-              <TabsContent value="security">
-                <SecurityTab />
-              </TabsContent>
-
-              <TabsContent value="preferences">
-                <PreferencesTab />
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+          <TabsContent value="preferences" className="space-y-4">
+            <PreferencesTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

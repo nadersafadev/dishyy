@@ -1,13 +1,12 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { CategoryDetailHeader } from '@/components/categories/CategoryDetailHeader';
-import { CategoryCard } from '@/components/categories/CategoryCard';
-import { ParentCategoryLink } from '@/components/categories/ParentCategoryLink';
-import { ChildCategoriesList } from '@/components/categories/ChildCategoriesList';
-import { DishesGrid } from '@/components/categories/DishesGrid';
+import { notFound } from 'next/navigation';
+import { generateMetadata as baseGenerateMetadata } from '@/lib/metadata';
+import { Metadata } from 'next';
 
-export default async function CategoryDetailPage({
+export const metadata: Metadata = baseGenerateMetadata('Category Details');
+
+export default async function CategoryPage({
   params,
 }: {
   params: { id: string };
@@ -15,88 +14,66 @@ export default async function CategoryDetailPage({
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
   const user = await prisma.user.findUnique({
     where: { clerkId: userId },
-    select: { role: true },
+    select: { id: true, role: true },
   });
 
   if (!user || user.role !== 'ADMIN') {
-    redirect('/dashboard');
+    throw new Error('Unauthorized access');
   }
 
   const category = await prisma.category.findUnique({
     where: { id: params.id },
     include: {
-      parent: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      children: {
-        select: {
-          id: true,
-          name: true,
+      parent: true,
+      dishes: {
+        include: {
           _count: {
             select: {
-              dishes: true,
+              parties: true,
             },
           },
-        },
-      },
-      dishes: {
-        select: {
-          id: true,
-          name: true,
-          unit: true,
-          createdAt: true,
-          updatedAt: true,
-          description: true,
-          imageId: true,
-          imageUrl: true,
-          categoryId: true,
         },
       },
     },
   });
 
   if (!category) {
-    redirect('/categories');
+    notFound();
   }
 
   return (
-    <div className="space-y-6">
-      <CategoryDetailHeader
-        id={category.id}
-        name={category.name}
-        description={category.description}
-      />
-
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Parent Category */}
-        <CategoryCard title="Parent Category">
-          <ParentCategoryLink parent={category.parent} />
-        </CategoryCard>
-
-        {/* Child Categories */}
-        <CategoryCard
-          title="Child Categories"
-          description="Categories that are nested under this one"
-        >
-          <ChildCategoriesList children={category.children} />
-        </CategoryCard>
+    <div className="max-w-2xl mx-auto space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {category.name}
+        </h1>
+        <p className="text-muted-foreground">
+          {category.description || 'No description available'}
+        </p>
       </div>
 
-      {/* Associated Dishes */}
-      <CategoryCard
-        title="Associated Dishes"
-        description="Dishes that belong to this category."
-      >
-        <DishesGrid data={category.dishes} />
-      </CategoryCard>
+      <div className="card p-6">
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-lg font-medium">Parent Category</h2>
+            <p className="text-muted-foreground">
+              {category.parent?.name || 'None'}
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-medium">Dishes</h2>
+            <p className="text-muted-foreground">
+              {category.dishes.length} dishes in this category
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

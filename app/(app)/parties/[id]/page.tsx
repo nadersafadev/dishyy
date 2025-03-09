@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { DishesContent } from './party-content';
 import { PartyDishAmounts } from '@/components/party-dishes-amounts';
@@ -25,23 +25,22 @@ export default async function PartyPage({
   const { userId } = await auth();
 
   if (!userId) {
-    redirect('/sign-in');
+    throw new Error('User ID not found');
   }
 
-  const [user, party] = await Promise.all([
-    prisma.user.findUnique({
-      where: { clerkId: userId },
-      select: { id: true, role: true },
-    }),
-    getPartyDetails(params.id),
-  ]);
-
-  if (!party) {
-    redirect('/parties');
-  }
+  const user = await prisma.user.findUnique({
+    where: { clerkId: userId },
+    select: { id: true, role: true },
+  });
 
   if (!user) {
-    redirect('/sign-in');
+    throw new Error('User not found');
+  }
+
+  const party = await getPartyDetails(params.id);
+
+  if (!party) {
+    notFound();
   }
 
   const isHost = party.createdById === user.id;
