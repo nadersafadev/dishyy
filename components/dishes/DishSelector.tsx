@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
-import { DishWithRelations, PaginationMeta } from '@/lib/types';
+import { DishWithRelations, PaginationMeta, Dish } from '@/lib/types';
 import { Plus } from 'lucide-react';
 import { DishesGrid } from './DishesGrid';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +16,7 @@ import {
 import { DishForm } from '@/components/DishForm';
 import { SearchInput } from '@/components/forms/search-input';
 import { SelectorGrid } from '@/components/ui/entity-grid/selector-grid';
+import { DishSelectorCard } from './DishSelectorCard';
 
 interface DishSelectorProps {
   availableDishes: DishWithRelations[];
@@ -36,48 +37,6 @@ const emptyPagination: PaginationMeta = {
   hasPreviousPage: false,
 };
 
-// Memoized DishCard component to prevent unnecessary re-renders
-const DishCard = memo(
-  ({
-    dish,
-    onClick,
-    isSelected,
-  }: {
-    dish: DishWithRelations;
-    onClick: () => void;
-    isSelected?: boolean;
-  }) => (
-    <button onClick={onClick} className="w-full text-left">
-      <Card
-        className={isSelected ? 'hover:bg-destructive/10' : 'hover:bg-accent'}
-      >
-        <CardContent className="p-4">
-          <div className="font-medium">{dish.name}</div>
-          {dish.description && (
-            <div className="text-sm text-muted-foreground line-clamp-1">
-              {dish.description}
-            </div>
-          )}
-          {dish.category && (
-            <div className="text-sm text-primary mt-1">
-              {dish.category.name}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </button>
-  )
-);
-DishCard.displayName = 'DishCard';
-
-interface AvailableDishesProps {
-  dishes: DishWithRelations[];
-  selectedDishIds: string[];
-  onSelect: (dish: DishWithRelations) => void;
-  onSearch: (query: string) => void;
-  isLoading?: boolean;
-}
-
 const DishCardSkeleton = () => (
   <Card>
     <CardContent className="p-4 space-y-2">
@@ -87,6 +46,14 @@ const DishCardSkeleton = () => (
     </CardContent>
   </Card>
 );
+
+interface AvailableDishesProps {
+  dishes: DishWithRelations[];
+  selectedDishIds: string[];
+  onSelect: (dish: DishWithRelations) => void;
+  onSearch: (query: string) => void;
+  isLoading?: boolean;
+}
 
 // Separate component for available dishes with its own search state
 const AvailableDishes = memo(
@@ -140,17 +107,18 @@ const AvailableDishes = memo(
     return (
       <div className="space-y-4">
         <SearchInput
-          placeholder="Search dishes by name, description, or category..."
+          placeholder="Search dishes..."
           value={searchQuery}
           onSearchChange={handleSearchChange}
+          className="w-full"
         />
         <Card>
-          <CardHeader>
-            <CardTitle>Available Dishes</CardTitle>
+          <CardHeader className="p-4">
+            <CardTitle className="text-lg">Available Dishes</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0">
             {isLoading ? (
-              <div className="grid gap-4 grid-cols-1">
+              <div className="grid gap-4">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <DishCardSkeleton key={i} />
                 ))}
@@ -159,7 +127,7 @@ const AvailableDishes = memo(
               <SelectorGrid
                 data={availableDishes}
                 renderCard={dish => (
-                  <DishCard
+                  <DishSelectorCard
                     key={dish.id}
                     dish={dish}
                     onClick={() => onSelect(structuredClone(dish))}
@@ -185,14 +153,16 @@ const SelectedDishes = memo(
     onDeselect: (id: string) => void;
   }) => (
     <Card>
-      <CardHeader>
-        <CardTitle>Selected Dishes ({dishes.length})</CardTitle>
+      <CardHeader className="p-4">
+        <CardTitle className="text-lg">
+          Selected Dishes ({dishes.length})
+        </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 pt-0">
         <SelectorGrid
           data={dishes}
           renderCard={dish => (
-            <DishCard
+            <DishSelectorCard
               key={dish.id}
               dish={dish}
               onClick={() => onDeselect(dish.id)}
@@ -217,7 +187,6 @@ export function DishSelector({
 }: DishSelectorProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  // Get just the IDs for filtering available dishes
   const selectedDishIds = useMemo(
     () => selectedDishes.map(dish => dish.id),
     [selectedDishes]
@@ -228,13 +197,15 @@ export function DishSelector({
   }, []);
 
   const handleDishCreated = useCallback(
-    (dish: DishWithRelations) => {
+    (dish: Dish) => {
       // Close dialog first
       setIsCreateDialogOpen(false);
 
       // Prepare dish with relations
       const dishWithRelations: DishWithRelations = {
         ...dish,
+        id: dish.id,
+        imageId: null,
         category: dish.category || null,
         _count: { parties: 0 },
       };
@@ -249,51 +220,36 @@ export function DishSelector({
   );
 
   return (
-    <>
-      <div className="space-y-6">
-        <Button onClick={handleCreateDialogOpen} className="gap-2">
-          <Plus className="h-4 w-4" />
-          New Dish
-        </Button>
+    <div className="space-y-4">
+      <Button
+        onClick={handleCreateDialogOpen}
+        className="w-full sm:w-auto gap-2"
+      >
+        <Plus className="h-4 w-4 shrink-0" />
+        <span>New Dish</span>
+      </Button>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <AvailableDishes
-            dishes={availableDishes}
-            selectedDishIds={selectedDishIds}
-            onSelect={onDishSelect}
-            onSearch={onSearch}
-            isLoading={isLoading}
-          />
-          <SelectedDishes dishes={selectedDishes} onDeselect={onDishDeselect} />
-        </div>
+      <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
+        <AvailableDishes
+          dishes={availableDishes}
+          selectedDishIds={selectedDishIds}
+          onSelect={onDishSelect}
+          onSearch={onSearch}
+          isLoading={isLoading}
+        />
+        <SelectedDishes dishes={selectedDishes} onDeselect={onDishDeselect} />
       </div>
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="w-[calc(100%-2rem)] sm:w-auto max-w-2xl h-[calc(100vh-2rem)] flex flex-col p-0">
+          <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle>Create New Dish</DialogTitle>
           </DialogHeader>
-          <DishForm
-            onSuccess={dish => {
-              // Close dialog first
-              setIsCreateDialogOpen(false);
-
-              // Prepare dish with relations
-              const dishWithRelations: DishWithRelations = {
-                ...dish,
-                category: dish.category || null,
-                _count: { parties: 0 },
-              };
-
-              // Call parent callbacks
-              if (onDishCreated) {
-                onDishCreated(dishWithRelations);
-              }
-              onDishSelect(dishWithRelations);
-            }}
-          />
+          <div className="flex-1 overflow-y-auto px-6 pb-6">
+            <DishForm onSuccess={handleDishCreated} />
+          </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }
