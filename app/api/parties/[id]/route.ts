@@ -165,7 +165,21 @@ export async function DELETE(
       where: { clerkId: userId },
     });
 
-    if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return new NextResponse('User not found', { status: 404 });
+    }
+
+    // Check if user is the party host or an admin
+    const party = await prisma.party.findUnique({
+      where: { id: params.id },
+      select: { createdById: true },
+    });
+
+    if (!party) {
+      return new NextResponse('Party not found', { status: 404 });
+    }
+
+    if (party.createdById !== user.id && user.role !== 'ADMIN') {
       return new NextResponse('Unauthorized', { status: 403 });
     }
 

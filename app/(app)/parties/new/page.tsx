@@ -15,11 +15,11 @@ export default async function NewPartyPage() {
 
   const user = await prisma.user.findUnique({
     where: { clerkId: userId },
-    select: { id: true, role: true },
+    select: { id: true },
   });
 
-  if (!user || user.role !== 'ADMIN') {
-    throw new Error('Unauthorized access');
+  if (!user) {
+    throw new Error('User not found');
   }
 
   return (
