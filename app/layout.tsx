@@ -1,10 +1,11 @@
 import type React from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Cairo } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/providers/ToastProvider';
+import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,6 +22,15 @@ const cairo = Cairo({
 export const metadata: Metadata = {
   title: 'Dishyy',
   description: 'Where Flavors Unite and Friendships Simmer',
+  applicationName: 'Dishyy',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Dishyy',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: [
       {
@@ -36,8 +46,12 @@ export const metadata: Metadata = {
     ],
     apple: [
       {
-        url: '/favicon.svg',
-        href: '/favicon.svg',
+        url: '/icon-192.png',
+        sizes: '192x192',
+      },
+      {
+        url: '/icon-512.png',
+        sizes: '512x512',
       },
     ],
     shortcut: '/favicon.svg',
@@ -66,10 +80,13 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
   themeColor: '#ffffff',
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -82,6 +99,14 @@ export default function RootLayout({
       <html lang="en" className={`${inter.variable} ${cairo.variable}`}>
         <head>
           <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+          <meta name="mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="default"
+          />
+          <meta name="apple-mobile-web-app-title" content="Dishyy" />
+          <meta name="application-name" content="Dishyy" />
         </head>
         <body className={inter.className}>
           <ThemeProvider
@@ -91,6 +116,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <InstallPrompt />
             <ToastProvider />
           </ThemeProvider>
         </body>
