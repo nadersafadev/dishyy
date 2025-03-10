@@ -25,8 +25,30 @@ export const metadata: Metadata = {
   applicationName: 'Dishyy',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Dishyy',
+    startupImage: [
+      {
+        url: '/splash-640x1136-light.png',
+        media:
+          '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)',
+      },
+      {
+        url: '/splash-828x1792-light.png',
+        media:
+          '(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)',
+      },
+      {
+        url: '/splash-light.png',
+        media:
+          '(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)',
+      },
+      {
+        url: '/splash-1290x2796-light.png',
+        media:
+          '(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)',
+      },
+    ],
   },
   formatDetection: {
     telephone: false,
@@ -46,12 +68,8 @@ export const metadata: Metadata = {
     ],
     apple: [
       {
-        url: '/icon-192.png',
-        sizes: '192x192',
-      },
-      {
-        url: '/icon-512.png',
-        sizes: '512x512',
+        url: '/apple-touch-icon-180x180.png',
+        sizes: '180x180',
       },
     ],
     shortcut: '/favicon.svg',
@@ -85,7 +103,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: '#ffffff',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
   viewportFit: 'cover',
 };
 
@@ -103,10 +124,50 @@ export default function RootLayout({
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta
             name="apple-mobile-web-app-status-bar-style"
-            content="default"
+            content="black-translucent"
           />
           <meta name="apple-mobile-web-app-title" content="Dishyy" />
           <meta name="application-name" content="Dishyy" />
+          <link
+            rel="apple-touch-startup-image"
+            media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: light)"
+            href="/splash-1290x2796-light.png"
+          />
+          <link
+            rel="apple-touch-startup-image"
+            media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: dark)"
+            href="/splash-1290x2796-dark.png"
+          />
+          <link
+            rel="apple-touch-startup-image"
+            media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: light)"
+            href="/splash-light.png"
+          />
+          <link
+            rel="apple-touch-startup-image"
+            media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (prefers-color-scheme: dark)"
+            href="/splash-dark.png"
+          />
+          <link
+            rel="apple-touch-startup-image"
+            media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (prefers-color-scheme: light)"
+            href="/splash-828x1792-light.png"
+          />
+          <link
+            rel="apple-touch-startup-image"
+            media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (prefers-color-scheme: dark)"
+            href="/splash-828x1792-dark.png"
+          />
+          <link
+            rel="apple-touch-startup-image"
+            media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (prefers-color-scheme: light)"
+            href="/splash-640x1136-light.png"
+          />
+          <link
+            rel="apple-touch-startup-image"
+            media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (prefers-color-scheme: dark)"
+            href="/splash-640x1136-dark.png"
+          />
         </head>
         <body className={inter.className}>
           <ThemeProvider

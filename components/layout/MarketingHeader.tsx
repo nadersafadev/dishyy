@@ -4,9 +4,9 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Menu, X, LayoutDashboard } from 'lucide-react';
+import { Menu, X, LayoutDashboard, LogOut } from 'lucide-react';
 import Image from 'next/image';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, useClerk } from '@clerk/nextjs';
 
 const marketingLinks = [
   { href: '/', label: 'Home' },
@@ -21,6 +21,7 @@ export function MarketingHeader() {
   const pathname = usePathname();
   const isHomePage = pathname === '/';
   const { isSignedIn } = useAuth();
+  const { signOut } = useClerk();
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
@@ -61,6 +62,10 @@ export function MarketingHeader() {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const handleSignOut = () => {
+    signOut();
   };
 
   return (
@@ -134,20 +139,35 @@ export function MarketingHeader() {
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-4">
               {isSignedIn ? (
-                <Link href="/dashboard">
+                <>
+                  <Link href="/dashboard">
+                    <Button
+                      variant={isTransparent ? 'outline' : 'ghost'}
+                      size="sm"
+                      className={`gap-2 ${
+                        isTransparent
+                          ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
+                          : ''
+                      }`}
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Go to Dashboard
+                    </Button>
+                  </Link>
                   <Button
                     variant={isTransparent ? 'outline' : 'ghost'}
                     size="sm"
-                    className={`gap-2 ${
+                    onClick={handleSignOut}
+                    className={`gap-2 text-destructive hover:text-destructive ${
                       isTransparent
-                        ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
+                        ? 'border-white/20 bg-white/10 hover:bg-white/20 hover:border-white/30'
                         : ''
                     }`}
                   >
-                    <LayoutDashboard className="h-4 w-4" />
-                    Go to Dashboard
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
                   </Button>
-                </Link>
+                </>
               ) : (
                 <>
                   <Link href="/sign-in">
@@ -233,20 +253,35 @@ export function MarketingHeader() {
               ))}
               <div className="border-t mt-4 pt-4 px-6 space-y-3">
                 {isSignedIn ? (
-                  <Link href="/dashboard" className="block">
+                  <>
+                    <Link href="/dashboard" className="block">
+                      <Button
+                        variant={isTransparent ? 'outline' : 'ghost'}
+                        size="sm"
+                        className={`w-full gap-2 ${
+                          isTransparent
+                            ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
+                            : ''
+                        }`}
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        Go to Dashboard
+                      </Button>
+                    </Link>
                     <Button
                       variant={isTransparent ? 'outline' : 'ghost'}
                       size="sm"
-                      className={`w-full gap-2 ${
+                      onClick={handleSignOut}
+                      className={`w-full gap-2 text-destructive hover:text-destructive ${
                         isTransparent
-                          ? 'border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30'
+                          ? 'border-white/20 bg-white/10 hover:bg-white/20 hover:border-white/30'
                           : ''
                       }`}
                     >
-                      <LayoutDashboard className="h-4 w-4" />
-                      Go to Dashboard
+                      <LogOut className="h-4 w-4" />
+                      Sign Out
                     </Button>
-                  </Link>
+                  </>
                 ) : (
                   <>
                     <Link href="/sign-in" className="block">

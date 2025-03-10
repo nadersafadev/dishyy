@@ -1,6 +1,6 @@
 'use client';
 
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, useClerk } from '@clerk/nextjs';
 import Link from 'next/link';
 import { Logo } from '@/components/ui/logo';
 import * as Icons from 'lucide-react';
@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { NavItem } from './NavItem';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { LucideIcon, LucideProps } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 interface HeaderClientProps {
   userId: string | null;
@@ -35,9 +36,14 @@ export function HeaderClient({
   isAdmin,
   filteredNavItems,
 }: HeaderClientProps) {
+  const { signOut } = useClerk();
   const getIcon = (iconName: string): LucideIcon => {
     const icon = Icons[iconName as keyof typeof Icons];
     return icon as LucideIcon;
+  };
+
+  const handleSignOut = () => {
+    signOut();
   };
 
   return (
@@ -118,6 +124,18 @@ export function HeaderClient({
                       </SheetClose>
                     ))}
                   </nav>
+
+                  {/* Sign Out Button */}
+                  <div className="mt-auto pt-6 border-t border-border/40">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign Out
+                    </Button>
+                  </div>
                 </SheetContent>
               </Sheet>
             </div>
@@ -130,6 +148,10 @@ export function HeaderClient({
               appearance={{
                 elements: {
                   avatarBox: 'w-8 h-8 hover:opacity-80 transition-opacity',
+                  userButtonPopoverCard: 'shadow-lg border border-border/40',
+                  userButtonPopoverActions: 'p-2',
+                  userButtonPopoverActionButton: 'text-sm',
+                  userButtonPopoverFooter: 'hidden',
                 },
               }}
             />

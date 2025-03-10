@@ -49,7 +49,7 @@ export default function AuthenticatedHome({
       </div>
 
       {/* Content */}
-      <div className="container relative z-10 py-10 flex items-center justify-center">
+      <div className="container relative z-10 py-10 mt-16 flex items-center justify-center">
         <div className="w-full max-w-3xl">
           <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm shadow-xl overflow-hidden ring-1 ring-white/10 ring-inset">
             {/* Top gradient accent */}
