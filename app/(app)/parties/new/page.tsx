@@ -23,7 +23,7 @@ export default async function NewPartyPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="container mx-auto space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">New Party</h1>
         <p className="text-muted-foreground">

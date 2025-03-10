@@ -5,55 +5,54 @@ import { syncUserRole } from '@/lib/roles';
 import { clerkClient } from '@clerk/clerk-sdk-node';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { PlusIcon } from 'lucide-react';
+import { PlusIcon, ArrowRight } from 'lucide-react';
 import { PartyListWithViewToggle } from '@/components/party-list-with-view-toggle';
 import { DishListWithViewToggle } from '@/components/DishListWithViewToggle';
+import { Prisma } from '@prisma/client';
 
-export default async function Dashboard() {
-  const { userId } = await auth();
+// Type for our data fetching function
+type DashboardData = {
+  parties: Prisma.PartyGetPayload<{
+    include: {
+      createdBy: true;
+      dishes: {
+        include: {
+          dish: {
+            select: {
+              name: true;
+              unit: true;
+            };
+          };
+        };
+      };
+      participants: {
+        include: {
+          user: true;
+        };
+      };
+    };
+  }>[];
+  dishes:
+    | Prisma.DishGetPayload<{
+        include: {
+          _count: {
+            select: {
+              parties: true;
+            };
+          };
+        };
+      }>[]
+    | null;
+};
 
-  if (!userId) {
-    throw new Error('User ID not found');
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { clerkId: userId },
-    select: { id: true, role: true },
-  });
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  // Get Clerk user details for debugging
-  const clerkUser = await clerkClient.users.getUser(userId);
-  console.log('Clerk User:', {
-    id: clerkUser.id,
-    firstName: clerkUser.firstName,
-    lastName: clerkUser.lastName,
-    email: clerkUser.emailAddresses[0].emailAddress,
-  });
-
-  // Check existing database user
-  const existingUser = await prisma.user.findUnique({
-    where: { clerkId: userId },
-  });
-  console.log('Existing DB User:', existingUser);
-
-  // Sync user role and get user data
-  const userData = await syncUserRole();
-  if (!userData) {
-    throw new Error('Failed to sync user role');
-  }
-  console.log('Synced User:', userData);
-
-  // Determine if user is new based on creation date
-  // Consider a user "new" if they were created in the last 24 hours
-  const isNewUser =
-    Date.now() - new Date(userData.createdAt).getTime() < 24 * 60 * 60 * 1000;
-
+// Separate data fetching logic to avoid duplication
+async function fetchDashboardData(isAdmin: boolean): Promise<DashboardData> {
   const [parties, dishes] = await Promise.all([
     prisma.party.findMany({
+      take: 5, // Limit to 5 parties
+      orderBy: {
+        createdAt: 'desc', // Show most recent first
+      },
       include: {
         createdBy: true,
         dishes: {
@@ -73,8 +72,9 @@ export default async function Dashboard() {
         },
       },
     }),
-    userData.role === 'ADMIN'
+    isAdmin
       ? prisma.dish.findMany({
+          take: 9, // Limit to 9 dishes
           orderBy: {
             name: 'asc',
           },
@@ -89,174 +89,172 @@ export default async function Dashboard() {
       : null,
   ]);
 
-  const isAdmin = userData.role === 'ADMIN';
+  return { parties, dishes };
+}
 
+export default async function Dashboard() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect('/sign-in');
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      select: { id: true, role: true },
+    });
+
+    // Handle new user flow
+    if (!user) {
+      // Get Clerk user details for debugging
+      const clerkUser = await clerkClient.users.getUser(userId);
+      console.log('New user detected:', {
+        id: clerkUser.id,
+        firstName: clerkUser.firstName,
+        lastName: clerkUser.lastName,
+        email: clerkUser.emailAddresses[0].emailAddress,
+      });
+
+      // Sync user role and get user data
+      const userData = await syncUserRole();
+      if (!userData || !userData.role) {
+        console.error('Failed to sync user role or invalid user data');
+        redirect('/error?message=Failed to setup user account');
+      }
+
+      // Determine if user is new based on creation date
+      const isNewUser =
+        Date.now() - new Date(userData.createdAt).getTime() <
+        24 * 60 * 60 * 1000;
+
+      // Fetch dashboard data
+      const { parties, dishes } = await fetchDashboardData(
+        userData.role === 'ADMIN'
+      );
+
+      return (
+        <DashboardView
+          isNewUser={isNewUser}
+          isAdmin={userData.role === 'ADMIN'}
+          parties={parties}
+          dishes={dishes}
+        />
+      );
+    }
+
+    // Regular user flow
+    const { parties, dishes } = await fetchDashboardData(user.role === 'ADMIN');
+
+    return (
+      <DashboardView
+        isNewUser={false}
+        isAdmin={user.role === 'ADMIN'}
+        parties={parties}
+        dishes={dishes}
+      />
+    );
+  } catch (error) {
+    console.error('Dashboard error:', error);
+
+    // Handle specific error types
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // Database connection issues
+      redirect('/error?message=Database connection error');
+    } else if (error instanceof Prisma.PrismaClientValidationError) {
+      // Invalid data shape
+      redirect('/error?message=Invalid data format');
+    } else if (error instanceof Error) {
+      // Other known errors
+      redirect(`/error?message=${encodeURIComponent(error.message)}`);
+    }
+
+    // Unknown errors
+    redirect('/error?message=Failed to load dashboard');
+  }
+}
+
+// Separate view component to reduce duplication
+function DashboardView({
+  isNewUser,
+  isAdmin,
+  parties,
+  dishes,
+}: {
+  isNewUser: boolean;
+  isAdmin: boolean;
+  parties: DashboardData['parties'];
+  dishes: DashboardData['dishes'];
+}) {
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {isNewUser
-              ? `Welcome to Dishyy, ${userData.name}!`
-              : `Welcome back, ${userData.name}!`}
-          </h1>
-          <p className="text-muted-foreground">
-            {isNewUser
-              ? "Let's get started with creating or joining dish parties."
-              : 'Manage your dish parties and discover new culinary adventures.'}
-          </p>
+    <div className="container mx-auto py-8 space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          {isNewUser && (
+            <p className="text-muted-foreground mt-2">
+              Welcome! This is your dashboard where you can manage your parties
+              and dishes.
+            </p>
+          )}
         </div>
-        {isAdmin && (
-          <div className="flex flex-col sm:flex-row gap-4 self-start sm:self-auto">
+        <div className="flex items-center gap-4">
+          <Button asChild>
             <Link href="/parties/new">
-              <Button className="gap-2 w-full sm:w-auto">
-                <PlusIcon className="h-4 w-4" />
-                Create Party
-              </Button>
+              <PlusIcon className="w-4 h-4 mr-2" />
+              New Party
             </Link>
-            <Link href="/dishes/new">
-              <Button variant="outline" className="gap-2 w-full sm:w-auto">
-                <PlusIcon className="h-4 w-4" />
-                Add Dish
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-8">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Recent Parties</h2>
+              <p className="text-sm text-muted-foreground">
+                Your most recently created or joined parties
+              </p>
+            </div>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/parties" className="flex items-center gap-2">
+                Show All
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+          </div>
+          <PartyListWithViewToggle
+            parties={parties}
+            title="Available Dish Parties"
+            description="Join or view upcoming dish parties in your area."
+          />
+        </div>
+
+        {isAdmin && dishes && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold">Popular Dishes</h2>
+                <p className="text-sm text-muted-foreground">
+                  Most frequently used dishes in parties
+                </p>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/dishes" className="flex items-center gap-2">
+                  Show All
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </Button>
-            </Link>
+            </div>
+            <DishListWithViewToggle
+              dishes={dishes}
+              title="Available Dishes"
+              description="Manage and organize dishes for your parties."
+            />
           </div>
         )}
       </div>
-
-      {/* First Time User Guide - Only shown to new users */}
-      {isNewUser && (
-        <section className="card p-6 space-y-6 bg-primary-50/20 dark:bg-primary-950/20 border border-primary-200 dark:border-primary-800 rounded-lg">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-medium">
-              🎉 Getting Started with Dishyy
-            </h2>
-            {/* Dismissible button would go here (requires client component) */}
-          </div>
-
-          <div className="space-y-5">
-            {/* Step 1: Explore the platform */}
-            <div className="border border-primary-200 dark:border-primary-800 rounded-lg p-4 bg-white dark:bg-slate-900">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                  1
-                </div>
-                <div className="space-y-2 flex-1">
-                  <h3 className="font-medium">Explore Available Parties</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Browse through parties happening in your area and see what
-                    dishes others are contributing.
-                  </p>
-                  <Link href="#parties-section">
-                    <Button variant="secondary" size="sm" className="mt-2">
-                      Browse Parties
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Step 2: Join a party */}
-            <div className="border border-primary-200 dark:border-primary-800 rounded-lg p-4 bg-white dark:bg-slate-900">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                  2
-                </div>
-                <div className="space-y-2 flex-1">
-                  <h3 className="font-medium">Join Your First Party</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Find a party that interests you and join by selecting dishes
-                    you'd like to contribute.
-                  </p>
-                  {parties.length > 0 ? (
-                    <Link href={`/parties/${parties[0].id}`}>
-                      <Button variant="secondary" size="sm" className="mt-2">
-                        View First Party
-                      </Button>
-                    </Link>
-                  ) : (
-                    <p className="text-xs italic mt-2">
-                      No parties available yet. Check back soon!
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Step 3: Create a party (Admin only) */}
-            {isAdmin && (
-              <div className="border border-primary-200 dark:border-primary-800 rounded-lg p-4 bg-white dark:bg-slate-900">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                    3
-                  </div>
-                  <div className="space-y-2 flex-1">
-                    <h3 className="font-medium">Create Your Own Party</h3>
-                    <p className="text-sm text-muted-foreground">
-                      As an admin, you can create new dish parties and invite
-                      others to join.
-                    </p>
-                    <Link href="/parties/new">
-                      <Button className="mt-2 gap-2" size="sm">
-                        <PlusIcon className="h-3 w-3" />
-                        Create New Party
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3/4: Complete your profile */}
-            <div className="border border-primary-200 dark:border-primary-800 rounded-lg p-4 bg-white dark:bg-slate-900">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                  {isAdmin ? '4' : '3'}
-                </div>
-                <div className="space-y-2 flex-1">
-                  <h3 className="font-medium">Complete Your Profile</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Add more details to your profile to help others connect with
-                    you at dish parties.
-                  </p>
-                  <Link href="/profile">
-                    <Button variant="outline" size="sm" className="mt-2">
-                      View Profile
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end mt-2">
-            <p className="text-xs text-muted-foreground italic">
-              This guide will disappear after 24 hours.
-            </p>
-          </div>
-        </section>
-      )}
-
-      {/* Parties Section */}
-      <section id="parties-section" className="card p-6 space-y-4">
-        <PartyListWithViewToggle
-          parties={parties}
-          title="Available Dish Parties"
-          description="Join or view upcoming dish parties in your area."
-        />
-      </section>
-
-      {/* Dishes Section - Admin Only */}
-      {isAdmin && dishes && (
-        <section className="card p-6 space-y-4">
-          <DishListWithViewToggle
-            dishes={dishes}
-            title="Available Dishes"
-            description="Manage and organize dishes for your parties."
-          />
-        </section>
-      )}
     </div>
   );
 }
